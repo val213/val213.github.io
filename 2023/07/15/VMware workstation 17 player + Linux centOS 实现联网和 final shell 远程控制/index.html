@@ -190,7 +190,7 @@
 <h4 id="NAT模式"><a href="#NAT模式" class="headerlink" title="NAT模式"></a>NAT模式</h4><p>NAT模式借助虚拟NAT设备和虚拟DHCP服务器，使得虚拟机可以联网。<br><img src="https://pic1.zhimg.com/80/v2-44c9bfa71f5e83cb35d176d118c5336c_1440w.webp"></p>
 <h4 id="Host-Only模式"><a href="#Host-Only模式" class="headerlink" title="Host-Only模式"></a>Host-Only模式</h4><p>Host-Only模式其实就是NAT模式去除了虚拟NAT设备，然后使用VMware Network Adapter VMnet1虚拟网卡连接VMnet1虚拟交换机来与虚拟机通信的，Host-Only模式将虚拟机与外网隔开，使得虚拟机成为一个独立的系统，只与主机相互通讯。<br><img src="https://pic3.zhimg.com/80/v2-0f955bae382c5c1e666651f4b8ac8dc6_1440w.webp"></p>
 <h4 id="补充：DHCP是什么？"><a href="#补充：DHCP是什么？" class="headerlink" title="补充：DHCP是什么？"></a>补充：DHCP是什么？</h4><ol>
-<li><p>概念<br>DHCP是一种基于客户&#x2F;服务器模式的服务协议，位于应用层，使用UDP协议工作，是一个应用于局域网的网络协议，该协议允许服务器向客户端动态分配IP地址和配置信息。<br>DHCP的服务端口号为68，客户端口号为67</p>
+<li><p>概念<br>DHCP是一种基于客户/服务器模式的服务协议，位于应用层，使用UDP协议工作，是一个应用于局域网的网络协议，该协议允许服务器向客户端动态分配IP地址和配置信息。<br>DHCP的服务端口号为68，客户端口号为67</p>
 </li>
 <li><p>作用<br>如果有很多台电脑都需要配置一个网络环境，那么每台电脑都需要手动去完成上述配置。而DHCP服务器主要的作用，就是自动地将网络参数正确的分配给网络中的每台计算机，让客户端可以在开机时就自动分配好网络的参数值。</p>
 </li>
