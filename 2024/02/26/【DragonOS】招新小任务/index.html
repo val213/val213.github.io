@@ -1,0 +1,415 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DragonOS招新面试小任务 | Val-Blog</title><meta name="author" content="Val,10425999@qq.com, val213666@gmail.com"><meta name="copyright" content="Val"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="DragonOSrust入门与开发环境推荐rust入门的教程仓库 https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;rustlings 开发环境推荐用 vscode + rust-analyzer 插件+ CodeLLDB 插件 rustlingsquiz2The difference between the two snippets lies in how they iterate ov">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DragonOS招新面试小任务">
+<meta property="og:url" content="https://val213.github.io/2024/02/26/%E3%80%90DragonOS%E3%80%91%E6%8B%9B%E6%96%B0%E5%B0%8F%E4%BB%BB%E5%8A%A1/index.html">
+<meta property="og:site_name" content="Val-Blog">
+<meta property="og:description" content="DragonOSrust入门与开发环境推荐rust入门的教程仓库 https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;rustlings 开发环境推荐用 vscode + rust-analyzer 插件+ CodeLLDB 插件 rustlingsquiz2The difference between the two snippets lies in how they iterate ov">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2024-02-26T15:32:44.571Z">
+<meta property="article:modified_time" content="2024-04-23T04:30:54.760Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="DragonOS">
+<meta property="article:tag" content="Rust">
+<meta property="article:tag" content="文件系统">
+<meta property="article:tag" content="内核">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://val213.github.io/2024/02/26/%E3%80%90DragonOS%E3%80%91%E6%8B%9B%E6%96%B0%E5%B0%8F%E4%BB%BB%E5%8A%A1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: Val","link":"Link: ","source":"Source: Val-Blog","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DragonOS招新面试小任务',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-23 12:30:54'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (false) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://github.com/val213/image/blob/main/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230630230143.jpg?raw=true" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">85</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">70</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Val-Blog"><span class="site-name">Val-Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">DragonOS招新面试小任务</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2024-02-26T15:32:44.571Z" title="Created 2024-02-26 23:32:44">2024-02-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-04-23T04:30:54.760Z" title="Updated 2024-04-23 12:30:54">2024-04-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DragonOS/">DragonOS</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DragonOS招新面试小任务"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="DragonOS"><a href="#DragonOS" class="headerlink" title="DragonOS"></a>DragonOS</h1><h2 id="rust入门与开发环境推荐"><a href="#rust入门与开发环境推荐" class="headerlink" title="rust入门与开发环境推荐"></a>rust入门与开发环境推荐</h2><p>rust入门的教程仓库 <a target="_blank" rel="noopener" href="https://github.com/rust-lang/rustlings">https://github.com/rust-lang/rustlings</a></p>
+<p>开发环境推荐用 <code>vscode</code> + <code>rust-analyzer</code> 插件+ <code>CodeLLDB</code> 插件</p>
+<h3 id="rustlings"><a href="#rustlings" class="headerlink" title="rustlings"></a>rustlings</h3><h4 id="quiz2"><a href="#quiz2" class="headerlink" title="quiz2"></a>quiz2</h4><p>The difference between the two snippets lies in how they iterate over <code>input</code>.</p>
+<p>In the first snippet, <code>input.iter()</code> is used. This method returns an iterator that borrows each element from <code>input</code>. This means that the <code>string</code> and <code>command</code> variables in the loop are references to the elements in <code>input</code>. This is why you see <code>*n</code> in the <code>Command::Append(n)</code> match arm - it’s dereferencing <code>n</code> to get the actual value. Also, because <code>string</code> is a reference, methods that consume the string (like <code>to_owned()</code>) or return a new owned string (like <code>to_uppercase()</code>) can be used without issues.</p>
+<p>In the second snippet, <code>input</code> is used directly in the <code>for</code> loop. This means that <code>input</code> is being moved into the loop, and <code>string</code> and <code>command</code> are the actual values from <code>input</code>, not references. This is why you don’t see <code>*n</code> in the <code>Command::Append(n)</code> match arm - <code>n</code> is already the actual value. However, because <code>string</code> is not a reference, you would run into issues if you tried to use methods that borrow the string, unless you clone or copy the string first.</p>
+<h4 id="error2"><a href="#error2" class="headerlink" title="error2"></a>error2</h4><p>In the <code>total_cost</code> function, <code>e</code> is a variable that holds the error returned by the <code>parse</code> method when it fails to convert <code>item_quantity</code> into an <code>i32</code>. The <code>parse</code> method returns a <code>Result</code> type, which can be either <code>Ok</code> if the parsing is successful, or <code>Err</code> if it fails. In the case of an error, the <code>Err</code> variant will contain a <code>ParseIntError</code> object, which is captured in the <code>e</code> variable.</p>
+<p>The <code>match</code> statement is used to handle both the <code>Ok</code> and <code>Err</code> cases. If <code>parse</code> is successful, the <code>Ok</code> branch multiplies the quantity by the cost per item and adds the processing fee, then wraps the total cost in an <code>Ok</code> variant. If <code>parse</code> fails, the <code>Err</code> branch simply passes the error along by wrapping it in an <code>Err</code> variant.</p>
+<p>The test <code>item_quantity_is_an_invalid_number</code> is checking the error handling of the <code>total_cost</code> function. It calls <code>total_cost</code> with an invalid string “beep boop”, which cannot be parsed into an <code>i32</code>. This causes <code>parse</code> to return an error, which is then returned by <code>total_cost</code>.</p>
+<p>The <code>unwrap_err</code> method is called on the result of <code>total_cost</code>, which returns the contained <code>ParseIntError</code> if the result is <code>Err</code>, or panics if the result is <code>Ok</code>. The <code>to_string</code> method is then called on the error to convert it into a string.</p>
+<p>The test asserts that the string representation of the error is “invalid digit found in string”, which is the error message associated with a <code>ParseIntError</code> when the string contains invalid digits. Since “beep boop” indeed contains invalid digits, the error message is as expected, and the test passes.</p>
+<h4 id="amp-，-，ref"><a href="#amp-，-，ref" class="headerlink" title="&amp;，*，ref"></a>&amp;，*，ref</h4><p>In Rust, <code>&amp;</code>, <code>*</code>, and <code>ref</code> are used in different contexts related to references and dereferencing.</p>
+<ol>
+<li><p><code>&amp;</code>: This is used to <strong>create a reference to a value</strong>. For example, <code>&amp;x</code> creates a reference to <code>x</code>. <strong>This means you can access <code>x</code> without taking ownership of it.</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">x</span> = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">let</span> <span class="variable">y</span> = &amp;x; <span class="comment">// y is a reference to x</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>*</code>: This is used to <strong>dereference a reference</strong>, i.e., get the value that the reference points to. For example, if <code>y</code> is a reference to <code>x</code>, then <code>*y</code> gives you <code>x</code>.</p>
+</li>
+</ol>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">x</span> = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">let</span> <span class="variable">y</span> = &amp;x; <span class="comment">// y is a reference to x</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">z</span> = *y; <span class="comment">// z is now 10, the value that y points to</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><code>ref</code>: This is used in <strong>pattern matching</strong> to <strong>create a reference to a value</strong>. For example, in a match expression, you might want to create a reference to the value you’re matching on, rather than moving the value.</li>
+</ol>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="variable">x</span> = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">match</span> x &#123;</span><br><span class="line">    <span class="keyword">ref</span> y =&gt; <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, y), <span class="comment">// y is a reference to x</span></span><br><span class="line">    _ =&gt; (),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>In this case, <code>ref</code> allows you to <strong>create a reference within the pattern itself</strong>. This is useful when the pattern includes destructuring.</p>
+<h3 id=""><a href="#" class="headerlink" title="_"></a>_</h3><p>The underscore <code>_</code> in Rust is used as a <strong>placeholder</strong> for a value that you don’t need or care about. It can be used in various contexts to indicate that a value is being ignored or not used.</p>
+<h3 id="‘static-生命周期"><a href="#‘static-生命周期" class="headerlink" title="‘static 生命周期"></a>‘static 生命周期</h3><p><code>&#39;static</code> 生命周期是 Rust 中的一种特殊生命周期，表示一个值在整个程序的生命周期内都有效。具体来说，<code>&#39;static</code> 生命周期是一个特殊的生命周期标识符，用于表示一个值的生命周期可以持续到程序的整个运行期间。这意味着这个值在程序启动时创建，直到程序结束时才被销毁。</p>
+<h3 id="dyn-关键字"><a href="#dyn-关键字" class="headerlink" title="dyn 关键字"></a>dyn 关键字</h3><p><code>dyn</code> 关键字用于指定动态分发的类型。在 Rust 中，<code>dyn</code> 关键字通常与 trait 对象一起使用，用于指定 trait 对象的类型。具体来说，<code>dyn</code> 关键字用于标识 trait 对象的类型，表示该类型是动态分发的，即在运行时才确定具体的类型。在 Rust 中，trait 对象是一种允许在运行时处理不同类型的对象的机制。通过 trait 对象，可以将不同类型的对象存储在相同的数据结构中，并在运行时根据具体类型来调用相应的方法。使用 <code>dyn</code> 关键字可以明确指定 trait 对象的类型，以便进行动态分发。</p>
+<h3 id="Option-和-Result"><a href="#Option-和-Result" class="headerlink" title="Option 和 Result"></a>Option 和 Result</h3><p><code>Option</code> 和 <code>Result</code> 是 Rust 中的两种常用枚举类型，用于处理可能为空或可能出错的情况。具体来说，<code>Option</code> 用于表示可能为空的值，有两个变体：<code>Some</code>（包含值）和 <code>None</code>（空值）。<code>Result</code> 用于表示可能出错的操作，有两个变体：<code>Ok</code>（成功）和 <code>Err</code>（错误）。在 Rust 中，<code>Option</code> 和 <code>Result</code> 是用于处理可选值和错误处理的标准方式。通过 <code>Option</code> 和 <code>Result</code>，可以更安全和可靠地处理可能为空或可能出错的情况，避免了空指针和未处理异常等问题。</p>
+<h3 id="Arc-和-Mutex"><a href="#Arc-和-Mutex" class="headerlink" title="Arc 和 Mutex"></a>Arc 和 Mutex</h3><p><code>Arc</code> 和 <code>Mutex</code> 是 Rust 中用于多线程编程的两种常用类型。<code>Arc</code> 是原子引用计数类型，用于在多线程环境中共享数据。<code>Mutex</code> 是互斥锁类型，用于保护共享数据的访问。在 Rust 中，<code>Arc</code> 和 <code>Mutex</code> 通常结合使用，以确保多线程环境下对共享数据的安全访问。具体来说，<code>Arc</code> 允许多个线程共享对同一份数据的引用，而 <code>Mutex</code> 用于在多线程环境中保护共享数据的访问，确保同一时间只有一个线程可以访问数据。通过 <code>Arc</code> 和 <code>Mutex</code>，可以实现多线程环境下的数据共享和访问控制，确保程序的正确性和可靠性。</p>
+<h3 id="Rust中的生命周期"><a href="#Rust中的生命周期" class="headerlink" title="Rust中的生命周期"></a>Rust中的生命周期</h3><p>在 Rust 中，生命周期是一种用于描述引用的有效范围的机制。具体来说，生命周期用于指定引用的作用域，即引用在何时创建和何时销毁。在 Rust 中，生命周期通常用单引号（’）加上标识符来表示，如 ‘a。生命周期可以应用于函数参数、返回值、结构体字段等地方，用于指定引用的有效范围。通过生命周期，可以确保引用在其有效范围内是有效的，避免悬垂引用和内存安全问题。Rust 的生命周期系统是一种静态检查机制，可以在编译时检查引用的有效性，确保程序的正确性和安全性。</p>
+<h3 id="Rust中的trait"><a href="#Rust中的trait" class="headerlink" title="Rust中的trait"></a>Rust中的trait</h3><p>在 Rust 中，trait 是一种用于定义共享行为的机制。trait 允许你抽象地定义某种类型的行为，而不关心具体类型是什么。类似于其他语言中的接口（interface）或抽象类（abstract class），trait 提供了一种将方法签名组合在一起的方式，以在不同类型上共享这些行为。trait 提供了一种在 Rust 中实现多态和代码重用的强大机制。通过使用 trait，可以在不破坏类型安全性的情况下，为不同类型引入共享的行为和规范。</p>
+<h3 id="Rust中的模块系统"><a href="#Rust中的模块系统" class="headerlink" title="Rust中的模块系统"></a>Rust中的模块系统</h3><p>在 Rust 中，模块系统是一种用于组织代码的机制。模块系统允许将代码分割成多个逻辑单元，以便更好地组织和管理代码。具体来说，Rust 的模块系统包括如下几个方面：</p>
+<ul>
+<li>包（package）：一个用于构建、测试并分享单元包的 Cargo 功能。</li>
+<li>单元包（crate）：一个用于生成库或可执行文件的树形模块结构。</li>
+<li>模块（module）：用于控制文件结构、作用域及路径的私有性。</li>
+<li>路径（path）：一种用于命名条目的方法，这些条目包括结构体、函数和模块等。</li>
+<li>在 Rust 中，模块系统提供了一种灵活的方式来组织代码，使得代码更易于维护和扩展。通过模块系统，可以将代码分割成多个逻辑单元，提高代码的可读性和可维护性。</li>
+</ul>
+<h2 id="原实现的代码理解"><a href="#原实现的代码理解" class="headerlink" title="原实现的代码理解"></a>原实现的代码理解</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yangxinrui/p/15924361.html">https://www.cnblogs.com/yangxinrui/p/15924361.html</a></p>
+<h3 id="ramfs模块组成"><a href="#ramfs模块组成" class="headerlink" title="ramfs模块组成"></a>ramfs模块组成</h3><p>当理解一个文件系统模块时，首先要明确文件系统的基本概念，特别是inode、文件、目录等。以下是对 ramfs 模块中每个函数实现的简要说明：</p>
+<ul>
+<li><p>LockedRamFSInode 结构体<br><code>LockedRamFSInode</code> 是对 <code>RamFSInode</code> 的加锁封装，通过 <code>SpinLock</code> 实现了对 <code>RamFSInode</code> 的线程安全访问。</p>
+</li>
+<li><p>RamFS 结构体<br><code>RamFS</code> 结构体代表整个内存文件系统，其中包含一个指向<code>根 Inode</code> 的强引用。</p>
+</li>
+<li><p>RamFSInode 结构体<br><code>RamFSInode</code> 结构体表示内存文件系统中的 <code>Inode</code>，即文件或目录。以下是它的主要字段：</p>
+<ul>
+<li>parent: 指向父 Inode 的弱引用。</li>
+<li>self_ref: 指向自身的弱引用。</li>
+<li>children: 存储子 Inode 的 B 树，模拟目录结构。</li>
+<li>data: 存储文件内容的字节向量。</li>
+<li>metadata: 存储 Inode 的元数据，包括权限、文件类型、大小等信息。</li>
+<li>fs: 指向文件系统对象的弱引用。</li>
+<li>special_node: 存储特殊节点的信息，如管道。</li>
+</ul>
+</li>
+<li>RamFS 实现的 FileSystem trait<ul>
+<li>root_inode: 返回文件系统的根 Inode。</li>
+<li>info: 返回文件系统信息，包括块设备 ID 和最大文件名长度。</li>
+<li>as_any_ref: 用于实现动态转换，简单地返回 self。</li>
+</ul>
+</li>
+<li>RamFS 实现的 IndexNode trait<br>以下是 <code>IndexNode trait</code> 中的一些关键方法：<ul>
+<li>truncate: 截断文件内容至指定长度。</li>
+<li>close: 关闭文件。</li>
+<li>open: 打开文件。</li>
+<li>read_at: 从指定偏移处读取数据。</li>
+<li>write_at: 在指定偏移处写入数据。</li>
+<li>fs: 返回文件系统对象。</li>
+<li>as_any_ref: 返回 self 的动态引用。</li>
+<li>metadata: 返回 Inode 的元数据。</li>
+<li>set_metadata: 设置 Inode 的元数据。</li>
+<li>resize: 调整文件大小。</li>
+<li>create_with_data: 创建带有初始数据的 Inode。</li>
+<li>link: 创建硬链接。</li>
+<li>unlink: 删除硬链接。</li>
+<li>rmdir: 删除目录。</li>
+<li>move_: 移动 Inode。</li>
+<li>find: 根据名称查找 Inode。</li>
+<li>get_entry_name: 根据 Inode ID 获取目录项名称。</li>
+<li>list: 列出目录中的项。</li>
+<li>mknod: 创建 Inode。</li>
+<li>special_node: 返回特殊节点信息。<br>这些方法实现了文件系统和 Inode 的基本操作，包括文件和目录的创建、读写、删除等。<strong>对于目录项的查找和管理，使用了 B 树来提高性能</strong>。同时，考虑了<code>多线程环境下的同步问题</code>，使用了 <code>SpinLock</code> 来保护共享数据结构的访问。<h4 id="主要功能的函数调用流程"><a href="#主要功能的函数调用流程" class="headerlink" title="主要功能的函数调用流程"></a>主要功能的函数调用流程</h4></li>
+</ul>
+</li>
+<li>文件系统初始化：</li>
+</ul>
+<p>调用 RamFS::new() 函数初始化内存文件系统。<br>在初始化过程中，创建了根目录的 Inode（LockedRamFSInode）。</p>
+<ul>
+<li>创建文件或目录：</li>
+</ul>
+<p>调用 create_with_data 函数，该函数会在指定目录下创建一个新的 Inode（文件或目录）。<br>在 create_with_data 中，首先获取目录的 Inode，然后创建新的 Inode，并将其插入到父目录的子 Inode 列表中。</p>
+<ul>
+<li>删除文件或目录：</li>
+</ul>
+<p>调用 unlink 或 rmdir 函数，这些函数负责删除指定目录下的文件或目录。<br>在 unlink 或 rmdir 中，首先获取目录的 Inode，然后根据给定的名称找到要删除的子 Inode，最后从父目录中移除该子 Inode。</p>
+<ul>
+<li>文件读写操作：</li>
+</ul>
+<p>调用 read_at 和 write_at 函数进行文件的读写操作。<br>在这些函数中，首先获取文件的 Inode，然后根据偏移量进行读取或写入操作。</p>
+<ul>
+<li>创建硬链接：</li>
+</ul>
+<p>调用 link 函数创建文件的硬链接。<br>在 link 函数中，首先获取目录的 Inode，然后在目录中插入一个新的子 Inode 条目，并增加被链接 Inode 的硬链接计数。</p>
+<ul>
+<li>查找文件或目录：</li>
+</ul>
+<p>调用 find 函数通过文件或目录的名称查找对应的 Inode。<br>在 find 函数中，根据给定的名称，在当前目录的子 Inode 列表中查找对应的 Inode。</p>
+<ul>
+<li>列出目录内容：</li>
+</ul>
+<p>调用 list 函数列出目录的内容。<br>在 list 函数中，获取目录的 Inode，然后遍历子 Inode 列表，获取各个子 Inode 的名称。</p>
+<ul>
+<li>移动文件或目录：</li>
+</ul>
+<p>调用 move<em> 函数移动文件或目录。<br>在 move</em> 函数中，首先在目标目录下创建一个硬链接，然后取消源目录下的硬链接。</p>
+<ul>
+<li>获取目录项名称：</li>
+</ul>
+<p>调用 get_entry_name 函数获取目录项的名称。<br>在 get_entry_name 函数中，通过 Inode ID 来查找对应的目录项名称。</p>
+<h4 id="加锁和-Arc-的理解"><a href="#加锁和-Arc-的理解" class="headerlink" title="加锁和 Arc 的理解"></a>加锁和 Arc 的理解</h4><h5 id="加锁（SpinLock）的作用："><a href="#加锁（SpinLock）的作用：" class="headerlink" title="加锁（SpinLock）的作用："></a>加锁（SpinLock）的作用：</h5><p>确保多线程环境下对共享数据结构（如 <code>RamFSInode</code>）的访问是安全的。在并发环境中，多个线程可能同时访问和修改数据，加锁可以防止竞争条件和数据不一致性。</p>
+<h4 id="Arc-的作用："><a href="#Arc-的作用：" class="headerlink" title="Arc 的作用："></a>Arc 的作用：</h4><p><code>Arc（Atomic Reference Counting）</code>是一种智能指针，允许多个引用指向同一份数据，并在引用计数为零时自动释放数据。在这里，Arc 用于确保多个部分可以安全地引用和共享相同的数据结构，如 <code>RamFSInode</code>。</p>
+<p>锁（Locking）：</p>
+<p>代码中使用了 SpinLock，这是一个简单的自旋锁。自旋锁会一直尝试获取锁，而不会让线程进入休眠。这种锁适用于短时间内可以获得锁的情况，避免了线程切换的开销。<br>锁的主要目的是确保多个线程对共享数据的访问是互斥的，避免竞争条件和数据不一致性。<br>Arc（Atomic Reference Counting）：</p>
+<p>使用了 Arc（原子引用计数），这是一个具有线程安全的引用计数的智能指针。Arc 允许多个引用同时存在，不需要额外的锁来保护引用计数。<br>在这份代码中，Arc 主要用于保持 Inode 的引用，确保多个地方可以共享对 Inode 的引用而不用担心所有权问题。<br>元数据更新策略：</p>
+<p>在元数据更新时，代码通过获取 Inode 的锁来确保更新的原子性，防止多个线程同时修改相同 Inode 导致的问题。<br>例如，在 set_metadata 函数中，通过获取 Inode 锁来保护对元数据的修改，确保在多线程环境下对元数据的更新是安全的。<br>请求时更新策略：</p>
+<p>在某些函数中，如 get_entry_name 和 list，可能涉及到对子 Inode 的遍历和查询。这里的实现可能会导致性能问题，因为它使用了暴力遍历来查找相应的 Inode。<br>代码中通过注释提示了这一点，并建议进行优化。可以考虑改进数据结构或者使用更高效的算法来进行查询，以提高性能。<br>特殊节点信息（SpecialNodeData）：</p>
+<p>Inode 结构中包含了 special_node 字段，用于存储特殊文件（如管道、设备文件）的特殊信息。这可以用来支持一些特殊文件的操作。<br>目前的实现中提供了对管道文件的支持，使用了 LockedPipeInode 类型。<br>总体来说，这份代码采用了一些经典的并发编程和文件系统实现的技术，例如自旋锁、引用计数、元数据的锁保护等，以确保在多线程环境下的正确性和可靠性。在使用时需要注意并发操作的正确性，并根据实际需求可能进行性能优化。</p>
+<h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><h4 id="关于软硬链接"><a href="#关于软硬链接" class="headerlink" title="关于软硬链接"></a>关于软硬链接</h4><p>链接（Symbolic Link）和硬链接（Hard Link）是文件系统中用来创建文件之间关联的两种不同方式。</p>
+<p>硬链接（Hard Link）：</p>
+<p>硬链接是指多个文件目录项（文件名）指向同一个 inode 的链接关系。在硬链接中，同一个文件可以有多个硬链接，它们都指向同一个 inode。这意味着一个硬链接的更改会影响到其他所有硬链接，因为它们实际上是同一个文件。<br>硬链接的限制是必须位于同一个文件系统中，因为 inode 是文件系统内部的标识，不同文件系统的 inode 无法关联。<br>软链接（Symbolic Link）：</p>
+<p>软链接是一个指向另一个文件的特殊文件。软链接本身有一个独立的 inode，里面存储的是目标文件的路径。软链接实际上是一个包含目标文件路径的文本文件，当访问软链接时，系统会自动解析路径并访问目标文件。<br>软链接可以跨越文件系统，并且可以链接到不存在的目标。但是，如果目标文件被删除，软链接就会变为悬空链接。<br>总体来说，硬链接是文件系统中多个文件名指向同一个实际文件的关系，而软链接是一个特殊的文件，其内容是指向另一个文件的路径。硬链接直接引用 inode，而软链接引用文件路径。</p>
+<h4 id="关于强弱引用"><a href="#关于强弱引用" class="headerlink" title="关于强弱引用"></a>关于强弱引用</h4><p>弱应用就是C++中的智能指针，强引用就是普通指针。强引用会增加引用计数，弱引用不会增加引用计数。强引用指针指向的对象被释放，强引用指针就会变成空指针，而弱引用指针不会变成空指针。弱引用指针可以通过lock()函数转换成强引用指针，如果强引用指针为空，lock()函数返回空指针。</p>
+<h4 id="模块系统"><a href="#模块系统" class="headerlink" title="模块系统"></a>模块系统</h4><p>Rust提供了一系列的功能来帮助我们管理代码，这其中就包括决定哪些细节是暴露的，哪些细节是私有的，以及不同的作用域内存在哪些名称。这些功能有时被统称为模块系统，它们包括如下几个方面:</p>
+<p>package(包) : 一个用于构建,测试并分享单元包的Cargo功能。<br>crate(单元包) : 一个用于生成库或可执行文件的树形模块结构。<br>module(模块) use关键字 : 它们被用于控制文件结构，作域及路径的私有性。<br>path(路径) : 一种用于命名条目的方法，这些条目包括结构体,函数和模块等。</p>
+<h4 id="关于mod-rs"><a href="#关于mod-rs" class="headerlink" title="关于mod.rs"></a>关于mod.rs</h4><p>在 Rust 项目中，mod.rs 文件通常是一个模块的主文件。每个目录下的 mod.rs 文件用于定义该目录下的模块的内容，并充当模块的入口点。</p>
+<p>具体来说，如果一个目录包含了多个 Rust 源代码文件（.rs 文件），而你希望将这些文件组织成一个模块，可以使用 mod.rs 文件来引入这些文件，使其成为一个单独的模块。</p>
+<p>例如，假设有一个名为 my_module 的目录，里面包含了以下两个文件：<br><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//my_module/mod.rs：</span></span><br><span class="line"><span class="comment">//rust</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 引入其他文件作为模块的一部分</span></span><br><span class="line"><span class="keyword">mod</span> file1;</span><br><span class="line"><span class="keyword">mod</span> file2;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 导出模块的内容</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">use</span> file1::function_from_file1;</span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">use</span> file2::function_from_file2;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 模块的其他内容...</span></span><br></pre></td></tr></table></figure><br><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//my_module/file1.rs：</span></span><br><span class="line"><span class="comment">//rust</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 文件1的具体实现</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">function_from_file1</span>() &#123;</span><br><span class="line">    <span class="comment">// 实现细节...</span></span><br><span class="line">&#125;</span><br><span class="line">my_module/file2.rs：</span><br><span class="line">rust</span><br><span class="line"><span class="built_in">Copy</span> code</span><br><span class="line"><span class="comment">// my_module/file2.rs</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 文件2的具体实现</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">function_from_file2</span>() &#123;</span><br><span class="line">    <span class="comment">// 实现细节...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这样，通过在 <code>my_module/mod.rs</code> 中引入文件1和文件2，并导出它们的函数，就可以在其他模块中直接使用 <code>my_module</code> 这个模块，而不需要直接引入 <code>file1</code> 和 <code>file2</code>。</p>
+<p>总体而言，<code>mod.rs</code> 文件是 <code>Rust</code> 中用于组织目录下多个文件形成模块的约定之一。</p>
+<h4 id="trait"><a href="#trait" class="headerlink" title="trait"></a>trait</h4><p>在Rust编程语言中，trait 是一种定义共享行为的机制。trait 允许你抽象地定义某种类型的行为，而不关心具体类型是什么。类似于其他语言中的接口（interface）或抽象类（abstract class），trait 提供了一种将方法签名组合在一起的方式，以在不同类型上共享这些行为。</p>
+<p>trait 提供了一种在Rust中实现多态和代码重用的强大机制。通过使用 trait，可以在不破坏类型安全性的情况下，为不同类型引入共享的行为和规范。</p>
+<h2 id="文件系统架构理解"><a href="#文件系统架构理解" class="headerlink" title="文件系统架构理解"></a>文件系统架构理解</h2><ul>
+<li><p>RamFS（内存文件系统）： 这是一个基于内存的文件系统，用作默认的根文件系统。在初始化过程中，代码使用RamFS作为根文件系统，创建了一些基本的目录结构，如/proc、/dev、/sys等。</p>
+</li>
+<li><p>MountFS（挂载文件系统）： 挂载文件系统的时候，套了MountFS这一层，以实现文件系统的递归挂载。这是一个用于挂载其他文件系统的文件系统。在初始化时，代码使用RamFS创建了一个MountFS对象，并将其作为根文件系统的一部分。通过MountFS，其他文件系统可以被挂载到指定的目录上。</p>
+</li>
+<li><p>procfs、devfs、sysfs： 这些是特殊的文件系统，提供了对进程、设备和系统信息的访问。在初始化过程中，这些文件系统被创建，并通过MountFS挂载到根文件系统的相应目录中。</p>
+</li>
+<li><p>sysfs是一个基于内存的文件系统，它的作用是将内核信息以文件的方式提供给用户程序使用。<br>&emsp;&emsp;sysfs可以看成与proc,devfs和devpty同类别的文件系统，该文件系统是虚拟的文件系统，可以更方便对系统设备进行管理。它可以产生一个包含所有系统硬件层次视图，与提供进程和状态信息的proc文件系统十分类似。sysfs把连接在系统上的设备和总线组织成为一个分级的文件，它们可以由用户空间存取，向用户空间导出内核的数据结构以及它们的属性。sysfs可以看成与proc,devfs和devpty同类别的文件系统，该文件系统是虚拟的文件系统，可以更方便对系统设备进行管理。它可以产生一个包含所有系统硬件层次视图，与提供进程和状态信息的proc文件系统十分类似。sysfs把连接在系统上的设备和总线组织成为一个分级的文件，它们可以由用户空间存取，向用户空间导出内核的数据结构以及它们的属性。</p>
+</li>
+<li><p>KernFS是一个伪文件系统，它充当其它内核文件系统的<strong>容器</strong>，面向用户提供文件接口。其核心功能就是，当kernfs的文件被读/写或者触发回调点的时候，将会对预设的回调函数进行调用，触发其它内核文件系统的操作。这种设计使得SysFS和文件系统的基本操作解耦，KernFS作为SysFS的承载物，使得SysFS能更专注于KObject的管理，让代码更加优雅。</p>
+</li>
+</ul>
+<ul>
+<li>FATFileSystem： 这是一个<strong>FAT32文件系统的实现</strong>，通过AHCI（Advanced Host Controller Interface）访问硬盘上的分区。<strong>在初始化中，代码尝试将FAT32文件系统挂载为新的根文件系统，以替代默认的RamFS</strong>。</li>
+</ul>
+<p>关系总结：</p>
+<ul>
+<li>RamFS是默认的根文件系统，用于初始化时创建基本的目录结构。</li>
+<li>MountFS作为根文件系统的一部分，用于挂载其他文件系统（实质上是一个机制）。</li>
+<li>procfs、devfs、sysfs是特殊文件系统，提供了对进程、设备和系统信息的访问。</li>
+<li>FATFileSystem是一个具体的文件系统实现，尝试替代默认的RamFS成为新的根文件系统。</li>
+</ul>
+<h3 id="用户程序调用的流程"><a href="#用户程序调用的流程" class="headerlink" title="用户程序调用的流程"></a>用户程序调用的流程</h3><p>在文件系统的架构中，用户程序调用文件操作通常会经过以下步骤进入内核和系统调用：</p>
+<p>用户程序调用文件操作函数： 用户程序通过使用文件系统库（如fs库）提供的文件操作函数来进行文件相关的操作，比如打开文件、读写文件等。</p>
+<p>系统调用： 文件操作函数通常是通过系统调用接口提供的。在用户空间，这些系统调用函数的实现只是一些包装，它们将用户传递的参数打包成适当的数据结构，然后通过系统调用指令（如int 0x80或syscall指令）进入内核空间。</p>
+<p>系统调用处理： 操作系统内核接收到系统调用后，会根据系统调用号（或其他标识符）来确定用户程序请求的具体服务，例如文件系统服务。</p>
+<p>文件系统抽象层： 内核中存在文件系统抽象层，该层负责处理文件系统相关的请求。它通过调用文件系统的相关接口来执行相应的操作。这可能涉及到虚拟文件系统（VFS）层，其中不同类型的文件系统都可以注册自己的实现。</p>
+<p>挂载文件系统的时候，套了MountFS这一层，以实现文件系统的递归挂载</p>
+<p>文件系统具体实现： 根据文件系统的挂载情况，VFS层会将请求传递给相应的具体文件系统实现。例如，如果用户程序请求对FAT32文件系统的文件进行读取，那么VFS层可能会将请求传递给FAT32文件系统的实现。</p>
+<p>硬件抽象层： 文件系统的实现通常会依赖于底层硬件（如硬盘、SSD等）。这可能涉及到存储设备驱动和硬件抽象层，以确保数据正确地传递到和从存储设备中。</p>
+<p>执行文件操作： 具体的文件系统实现会执行相应的文件操作，如读取、写入、创建、删除等。这可能涉及到在文件系统中定位文件、更新元数据等步骤。</p>
+<p>返回结果给用户程序： 内核最终将文件操作的结果返回给用户程序。如果操作成功，用户程序可以继续执行；否则，用户程序可能会得到相应的错误信息。</p>
+<h3 id="文件系统架构业务流程的个人总结"><a href="#文件系统架构业务流程的个人总结" class="headerlink" title="文件系统架构业务流程的个人总结"></a>文件系统架构业务流程的个人总结</h3><p>用户程序通过外部库进行系统调用，外部库通过软中断将系统调用传递给系统调用处理器<code>syscall_handler</code>（<code>arch-&gt;x86_64_syscall-&gt;mod.rs：syscall_handler</code>）。在这个处理过程中，系统调用处理器将规定好的系统调用号（<code>syscall_num</code>）作为参数传递给系统调用分发器 <code>handle</code>（<code>syscall-&gt;mod.rs：handle</code>），以匹配相应的处理流程。文件抽象-&gt;IndexNode抽象-&gt;具体文件系统实现-&gt;硬件抽象-&gt;执行文件操作-&gt;返回结果给用户程序。</p>
+<p>在系统初始化过程中（<code>vfs-&gt;core.rs-&gt;vfs_init</code>），创建了一个 RamFS 对象以及 MountFS 对象，并将 RamFS 作为默认的根文件系统。随后，根据需求在根目录下创建了其他具体文件系统（如 DevFS、ProcFS、SysFS）的文件夹并进行了初始化。随后调用了伪文件系统迁移的方法，将原来的文件系统都迁移到了FAT32文件系统下。</p>
+<p>每个文件系统都需要实现 vfs 中定义的 <code>FileSystem trait</code> 和 <code>IndexNode trait</code>。 RamFS 实现了这两个 trait（<code>impl IndexNode for LockedRamFSInode 和 impl FileSystem for RamFS</code>）。由于 RamFS 的 IndexNode trait 中实现了 create 函数。当进行系统调用创建文件（例如打开文件）时，VFS 分发到 RamFS 的 create 函数，然后调用 RamFS 的具体处理逻辑。</p>
+<p>我所做的就是在内核中的文件系统初始化的代码部分里多初始化了一个myramfs（和proc、sys等同级）,并且在myramfs中实现FileSystem以及IndexNode这两个trait，支持了文件的创建、删除、读写等操作。</p>
+<p>随后将myramfs挂载到了根文件系统下，使得用户程序可以通过myramfs进行文件操作。并且这个myramfs也随着后面的迁移操作迁移到了FAT32下。</p>
+<h3 id="具体架构的构成"><a href="#具体架构的构成" class="headerlink" title="具体架构的构成"></a>具体架构的构成</h3><p>FileSystem trait：定义了文件系统的基本操作，如创建、删除、读写等。每个文件系统都需要实现这个 trait，以提供对应的文件系统功能。</p>
+<p>IndexNode trait：定义了文件系统中 Inode 的基本操作，如打开、关闭、读写等。每个文件系统的 Inode 都需要实现这个 trait，以提供对应的 Inode 功能。</p>
+<p>RamFS：内存文件系统，用作默认的根文件系统。实现了 FileSystem trait 和 IndexNode trait，提供了文件系统的基本操作和 Inode 的基本操作。</p>
+<p>MountFS：挂载文件系统，用于挂载其他文件系统。作为根文件系统的一部分，提供了文件系统的递归挂载功能。</p>
+<p>procfs、devfs、sysfs：特殊文件系统，提供了对进程、设备和系统信息的访问。在初始化过程中，这些文件系统被创建，并通过 MountFS 挂载到根文件系统的相应目录中。</p>
+<p>FATFileSystem：FAT32 文件系统的实现，通过 AHCI 访问硬盘上的分区。在初始化过程中，代码尝试将 FAT32 文件系统挂载为新的根文件系统，以替代默认的 RamFS。</p>
+<p>总体而言，文件系统架构由多个文件系统组成，每个文件系统都实现了 FileSystem trait 和 IndexNode trait，以提供文件系统的基本操作和 Inode 的基本操作。这些文件系统可以通过挂载文件系统的方式组合在一起，形成一个完整的文件系统层次结构。</p>
+<h3 id="MountFS在文件系统里的作用"><a href="#MountFS在文件系统里的作用" class="headerlink" title="MountFS在文件系统里的作用"></a>MountFS在文件系统里的作用</h3></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://val213.github.io">Val</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://val213.github.io/2024/02/26/%E3%80%90DragonOS%E3%80%91%E6%8B%9B%E6%96%B0%E5%B0%8F%E4%BB%BB%E5%8A%A1/">https://val213.github.io/2024/02/26/%E3%80%90DragonOS%E3%80%91%E6%8B%9B%E6%96%B0%E5%B0%8F%E4%BB%BB%E5%8A%A1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><a class="post-meta__tags" href="/tags/DragonOS/">DragonOS</a><a class="post-meta__tags" href="/tags/Rust/">Rust</a><a class="post-meta__tags" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">文件系统</a><a class="post-meta__tags" href="/tags/%E5%86%85%E6%A0%B8/">内核</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/03/05/%E5%92%8C%E8%80%8C%E6%B3%B0%E6%9D%AF%E6%9C%BA%E5%99%A8%E4%BA%BA/" title="和而泰杯机器人比赛"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">和而泰杯机器人比赛</div></div></a></div><div class="next-post pull-right"><a href="/2024/02/26/%E3%80%90%E5%A4%A7%E4%BA%8C%E4%B8%8B%E3%80%91%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" title="计算机网络原理"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">计算机网络原理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2024/01/25/%E3%80%90%E5%A4%A7%E4%BA%8C%E4%B8%8B%E3%80%91%E5%8D%97%E5%A4%A7jyy%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" title="【大二下】南大jyy操作系统"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-25</div><div class="title">【大二下】南大jyy操作系统</div></div></a></div><div><a href="/2024/03/29/%E3%80%90DragonOS%E3%80%91%E5%AE%9E%E7%8E%B0sysfs%E4%B8%AD%E7%9A%84uevent/" title="实现sysfs中的uevent"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-29</div><div class="title">实现sysfs中的uevent</div></div></a></div><div><a href="/2024/03/16/%E3%80%90DragonOS%E3%80%91DragonOS%E7%A7%BB%E6%A4%8Dnslookup/" title="DragonOS移植nslookup"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-16</div><div class="title">DragonOS移植nslookup</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://github.com/val213/image/blob/main/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230630230143.jpg?raw=true" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Val</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">85</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">70</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/val213"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/val213" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:val213666@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">记录跬步 e/acc</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#DragonOS"><span class="toc-number">1.</span> <span class="toc-text">DragonOS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#rust%E5%85%A5%E9%97%A8%E4%B8%8E%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90"><span class="toc-number">1.1.</span> <span class="toc-text">rust入门与开发环境推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rustlings"><span class="toc-number">1.1.1.</span> <span class="toc-text">rustlings</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#quiz2"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">quiz2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#error2"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">error2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#amp-%EF%BC%8C-%EF%BC%8Cref"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">&amp;，*，ref</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.1.2.</span> <span class="toc-text">_</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%98static-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-number">1.1.3.</span> <span class="toc-text">‘static 生命周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dyn-%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-number">1.1.4.</span> <span class="toc-text">dyn 关键字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Option-%E5%92%8C-Result"><span class="toc-number">1.1.5.</span> <span class="toc-text">Option 和 Result</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Arc-%E5%92%8C-Mutex"><span class="toc-number">1.1.6.</span> <span class="toc-text">Arc 和 Mutex</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rust%E4%B8%AD%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-number">1.1.7.</span> <span class="toc-text">Rust中的生命周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rust%E4%B8%AD%E7%9A%84trait"><span class="toc-number">1.1.8.</span> <span class="toc-text">Rust中的trait</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rust%E4%B8%AD%E7%9A%84%E6%A8%A1%E5%9D%97%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.1.9.</span> <span class="toc-text">Rust中的模块系统</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AE%9E%E7%8E%B0%E7%9A%84%E4%BB%A3%E7%A0%81%E7%90%86%E8%A7%A3"><span class="toc-number">1.2.</span> <span class="toc-text">原实现的代码理解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ramfs%E6%A8%A1%E5%9D%97%E7%BB%84%E6%88%90"><span class="toc-number">1.2.1.</span> <span class="toc-text">ramfs模块组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD%E7%9A%84%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">主要功能的函数调用流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A0%E9%94%81%E5%92%8C-Arc-%E7%9A%84%E7%90%86%E8%A7%A3"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">加锁和 Arc 的理解</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8A%A0%E9%94%81%EF%BC%88SpinLock%EF%BC%89%E7%9A%84%E4%BD%9C%E7%94%A8%EF%BC%9A"><span class="toc-number">1.2.1.2.1.</span> <span class="toc-text">加锁（SpinLock）的作用：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Arc-%E7%9A%84%E4%BD%9C%E7%94%A8%EF%BC%9A"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">Arc 的作用：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.2.</span> <span class="toc-text">前置知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E8%BD%AF%E7%A1%AC%E9%93%BE%E6%8E%A5"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">关于软硬链接</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E5%BC%BA%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">关于强弱引用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.2.2.3.</span> <span class="toc-text">模块系统</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E4%BA%8Emod-rs"><span class="toc-number">1.2.2.4.</span> <span class="toc-text">关于mod.rs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#trait"><span class="toc-number">1.2.2.5.</span> <span class="toc-text">trait</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E7%90%86%E8%A7%A3"><span class="toc-number">1.3.</span> <span class="toc-text">文件系统架构理解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%A8%8B%E5%BA%8F%E8%B0%83%E7%94%A8%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.1.</span> <span class="toc-text">用户程序调用的流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E4%B8%9A%E5%8A%A1%E6%B5%81%E7%A8%8B%E7%9A%84%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.2.</span> <span class="toc-text">文件系统架构业务流程的个人总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E6%9E%B6%E6%9E%84%E7%9A%84%E6%9E%84%E6%88%90"><span class="toc-number">1.3.3.</span> <span class="toc-text">具体架构的构成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MountFS%E5%9C%A8%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E9%87%8C%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">1.3.4.</span> <span class="toc-text">MountFS在文件系统里的作用</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/04/24/%E3%80%90IBM%E3%80%91%E8%AE%B2%E5%BA%A7%E9%80%89%E9%A2%98%E8%B0%83%E6%9F%A5/" title="IBM主机创新俱乐部讲座主题兴趣调查"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="IBM主机创新俱乐部讲座主题兴趣调查"/></a><div class="content"><a class="title" href="/2024/04/24/%E3%80%90IBM%E3%80%91%E8%AE%B2%E5%BA%A7%E9%80%89%E9%A2%98%E8%B0%83%E6%9F%A5/" title="IBM主机创新俱乐部讲座主题兴趣调查">IBM主机创新俱乐部讲座主题兴趣调查</a><time datetime="2024-04-24T09:38:46.247Z" title="Created 2024-04-24 17:38:46">2024-04-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/11/%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BF%90%E7%BB%B4/" title="服务器运维"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="服务器运维"/></a><div class="content"><a class="title" href="/2024/04/11/%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BF%90%E7%BB%B4/" title="服务器运维">服务器运维</a><time datetime="2024-04-11T03:43:58.187Z" title="Created 2024-04-11 11:43:58">2024-04-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/11/%E3%80%90ts%E3%80%91TSRPC%E4%BD%BF%E7%94%A8tips/" title="TSRPC 使用tips"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TSRPC 使用tips"/></a><div class="content"><a class="title" href="/2024/04/11/%E3%80%90ts%E3%80%91TSRPC%E4%BD%BF%E7%94%A8tips/" title="TSRPC 使用tips">TSRPC 使用tips</a><time datetime="2024-04-11T02:59:56.545Z" title="Created 2024-04-11 10:59:56">2024-04-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/09/wangxiangeditor/" title="万象editor"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="万象editor"/></a><div class="content"><a class="title" href="/2024/04/09/wangxiangeditor/" title="万象editor">万象editor</a><time datetime="2024-04-09T02:31:12.039Z" title="Created 2024-04-09 10:31:12">2024-04-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/30/%E3%80%90%E5%A4%A7%E4%BA%8C%E4%B8%8B%E3%80%91%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E5%AE%9E%E9%AA%8C/" title="编译原理实验"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="编译原理实验"/></a><div class="content"><a class="title" href="/2024/03/30/%E3%80%90%E5%A4%A7%E4%BA%8C%E4%B8%8B%E3%80%91%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E5%AE%9E%E9%AA%8C/" title="编译原理实验">编译原理实验</a><time datetime="2024-03-30T11:13:11.016Z" title="Created 2024-03-30 19:13:11">2024-03-30</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2024 By Val</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">纯粹的心，感受意义不明</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">繁</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script></div><canvas class="fireworks" mobile="true"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="true" data-click="true"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
