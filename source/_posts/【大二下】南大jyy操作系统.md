@@ -934,7 +934,26 @@ Q: 什么样的任务是需要并行/并发的？它们应该如何实现？
 - 请求与保持：一个进程请求资阻塞时，不释放已获得的资源
 - 不剥夺：进程已获得的资源不能强行剥夺
 - 循环等待：若干进程之间形成头尾相接的循环等待资源关系
-#### 避免死锁
+
+#### 死锁的检测
+没有考过，但是可以考虑用图论的方法来检测死锁。如果有环，就说明发生了死锁。
+#### 死锁的处理
+Windows和Linux都使用的是鸵鸟算法，即不处理死锁，让死锁发生，然后重启。但是在一些特殊的场景下，比如在飞机上，就不能使用这种方法，因此需要在设计的时候就避免死锁。
+#### 死锁的恢复
+考过简答题
+- 重启
+- 杀死进程
+- 回滚
+- 什么都不做
+
+#### 避免死锁（死锁的预防）
+##### 银行家算法 bank algorithm
+alloc、max、need、available。首先计算出need矩阵。
+
+进程pn完成的时候，把alloc列中的资源还给了available，然后判断是否有进程可以完成，如果有就继续，没有就说明发生了死锁。
+
+用文字方式描述。
+
 ##### AA-Deadlock
 AA 型的死锁容易检测，及早报告，及早修复。
 ###### `spinlock-xv6.c` 中的各种防御性编程:
@@ -1080,6 +1099,79 @@ class LockOrdering:
 ```
  
 证明 T1:A→B→C; T2:B→C 是安全的。“在任意时刻总是有获得 “最靠后” 锁的可以继续执行”。
+
+#### 死锁预防
+这些是破坏死锁四个必要条件的方法：
+
+- Mutual Exclusion：Spool everything. 这意味着将所有资源都放入一个缓冲池（Spool）中，让每个进程在需要时从池中取用，用完后再放回。这样，资源就可以被多个进程共享，从而破坏了互斥条件。
+  - Some devices (such as printer) can be spooled
+    - only the printer daemon uses printer resource
+    - printer daemon doesn’t request other resources 
+    - thus deadlock for printer eliminated
+  - Spooling space is limited, so deadlock is still possible with this decision
+    - Two processes each fill up half the available space and can’t continue, so there is deadlock on the disk
+  - avoid assigning resource if not absolutely necessary
+  - as few processes as possible actually claim the resource
+  - Not all devices can be spooled
+> Spooling（Simultaneous Peripheral Operations On-Line）是一种数据管理技术，主要用于打印等I/O操作。其基本原理如下：
+>
+> 1. 当一个进程需要打印数据时，它不直接发送数据到打印机，而是将数据写入到一个磁盘文件中。这个文件通常被称为"spool"或"spool file"。
+>
+> 2. 打印机守护进程（printer daemon）会监视这些spool文件。当它发现有新的spool文件时，它会从文件中读取数据，并发送到打印机。
+>
+> 3. 打印机守护进程和打印机之间的通信通常是异步的。也就是说，打印机守护进程发送数据后，不需要等待打印机完成打印，就可以开始处理下一个spool文件。
+>
+> 通过这种方式，多个进程可以同时"使用"打印机。实际上，它们是在向磁盘文件中写入数据，而打印机守护进程负责将这些数据发送到打印机。这就是Spooling的基本原理。
+- Hold and Wait：Request all resources at once. 这意味着进程在开始执行前，一次性请求所有需要的资源。这样，进程就不会在执行过程中持有一部分资源并等待其他资源，从而破坏了占有并等待条件。
+  - 要求进程在启动前请求所有资源
+  - 进程永远不必等待它需要的东西
+  - 问题
+    - 在运行开始时可能不知道所需的资源
+    - 还占用其他进程可能使用的资源
+  - 变化：
+    - 请求资源的进程必须放弃当前拥有的所有资源，然后请求所有立即需要的资源
+
+- No Preemption：Take resources away. 这意味着操作系统可以强行从一个进程中取走其占有的资源，然后分配给其他进程。这样，就破坏了非剥夺条件。
+  - Virtualization of Resources 
+    - Spooling printer output to the disk 
+    - Allow only the printer daemon access to the real printer. 
+  - Problem
+    - Not all resources can be virtualized
+
+- Circular Wait：Order resources numerically. 这意味着将所有资源进行编号，每个进程都按照编号顺序请求资源。这样，就不会形成循环等待，从而破坏了循环等待条件。
+  - Approach 1: Request one resource at a time. 
+    - Release the current resource when request the next one 
+  - Approach 2: Global ordering of resources 
+    - Requests have to made in increasing order 
+  - Approach 3: Variation of Approach 2 
+    - No process request a resource lower than what it is already holding. 
+  - Problem:
+    - Finding a suitable numbering to satisfy everybody could be difficult/impossible 
+    - Increases burden on programmers to know the numbering 
+#### Other Issues
+❖ Two-Phase Locking
+❖ Communication Deadlocks
+❖ Livelock
+❖ Starvation
+##### 两阶段锁定
+- 两阶段锁定协议（Two-Phase Locking Protocol）是一种并发控制方法，用于确保事务的隔离性和一致性。
+- 两阶段锁定协议分为两个阶段：增长阶段（Growing Phase）和缩减阶段（Shrinking Phase）。
+- 在增长阶段，事务可以获取锁，但不能释放锁；在缩减阶段，事务可以释放锁，但不能获取锁。
+- 两阶段锁定协议可以防止死锁，但不能防止饥饿。
+
+##### 通信死锁
+- 通信死锁是指在分布式系统中，由于通信通道的限制或者通信协议的问题，导致进程之间无法正常通信，从而陷入死锁状态。
+- 通信死锁的原因包括：通信通道的限制、通信协议的问题、通信消息的丢失、通信消息的延迟等。
+- 避免通信死锁的方法包括：超时重传等。
+
+##### 活锁
+- 活锁（Livelock）是指系统中的进程或线程由于某种原因一直在忙碌地执行，但无法取得进展，从而无法完成任务。
+- 活锁通常是由于进程之间的竞争条件、资源争用、消息传递等问题导致的。
+
+##### 饥饿
+- 饥饿（Starvation）是指系统中的进程或线程由于某种原因无法获得所需的资源，从而无法继续执行任务。
+- 饥饿通常是由于资源分配不公平、资源争用、优先级反转等问题导致的。
+
 ### 数据竞争
 不使用锁的时候，也可能出现数据竞争的问题。而且无锁算法很难写对，结论是不如直接使用互斥锁来避免数据竞争。
 
@@ -1298,3 +1390,67 @@ Q: 如何拯救人类不擅长的并发编程？
 
 
 ## 操作系统的状态机模型 (操作系统的加载; thread-os 代码讲解) 
+
+
+
+
+## I/O 设备和驱动程序
+- Principles of I/O software
+- I/O software layers
+- Disks
+### Principles of I/O software
+#### programed I/O
+#### Interrupt-Driven I/O
+#### I/O using DMA
+
+### I/O software layers
+- User-level I/O software
+- Device-independent OS software
+- Device drivers
+- Interrupt handlers
+- Disks
+#### Interrupt Handlers
+#### Device Drivers
+#### Device-Independent OS Software
+- 设备驱动程序的统一接口
+- 缓冲buffer
+  - 双缓冲
+  - 循环缓冲区
+- 错误报告
+#### User-Level I/O Softwareq
+
+
+### Disks
+#### 磁盘格式化
+- 低级格式化
+在设置低级格式的时候，第0扇区的位置与前一个磁道存在偏移，这一偏移称为**柱面斜进（cylinder skew）**。这是因为磁头在磁盘上移动时，磁盘旋转的速度是固定的，而磁头移动的速度是可变的，因此在磁头移动到下一个磁道的过程中，磁盘旋转了一定的角度，这就导致了磁头在下一个磁道上的位置与前一个磁道上的位置存在偏移。为了解决这个问题，需要在设置低级格式时，将第0扇区的位置与前一个磁道的位置进行调整，这样就可以保证磁头在移动到下一个磁道时，能够准确读取数据。
+#### 磁盘臂调度算法
+寻道时间：磁头移动到指定磁道的时间
+旋转时间：磁盘旋转到指定扇区的时间
+传输时间：数据从磁盘传输到内存的时间
+
+- FCFS（First-Come, First-Served）
+  - 按照请求的顺序进行处理
+- SSF（Shortest Seek First）
+  - 优先移动到最近的磁道
+- Elevator（电梯算法）
+
+
+
+
+# 进程和线程
+## 批处理系统
+- FCFS
+- SJF
+## 交互式系统
+- RR
+- 优先级调度
+- 多级队列CTSS
+- 最短进程优先
+> 老化：
+- 保证调度
+- 彩票调度
+- 公平共享调度
+## 实时系统
+### 硬实时
+### 软实时

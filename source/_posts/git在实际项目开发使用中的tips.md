@@ -46,4 +46,37 @@ title: git在实际项目开发使用中的tips
     git push origin master
     ```
 
+
+- 处理本地仓库分支与源代码仓库的冲突
+    To merge updates from the `upstream` into your local `uevent` branch, you can follow these steps:
+
+    1. Fetch the updates from the `upstream`:
+
+    ```bash
+    git fetch upstream
+    ```
+
+    2. Switch to your `uevent` branch:
+
+    ```bash
+    git checkout uevent
+    ```
+
+    3. Merge the updates into your `uevent` branch. If the updates are on the `master` branch of the `upstream`, you would do:
+
+    ```bash
+    git merge upstream/master
+    ```
+
+    Replace `master` with the appropriate branch name if the updates are on a different branch.
+
+    4. Resolve any merge conflicts if they exist. After resolving conflicts, you need to add the resolved files with `git add <file>` and then commit the changes with `git commit`.
+
+    5. Finally, push the updates to your `uevent` branch on your remote repository:
+
+    ```bash
+    git push origin uevent
+    ```
+
+    Replace `origin` with the name of your remote if it's different.
 - 设置上游仓库：git remote add upstream <upstream_repository_url>
