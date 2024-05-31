@@ -45,3 +45,5 @@ title: git在实际项目开发使用中的tips
     ```bash
     git push origin master
     ```
+
+- 设置上游仓库：git remote add upstream <upstream_repository_url>

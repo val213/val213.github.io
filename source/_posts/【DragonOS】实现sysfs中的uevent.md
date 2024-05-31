@@ -436,7 +436,7 @@ Netlink 是一种在内核与用户应用间进行双向数据传输的非常好
 #### 内核空间Netlink socket API
 - [x] netlink_kernel_create()/netlink_kernel_release() 创建/销毁struct sock
 - [x] netlink_unicast: 发送单播消息
-- [x] netlink_broadcast: 发送广播消息 
+- [√] netlink_broadcast: 发送广播消息 
 
 
 #### 测试
@@ -447,6 +447,55 @@ Netlink 是一种在内核与用户应用间进行双向数据传输的非常好
 ## uevent机制
 uevent使用的netlink协议是：`pub const NETLINK_KOBJECT_UEVENT: u32 = 15;`
 
+### 设计思路
+#### trait `NetlinkSocket` 
+`NetlinkSocket`是netlink机制特定的内核抽象，不同于原本内核中实现的trait `Socket`，他们之间没有继承关系。
+```rust
+// netlink机制特定的内核抽象，不同于标准的trait Socket
+pub trait NetlinkSocket :Sync + Send + Debug + Any{
+    // fn sk_prot(&self) -> &dyn proto;
+    fn sk_family(&self) -> i32;
+    fn sk_state(&self) -> i32;
+    fn sk_protocol(&self) -> usize;
+    fn is_kernel(&self) -> bool;
+    fn equals(&self, other: &dyn NetlinkSocket) -> bool;
+}
+```
+#### struct `NetlinkSock` 
+`NetlinkSock`实现了`PartialEq`、自己的一套作为`socket`特有的经典的收发、绑定、解绑和注册等方法。
+```rust
+/* linux：struct sock has to be the first member of netlink_sock */
+#[derive(Debug)]
+pub struct NetlinkSock {
+    sk: Box<dyn NetlinkSocket>,
+    portid: u32,
+    dst_portid: u32,
+    dst_group: u32,
+    flags: u32,
+    subscriptions: u32,
+    ngroups: u64,
+    groups: Vec<u64>,
+    state: u64,
+    max_recvmsg_len: usize,
+    dump_done_errno: i32,
+    cb_running: bool,
+}
+```
+#### struct `UeventSock`
+`UeventSock`结构体包含了一个`NetlinkSock`结构体对象字段，这是因为在linux内核中，uevent socket属于一种特殊的netlinksocket，用于接收内核的uevent消息。因此把`UeventSock`定义为一种特殊的`NetlinkSock`。他作为NetlinkSock的一种，也需要实现`NetlinkSocket`的trait。
+```rust
+#[derive(Debug)]
+pub struct UeventSock {
+    netlinksock:NetlinkSock,
+    list: Vec<ListHead>,
+}
+```
+
+### 一些暂时不支持的特性
+- struct Net 网络空间命名
+
+### 与linux实现不同的地方
+- gfp_mask: 内核中的gfp_mask是一个用于内存分配的标志，用于指定内存分配的行为。在Rust中，我们可以使用`Box`或`Rc`来分配内存，而不需要使用gfp_mask。
 
 
 
@@ -460,7 +509,68 @@ fn parent(&self) -> Option<Weak<dyn KObject>>;
 /// 设置当前kobject的parent kobject（不一定与kset相同）
 fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
 ```
-- 函数指针->
+- 函数指针-> fn
 - trait->
 - struct->
-- goto->闭包
+- goto->闭包？
+
+
+### 数据类型对应关系替代
+- 整型 (Integers)
+
+    char (C 中的无符号字符): char 在 Rust 中是无符号的，范围通常在 0 到 255 之间。
+    - short->i16,
+    - int->i32,
+    - long->i64,
+    - long long ->i128,
+    - unsigned char->u8,
+    - unsigned short-> u16,
+    - unsigned int-> u32,
+    - unsigned long-> u64,
+    - unsigned long long (C 中的无符号整数)->u128
+
+- 浮点型 (Floating-Point Numbers)
+
+    float, double, long double (C 中的浮点数): Rust 中的相应类型是 f32, f64, f64 是 Rust 的默认浮点数精度。
+
+- 布尔型 (Booleans)
+
+    _Bool (C 中的布尔类型): Rust 中的 bool 类型。
+
+- 字符串 (Strings)
+
+    C 中的字符串通常是 char* 或 const char* 类型。Rust 使用 String 类型，这是一个可变的、动态大小的字符串类型，通常使用 String::from 或 String::new 创建。
+
+- 指针 (Pointers)
+
+    C 中的指针通过 Rust 中的引用和 Box 来实现。普通引用用于可变或不可变的值，而 Box<T> 是 Rust 的堆分配机制。
+
+
+### 关于引用和所有权等
+copilot：
+
+在Rust中，函数参数的类型（值、共享引用或引用计数）取决于函数需要做什么。以下是一些一般的指导原则：
+
+1. 如果函数只需要读取参数的值，不需要修改它，那么你应该使用共享引用（`&T`）。这样，函数可以读取值，但不能修改它。这也意味着你可以在函数调用后继续使用这个值。
+
+2. 如果函数需要修改参数的值，那么你应该使用可变引用（`&mut T`）。这样，函数可以读取和修改值。但是，你不能在函数调用后继续使用这个值，除非你再次借用它。
+
+3. 如果函数需要拥有参数的所有权，那么你应该使用值（`T`）。这样，函数可以读取、修改和销毁值。但是，你不能在函数调用后继续使用这个值，因为它的所有权已经被移动。
+
+4. 如果函数需要共享参数的所有权，那么你应该使用引用计数（`Arc<T>`或`Rc<T>`）。**这样，函数可以读取和修改值，而且你可以在函数调用后继续使用这个值，因为它的所有权被共享，而不是被移动。
+
+关于所有权的规划，Rust的所有权规则是为了保证内存安全而设计的。以下是一些一般的指导原则：
+
+1. 尽量避免克隆值。克隆值会消耗额外的内存和CPU时间。如果可能，你应该使用引用或引用计数。
+
+2. 尽量避免使用`Rc<T>`或`Arc<T>`。虽然它们可以让你共享所有权，但是它们会增加引用计数的开销，并且可能导致循环引用。如果可能，你应该使用引用。
+
+3. 尽量避免使用`RefCell<T>`或`Mutex<T>`。虽然它们可以让你在运行时检查借用规则，但是它们会增加运行时的开销。如果可能，你应该在编译时检查借用规则。
+
+4. 尽量让函数拥有它们需要的所有权。这样，你可以避免不必要的引用和克隆。但是，你也需要确保你在函数调用后不再需要这个值。
+
+5. 尽量让结构体拥有它们的字段的所有权。这样，你可以避免不必要的引用和克隆。但是，你也需要确保你在结构体被销毁后不再需要这些字段。
+
+6. 尽量让变量拥有它们的值的所有权。这样，你可以避免不必要的引用和克隆。但是，你也需要确保你在变量离开作用域后不再需要这个值。
+
+以上的指导原则并不是绝对的。在某些情况下，你可能需要违反这些原则，例如，为了避免数据竞争，你可能需要使用`Mutex<T>`，或者为了共享大型数据结构，你可能需要使用`Arc<T>`。你应该根据你的具体需求来决定使用哪种类型。
