@@ -104,7 +104,7 @@ RUP中的软件生命周期在时间上被分解为四个顺序的阶段，分�
 - OOA阶段，此阶段分析用例，定义领域模型。
 - OOD阶段，此阶段定义类图，类之间的交互图（时序图等等）。
 - OOP阶段，根据OOD设计的类图，类之间的交互图输出代码
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-1.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-1.png?raw=true)
 ### OOA
 OOA全拼为Object-Oriented Analysis，面向对象分析。此过程是把现实的需求转义为领域模型（Domain Model）问题，以及输出领域模型（Domain Model）。第一步是根据需求输出用例，用例为一个一个场景，用户与App交互的场景。第二步是根据用例输出领域模型（Domian Model），领域模型（Domain Model）也就是我们常说的业务逻辑。会输出概念类，概念类的交互的关系，这部分概念类一般直接反应现实的事物。
 
@@ -145,8 +145,8 @@ Assign class B the responsibility to create an instance of class A if one of the
 例子：
 - 订单是商品的容器，订单应该负责创建商品
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-3.png)
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-4.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-3.png?raw=true)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-4.png?raw=true)
 
 如果创建对象需要处理很多复杂性，例如使用回收的实例，或者根据某个外部属性值有条件地从一系列相似的类中创建实例，那么最好将创建对象的任务委托给一个叫做“工厂”的辅助类。
 
@@ -166,7 +166,7 @@ Low coupling is supported, which implies lower maintenance dependencies and high
 -  常见的网上商店的购物车（ShopCar），需要让每种商品（SKU）只在购物车内出现一次，购买相同商品，只需要更新商品的数量即可。
 -  一个订单（Order）是由多个订单项（OrderItem）组成，订单项是由商品（Product）和数量（quantity）组成的，订单项的总价是商品的单价乘以数量。
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/5.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/5.png?raw=true)
 
 ### ⭐3、Low coupling（低耦合）
 低耦合模式的意思就是要我们尽可能地减少类之间的连接。
@@ -213,8 +213,8 @@ functional area and collaborates with other classes to fulfill tasks
 
 **Problem:** How to keep objects focused, understandable, and manageable, and as a side effect, support Low Coupling? 
 **Solution:** Assign responsibilities so that cohesion remains high. Use this to evaluate alternatives
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-7.png)
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-8.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-7.png?raw=true)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-8.png?raw=true)
 图2额外增加了register到sale的耦合，让register干了杂活 一定程度破坏了它的内聚性。
 ### ⭐5、Controller（控制器）
 控制器模式是指在设计过程中，我们需要确定哪个类应该负责处理用户的请求。在这种情况下，我们应该考虑哪个类拥有处理用户请求所需要的所有信息，然后将处理用户请求的职责分配给这个类。这样，我们就可以避免处理用户请求的职责分散到多个类中，从而提高代码的可维护性。
@@ -226,7 +226,7 @@ UI层和领域模型之间的模式应用。主要是为了保持UI层和业务�
 - Represents the overall “system,” a “root object,” a device that the software is running within, or a major subsystem (these are all variables of a façade controller).
 - Represents a use case scenario within which the system operation occurs (a use case or session controller)
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-6.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-6.png?raw=true)
 感觉就像是Java后端开发的Controller层，负责接收前端的请求，然后调用Service层的方法，最后返回结果给前端。这个Controller层就是一个控制器，负责控制整个请求的流程。
 ### 6、Polymorphism（多态）
 这里的多态跟 OO 三大基本特征之一的“多态”是一个意思。即多个类有一些共同的形态。在代码上表现为替换switch case之类的操作，建立多态关系，通常以抽象超类和接口的形式呈现，子类进行继承。
@@ -240,10 +240,10 @@ behavior varies
 • In the **NextGen POS application**, there are multiple external third-party tax calculators that must be supported; the system needs to be able to integrate with different ones
 • What objects should be responsible for handling these varying external tax calculator interfaces?
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-9.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-9.png?raw=true)
 在monopoly game中的例子：player选择根据不同的square类型来执行不同的操作，这里就可以使用多态来实现。
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-10.png)
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-11.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-10.png?raw=true)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-11.png?raw=true)
 ### 7、Pure Fabrication（纯虚构）
 这里的纯虚构跟我们常说说的纯虚构函数意思相近。高内聚低耦合，是系统设计的终极目标，但是内聚和耦合永远都是矛盾对立的。高内聚以为这拆分出更多数量的类，但是对象之间需要协作来完成任务，这又造成了高耦合，反过来依然。该如何解决这个矛盾呢？有时候在类与类之间通过构建一个实际并不存在的类用于信息的传递和交换以保持高内聚和低耦合的特点。
 
@@ -263,7 +263,7 @@ Assign a highly cohesive set of responsibilities to an artificial or convenience
     • The PersistentStorage class is itself relatively cohesive, having the sole purpose of storing or inserting objects in a persistent storage medium
     • The PersistentStorage class is a very generic and reusable object
 - 在monopoly game中，Handling the Dice：
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-12.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-12.png?raw=true)
 
 Many existing object-oriented design patterns are example of Pure Fabrications: Adapter, Strategy, Command, and so on. All GoF design patterns are Pure Fabrications. Virtually all other design patterns are Pure Fabrications
 ### ⭐8、Indirection（间接）
@@ -332,7 +332,7 @@ OCP宣扬了目标，DIP宣扬了机制。
 合成/聚合复用原则（CARP）是指：尽量使用合成/聚合，尽量不要使用继承。合成/聚合复用原则的目的是降低类之间的耦合度，降低依赖，提高类的内聚性。
 ## GoF设计模式todo
 GoF设计模式是指Gang of Four Design Patterns，即四人帮设计模式。四人帮是指Erich Gamma、Richard Helm、Ralph Johnson和John Vlissides四位作者，他们在1994年出版了一本名为《设计模式：可复用面向对象软件的基础》的书，这本书总结了23种设计模式，这23种设计模式被称为GoF设计模式。
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-2.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-2.png?raw=true)
 前面说明了 GoF 的 23 种设计模式的分类，现在对各个模式的功能进行介绍。
 1.	**单例（Singleton）模式**：某个类只能生成一个实例，该类提供了一个全局访问点供外部获取该实例，其拓展是有限多例模式。
 2.	原型（Prototype）模式：将一个对象作为原型，通过对其进行复制而克隆出多个和原型类似的新实例。
