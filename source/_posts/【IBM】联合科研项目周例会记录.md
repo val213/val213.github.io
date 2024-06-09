@@ -109,6 +109,21 @@ deliver：
 技能：拥有训练模型、调整模型参数的经验
 
 
+前端组：
+任务1 了解下什么是restful API。参考： https://restfulapi.net/
+任务2 学习React框架，完成一个helloworld页面。参考： https://react.docschina.org/
+任务3 学习编译React工程，并将编译结果部署在Nginx中启动。
+
+后端组：
+任务1 了解下什么是restful API。参考： https://restfulapi.net/
+任务2 学习使用框架cherrypy，利用框架在本机完成一个helloworld的api接口。参考：https://cherrypy.dev/
+任务3 学习使用apidoc为自己的接口生成文档。参考：https://apidocjs.com/
+
+AI组：从两个方面逐步清晰我们的目标
+1 调研在AIOps中，通常可以对哪些东西预测，输入是什么，如何预测，输出是什么。抛砖引玉：https://segmentfault.com/a/1190000041851035?utm_source=sf-similar-article
+2 调研哪些产品在预测这里做的比较好。
 
 下周汇报学习进展
 ## 第二周汇报
+- 加强沟通
+- 看源码
