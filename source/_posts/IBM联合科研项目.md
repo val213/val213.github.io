@@ -633,7 +633,7 @@ MariaDB 安装完成后，运行 `mysql_secure_installation` 脚本来设置 roo
    ```
 
 完成以上步骤后，MariaDB 就安装并配置好了。你现在可以开始创建数据库和表，进行数据管理操作了。
-![alt text](image-35.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-35.png)
 
 
 ### 配置dockers环境过程中遇到启动了容器但是访问不到端口的问题

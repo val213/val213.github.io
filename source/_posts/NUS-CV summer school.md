@@ -192,7 +192,7 @@ Cons:
 
 ##### Local Binary Pattern (LBP)
 
-![Alt text](image.png)
+![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image.png)
 
 
 ##### Histogram of Oriented Gradient (HoG)
@@ -213,9 +213,9 @@ Cons:
 
 
 ##### k-fold Cross Validation
-![Alt text](image-1.png)
+![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-1.png)
 ##### Leave-one-out Cross Validation
-![Alt text](image-2.png)
+![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-2.png)
 
 #### summary
 Classification means assigning class label to input pattern.
