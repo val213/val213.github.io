@@ -537,6 +537,10 @@ pytest --cov=tut12 --cov-report term-missing test_tut12.py
 本篇阐述如何使用 Prometheus 实现性能压测 Metrics 的可观测性。
 
 ### 下周目标
+- 再次学习使用Prometheus+Grafana监控一个node并在grafana中展示
+- 读LOP-API脚手架的源码
+- cherrypy + MariaDB
+- Linuxone基础知识入门
 ## 第二周
 前端组 后端组 ：
 任务1 学习docker的基本用法，熟悉container，image操作相关命令，使用一个简单的dockerfile build一个image并启动。
@@ -551,7 +555,9 @@ pytest --cov=tut12 --cov-report term-missing test_tut12.py
 - 在虚拟机上用dockers拉取镜像的时候居然报错了！
 > Error response from daemon: Get "https://registry-1.docker.io/v2/": dial tcp: lookup registry-1.docker.io on 127.0.0.53:53: server misbehaving.
 
-筛查了一下，发现是因为虚拟机的DNS设置有问题，一开始尝试修改了`/etc/dockers/daemon.json`，没有作用；后来的解决方法是修改`/etc/resolv.conf`文件，将`nameserver 127.0.0.53:53`改为`nameserver 8.8.8.8`，然后重启网络服务`sudo service network-manager restart`再重新拉取镜像就可以了。
+筛查了一下，发现是因为虚拟机的DNS设置有问题，一开始尝试修改了`/etc/dockers/daemon.json`，没有作用；后来的解决方法是修改`/etc/resolv.conf`文件，将`nameserver 127.0.0.53:53`改为`nameserver 8.8.8.8`（我也不知道为什么一开始是这个地址），然后重启网络服务`sudo service network-manager restart`再重新拉取镜像就可以了。
+
+> 小插曲，刚好在配置的这两天，国外的dockers hub被墙了，所以我还需要更换国内的镜像源。
 
 在`/etc/dockers/daemon.json`中更换docker hub的国内镜像，成功拉取
 ```json
@@ -633,11 +639,11 @@ MariaDB 安装完成后，运行 `mysql_secure_installation` 脚本来设置 roo
    ```
 
 完成以上步骤后，MariaDB 就安装并配置好了。你现在可以开始创建数据库和表，进行数据管理操作了。
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-35.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-35.png?raw=true)
 
 
 ### 配置dockers环境过程中遇到启动了容器但是访问不到端口的问题
-不管是虚拟机还是宿主机都访问不到。
+不管是虚拟机还是宿主机都访问不到。先说结论：重启docker服务......
 
 尝试过程：
 初步了解并排除了docker-compose.yml和prometheus.yml的问题。
@@ -669,6 +675,14 @@ ping: bad address 'baidu.com'
 val213@ubuntu:~$ docker exec -it a55d25c92e6f ping www.baidu.com
 ping: bad address 'www.baidu.com'
 ```
+加上DNS:
+```json
+{
+  "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn/", "https://hub-mirror.c.163.com", "https://registry.docker-cn.com"],
+  "insecure-registries": ["10.0.0.12:5000"],
+  "dns": ["8.8.8.8", "8.8.4.4"]
+}
+```
 #### 内核级别的包过滤系统
 `sudo iptables -A INPUT -p tcp --dport 3000 -j ACCEPT`
 `sudo iptables -A INPUT -p tcp --dport 9090 -j ACCEPT`
@@ -695,12 +709,261 @@ sudo iptables -A INPUT -p tcp --dport 9090 -j ACCEPT
 - `docker inspect a55d25c92e6f`命令，可以查看容器的详细信息，包括网络配置等。
 - 在Docker中，如果在启动容器时没有指定容器名称（`container_name`），Docker会自动生成一个随机的名称。这个名称通常由一个形容词和一个著名科学家或工程师的名字组成，例如`quizzical_ganguly`。
 
-    然而，当使用`docker-compose`并在[`docker-compose.yml`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2Fhome%2Fval213%2FLOP-learn%2Fdocker-compose.yml%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%5D "/home/val213/LOP-learn/docker-compose.yml")文件中为服务指定了`container_name`属性时，容器将使用这个指定的名称，而不是生成一个随机名称。在您提供的[`docker-compose.yml`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2Fhome%2Fval213%2FLOP-learn%2Fdocker-compose.yml%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%5D "/home/val213/LOP-learn/docker-compose.yml")文件片段中，Prometheus服务被明确命名为`prometheus`：
+    然而，当使用`docker-compose`并在`docker-compose.yml`文件中为服务指定了`container_name`属性时，容器将使用这个指定的名称，而不是生成一个随机名称。例如`docker-compose.yml`文件片段中，Prometheus服务被明确命名为`prometheus`：
+```dockercompose
+services:
+prometheus:
+    container_name: prometheus
+```
+这意味着，当使用这个`docker-compose.yml`文件启动容器时，Prometheus容器的名称应该是`prometheus`，而不是一个随机生成的名称。如果容器名称是随机的，可能是因为容器是直接通过`docker run`命令启动的，而不是通过`docker-compose up`，或者是使用了不同的`docker-compose.yml`文件。
+#### 真正的解决方法！
+以上都是虚假的解决方法，因为等我第二天重新打开访问端口的时候，又不行了！
+我开始慢慢尝试之前试过的指令，最后发现，其实——真正的解决方法是重启docker服务！
+```shell
+sudo systemctl restart docker
+```
+### node_exporter部署
+node_exporter是一个用于收集系统性能指标的代理，它会定期从系统中收集各种指标，并将这些指标暴露给Prometheus。Prometheus可以通过查询node_exporter来获取系统的性能指标，然后将这些指标存储在时间序列数据库中，以便后续分析和可视化。
 
-    ```dockercompose
-    services:
-    prometheus:
-        container_name: prometheus
-    ```
+node_exporter的部署有两种方式，一种是直接在系统上运行node_exporter二进制文件，另一种是使用Docker容器运行node_exporter。在这里，我们将选择在宿主机上运行node_exporter二进制文件的方式。
 
-    这意味着，当使用这个`docker-compose.yml`文件启动容器时，Prometheus容器的名称应该是`prometheus`，而不是一个随机生成的名称。如果容器名称是随机的，可能是因为容器是直接通过`docker run`命令启动的，而不是通过`docker-compose up`，或者是使用了不同的`docker-compose.yml`文件。
+推荐理由：
+
+- 优点:
+
+    1. 完整的系统指标：直接在宿主机上运行Node Exporter可以访问更多的系统指标，包括磁盘IO、网络状态、进程信息等。
+    2. 简化网络配置：不需要特别配置网络，Prometheus可以直接通过宿主机的网络访问Node Exporter。
+#### 在宿主机上部署node_exporter
+1. **下载node_exporter二进制文件**:
+下载最新发行版，截止2024.6.10，最新版本是1.8.1。
+要在宿主机上安装Node Exporter，可以遵循以下步骤。这些步骤假设使用的是基于Linux的系统：
+
+1. **下载Node Exporter**:
+   首先，访问[Prometheus官方下载页面](https://prometheus.io/download/#node_exporter)以获取最新版本的Node Exporter。找到适合操作系统和架构的版本。以下命令示例将下载并解压Linux系统的最新版本（根据实际情况替换版本号）：
+
+```bash
+wget https://github.com/prometheus/node_exporter/releases/download/v*/node_exporter-1.8.1.linux-amd64.tar.gz
+
+ tar -xvf node_exporter-1.8.1.linux-amd64.tar.gz
+```
+
+
+2. **安装Node Exporter**:
+   解压后，将Node Exporter二进制文件移动到执行路径中：
+
+```bash
+sudo mv node_exporter-1.8.1.linux-amd64/node_exporter /usr/local/bin
+```
+
+3. **创建Systemd服务**:
+   为了让Node Exporter作为服务运行，可以创建一个Systemd服务文件。这样可以方便地管理Node Exporter的启动、停止和自动重启。
+
+   创建一个新的Systemd服务文件：
+
+```bash
+sudo nano /etc/systemd/system/node_exporter.service
+```
+
+然后，将以下内容粘贴到文件中：
+
+```ini
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=nobody
+Group=nogroup
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+```
+
+保存并关闭文件。
+
+4. **启动Node Exporter服务**:
+   重新加载Systemd以识别新的服务文件，启动Node Exporter服务，并设置为开机自启：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start node_exporter
+sudo systemctl enable node_exporter
+```
+
+5. **验证Node Exporter运行情况**:
+   检查Node Exporter服务的状态，确保它正在运行：
+
+```bash
+sudo systemctl status node_exporter
+```
+
+也可以通过访问`http://<宿主机IP地址>:9100/metrics`在浏览器中查看Node Exporter暴露的指标，以验证它是否正确运行。
+
+完成以上步骤后，Node Exporter将在宿主机上作为服务运行，Prometheus可以配置为从这个端点抓取指标。
+
+
+##### 关于Prometheus访问不到node_exporter的问题
+问题描述：在Prometheus配置文件中添加了node_exporter的target，但是在Prometheus的web界面中无法访问到node_exporter的指标。
+```yml
+- job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']
+  - job_name: 'mariaDB'
+    static_configs:
+      - targets: ['localhost:9104']
+```
+这两个target都是down，并且报错：`Get "http://localhost:9104/metrics": dial tcp 127.0.0.1:9104: connect: connection refused`和`Get "http://node_exporter:9100/metrics": dial tcp: lookup node_exporter on 8.8.8.8:53: no such host`
+**因为我是在虚拟机中部署node_exporter的**，所以得修改`prometheus.yml`文件，把`target`的IP地址改为虚拟机的IP地址(不能是`localhost`或者`node_exporter`，后者应该是在哪个教程粘贴的时候没注意，这玩意DNS根本解析不了)。同时要注意yml文件的格式，冒号后面要有空格。不然就会一启动容器就自动退出到`EXIT`状态。
+
+##### tips：
+- 创建容器的时候用 `--name` 指定名字
+```
+docker run -d \
+  --name=prometheus_new \
+  -p 9090:9090 \
+  -v /home/val213/LOP-learn/prometheus.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
+```
+- 查看容器的日志
+```shell
+docker logs <container_id/name>
+```
+- 重启prometheus容器
+    - 如果修改了Prometheus的配置文件（prometheus.yml）并希望应用这些更改，那么在这种情况下，需要重新加载Prometheus的配置或重启Prometheus容器。Prometheus支持在不重启的情况下重新加载其配置，可以通过发送SIGHUP信号到Prometheus进程来实现：
+    - `docker kill --signal=SIGHUP prometheus_new`
+    - 这将指示Prometheus重新加载其配置文件(注意这里的`prometheus_new`是我的容器的名字，你得换成你自己的)。如果出于某种原因这不起作用，或者您更倾向于简单的方法，您可以安全地重启Prometheus容器：
+    - `docker restart prometheus_new`
+    - 重启后，Prometheus将使用最新的配置启动，包括任何对抓取目标的更改。
+### Grafana展示面板
+当Grafana和Prometheus都在容器中运行时，您可以通过以下步骤为Grafana添加Prometheus作为数据源：
+
+#### 步骤1: 确定Prometheus容器的网络访问地址
+
+确定Prometheus容器的网络访问地址，因为Grafana需要通过这个地址来访问Prometheus。如果Grafana和Prometheus在同一个Docker网络中，您可以使用容器名称作为目标地址。确保两个容器都连接到同一个自定义网络（而不是默认的`bridge`网络），这样它们就可以通过容器名称相互访问了。
+
+如果您还没有创建自定义网络，可以通过以下命令创建一个：
+
+```bash
+docker network create my-monitoring-network
+```
+
+然后，确保启动Prometheus和Grafana容器时将它们连接到这个网络。例如：
+
+```bash
+docker run -d \
+  --network=my-monitoring-network \
+  --name=prometheus_new \
+  -p 9090:9090 \
+  -v /home/val213/LOP-learn/prometheus.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
+```
+
+```bash
+docker run -d \
+  --network=my-monitoring-network \
+  --name=grafana_new \
+  -p 3000:3000 \
+  grafana/grafana
+```
+
+#### 步骤2: 为Grafana添加Prometheus数据源
+
+1. **登录到Grafana**：在浏览器中打开Grafana的UI（默认是`http://localhost:3000`），使用默认的`admin/admin`作为用户名和密码登录。
+
+2. **打开数据源设置**：登录后，点击左侧菜单栏的齿轮图标（设置），然后选择“Data Sources”。
+
+3. **添加数据源**：点击页面上的“Add data source”按钮，然后从列表中选择“Prometheus”。
+
+4. **配置Prometheus数据源**：
+   - 在“HTTP”部分的“URL”字段中，输入Prometheus的访问地址。如果Grafana和Prometheus在同一个Docker网络中，这将是`http://prometheus:9090`，其中`prometheus`是Prometheus容器的名称，`9090`是Prometheus默认的端口号。
+   - 其他设置可以保留默认值。
+
+5. **保存并测试**：点击页面底部的“Save & Test”按钮。Grafana将尝试连接到指定的Prometheus实例。如果配置正确，您将看到一个绿色的成功消息。
+
+完成这些步骤后，您就成功地将Prometheus添加为Grafana的数据源了，现在可以开始创建仪表板来可视化Prometheus收集的指标数据。
+### 尝试监控MariaDB
+要在Prometheus中监控MariaDB，您可以使用`mysqld_exporter`，这是一个官方的exporter，用于抓取MySQL和MariaDB服务器的指标并使其可供Prometheus监控。以下是配置过程的概述：
+
+#### 步骤1: 下载并安装`mysqld_exporter`
+
+1. 访问[mysqld_exporter的GitHub发布页面](https://github.com/prometheus/mysqld_exporter/releases)下载最新版本的`mysqld_exporter`。
+2. 解压下载的文件到合适的目录。
+3. 赋予`mysqld_exporter`可执行权限。
+
+   ```bash
+   chmod +x mysqld_exporter
+   ```
+
+#### 步骤2: 配置MariaDB访问权限
+
+为了让`mysqld_exporter`能够访问MariaDB的指标，您需要为其创建一个具有限制权限的用户。
+
+1. 登录到MariaDB：
+
+   ```sql
+   mysql -u root -p
+   ```
+
+2. 创建一个新用户并授予必要的权限：
+
+   ```sql
+   CREATE USER 'exporter'@'localhost' IDENTIFIED BY 'YourPassword';
+   GRANT PROCESS, SLAVE MONITOR, REPLICATION CLIENT,  SELECT ON *.* TO 'exporter'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+   替换`YourPassword`为您选择的密码。
+
+#### 步骤3: 配置`mysqld_exporter`
+
+1. 创建一个名为`.my.cnf`的配置文件，包含用于登录MariaDB的凭据：
+
+```
+[client]
+user=exporter
+password=YourPassword
+```
+
+2. 确保此文件的权限足够安全，仅`mysqld_exporter`和必要的管理员用户可读。
+
+#### 步骤4: 运行`mysqld_exporter`
+
+使用以下命令启动`mysqld_exporter`，并指定配置文件：
+
+
+```shell
+./mysqld_exporter --config.my-cnf="/home/val213/LOP-learn/.my.cnf"
+```
+
+#### 步骤5: 配置Prometheus监控`mysqld_exporter`
+
+1. 编辑Prometheus的配置文件`prometheus.yml`，添加`mysqld_exporter`作为一个抓取目标：
+
+   ```yaml
+   scrape_configs:
+     - job_name: 'mysql'
+       static_configs:
+         - targets: ['localhost:9104']
+   ```
+
+2. 重启Prometheus以应用新的配置。
+
+#### 步骤6: 在Grafana中创建仪表板
+略去这一步，但是记得node_exporter_full是看不到mysql的监控的，要换一个支持mysql的监控仪表板。例如`https://grafana.com/grafana/dashboards/13106-galera-mariadb-overview/`。
+
+### 任务三 研读LOP-API脚手架的源码
+
+### 任务四 Linuxone基础知识入门
+>IBM LinuxONE is an enterprise-grade Linux® server that brings together the IBM expertise in building enterprise systems with the openness of the Linux operating system.
+>IBM LinuxONE是一款企业级Linux®服务器，它将IBM在构建企业级系统方面的专业知识与Linux操作系统的开放性结合在一起。
+>
+>LinuxONE offers a sustainable and cyber-resilient platform for hybrid cloud and AI applications, which can also help reduce total cost of ownership through workload consolidation. 
+>LinuxONE提供了一个可持续且具备网络弹性的平台，可用于混合云和AI应用程序，通过工作负载整合，还可以帮助降低总体拥有成本。
+
+### 小讲座
+- 为什么选择cherrypy
+    - 轻量，简单，过了法务的，没有任何问题
+- 

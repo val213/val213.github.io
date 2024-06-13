@@ -166,7 +166,7 @@ Low coupling is supported, which implies lower maintenance dependencies and high
 -  常见的网上商店的购物车（ShopCar），需要让每种商品（SKU）只在购物车内出现一次，购买相同商品，只需要更新商品的数量即可。
 -  一个订单（Order）是由多个订单项（OrderItem）组成，订单项是由商品（Product）和数量（quantity）组成的，订单项的总价是商品的单价乘以数量。
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/5.png?raw=true)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-5.png?raw=true)
 
 ### ⭐3、Low coupling（低耦合）
 低耦合模式的意思就是要我们尽可能地减少类之间的连接。
