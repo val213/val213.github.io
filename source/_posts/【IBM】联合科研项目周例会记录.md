@@ -127,3 +127,16 @@ AI组：从两个方面逐步清晰我们的目标
 ## 第二周汇报
 - 加强沟通
 - 看源码
+## 第三周汇报
+前端组Q：A主机的node_exporter，不能联通B机器的Prometheus？
+改变配置，指向B机器的Prometheus。
+
+虚拟机网络复杂可能要配置一下Prometheus的配置文件 防火墙、selinux要关闭
+
+
+谢强老师(前端)：
+- 前后端后面需要talk关于api
+- axios
+- ant-design组件库
+- dockerfile打包成image发布
+- mock数据
