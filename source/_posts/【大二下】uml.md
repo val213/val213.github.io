@@ -3,9 +3,11 @@ title: 软件需求分析与建模（uml）
 categories: 复习
 tags: uml
 ---
+感谢很多同学！
+
 考点思维导图：https://mindline.cn/webapp?file=6CUH8M
-# 名词表
-如下表所示：
+# 部分名词表
+
 |英文|中文|
 |---|---|
 |artifacts|工件，制品|
@@ -46,7 +48,7 @@ RUP的4+1视图是指用例视图、逻辑视图、实现视图、进程视图�
 - **进程（/处理）视图**：进程视图描述了系统的动态行为，进程视图是从软件开发人员的角度来描述系统的动态行为，进程视图是系统的动态行为的描述。
 - **部署（/物理）视图**：部署视图描述了系统的部署结构，部署视图是从系统管理员的角度来描述系统的部署结构，部署视图是系统的部署结构的描述。
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-195.png?raw=true)
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/{DBDUOVW{Y%ONIA7$D~KOUG.jpg)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/{DBDUOVW{Y%ONIA7$D~KOUG.jpg?raw=true)
 ### 九大核心工作流
 RUP中有9个核心工作流，分为6个核心过程工作流(Core Process Workflows)和3个核心支持工作流(Core Supporting Workflows)。尽管6个核心过程工作流可能使人想起传统瀑布模型中的几个阶段，但应注意迭代过程中的阶段是完全不同的，这些工作流在整个生命周期中一次又一次被访问。*9个核心工作流在项目中轮流被使用，在每一次迭代中以不同的重点和强度重复。*
 
@@ -706,7 +708,7 @@ context和state之间的连接时左边空心菱形右边箭头，代表聚合�
     - 关联关系：表示的是类与类之间存在某种特定的对应关系，**通常是一个类里面有的属性的类型是另一个类。关联可以是单向的，也可以是双向的**。
     ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-133.png?raw=true)
         - 在边边上表示这个关联的名称
-        - ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/<@]U)F8~8$X%%XL0J84PZ~}0.jpg>)
+        - ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/<@]U)F8~8$X%%XL0J84PZ~}0.jpg?raw=true>)
 选D，A如果把+改成-就对了；不加[+/-/#]符号，默认私有。属性或操作名前面的符号表示元素的可见性:如果使用了+符号，属性或操作具有公共级别的可见性;如果使用了-符号，则属性或操作是私有的。此外，#符号允许将操作或属性定义为受保护的，而~符号表示包的可见性。
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-225.png)
     - 聚合关系：表示的是关联关系的一种特例，是强的关联关系，表示的是整体与部分之间的关系，部分不能离开整体单独存在。通常是一个类是另外一个类（主类）的一部分，但是主类与部分类不是“同生共死”的。聚合表示一种弱的"拥有"关系，体现的是**A对象可以包含B对象，但B对象不是A对象的一部分**；
@@ -723,7 +725,7 @@ context和state之间的连接时左边空心菱形右边箭头，代表聚合�
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-194.png)
 例如，可以通过Sale其他属性和方法来直接确定total的值，那么把total叫做导出元素
 #### 接口
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/a4d35850f29b4d507ce49f39fa63281.jpg)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/a4d35850f29b4d507ce49f39fa63281.jpg?raw=true)
 - 用插座线表示法表示拥有一个接口依赖（必要接口）
 - 用棒棒糖表示法表示提供一个接口依赖（提供接口）
 - 用虚线表示法表示实现一个接口依赖（实现接口）
@@ -734,7 +736,7 @@ context和state之间的连接时左边空心菱形右边箭头，代表聚合�
     ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/[WGL3@0{}76IT3%@CYQNF_E.png)
 - 组合：contains-a，整体与部分之间的关系，部分不能离开整体单独存在，但是组合关系更强，部分和整体的生命周期一样
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/GOVT%5IPH49LV%$8S_MIE02.jpg)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/GOVT%5IPH49LV%$8S_MIE02.jpg?raw=true)
 选A。
 #### 活动类
 活动对象的类为活动类。用双竖线表示。
@@ -759,9 +761,9 @@ T写在类名的右上角表示模板类
     - （监护条件 只有当valid subscriber(有效订阅者)为真时才会执行状态转换）(play dial tion-播放拨号音)
     ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-182.png)
 - 嵌套状态图
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-183.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-183.png?raw=true)
 - 网页导航的一个状态图
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-185.png)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-185.png?raw=true)
 - Next gen pos的一个状态图
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-184.png?raw=true)
 >状态图以状态的概念描述对象、子系统、系统在生命周期中的各种行为，简单的说就是一个状态图只描述某一个对象（可以是类、程序模块、系统）的行为。通过状态图可以知道一个对象、子系统、系统的各种状态及其收到的消息对其状态的影响。世界万物都有可以描述的状态，因此都可以通过状态图来描述他们的行为，状态图具有很强的表达能力。
@@ -866,7 +868,7 @@ clock是一个主动类(active class)产生的主动对象，可以随时执行�
     - 而顺序图用来分析类中的具体方法
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-149.png?raw=true)
 
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/<7IU$4$QSGSV3WDZJXSBL(15.jpg>)选C
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/<7IU$4$QSGSV3WDZJXSBL(15.jpg?raw=true>)选C
 #### operation contract
 - 后置条件postcondition有三种类型：
     - instance creation/deletion
@@ -886,7 +888,7 @@ clock是一个主动类(active class)产生的主动对象，可以随时执行�
 uml1.4：
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-187.png?raw=true)
 uml2.0：
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/288f0760a23f8a6092eab4d8f20a053.jpg)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/288f0760a23f8a6092eab4d8f20a053.jpg?raw=true)
 ### 10、部署图（Deployment Diagrams）
 部署图描述任何基于计算机的应用系统的物理或逻辑的配置。它可以描述系统硬件的物理拓扑结构和在此结构上执行的系统软件，也能描述系统节点的拓扑结构和通信路径、节点上运行的构件、构件中的逻辑单元等。
 
@@ -900,7 +902,7 @@ uml2.0：
 
 #### 信息系统逻辑架构中常见的层
 松散分层耦合
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/f2622a3cd98ef2d260b8a15407baf7c.jpg)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/f2622a3cd98ef2d260b8a15407baf7c.jpg?raw=true)
 
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-151.png?raw=true)
 - domain model 启发了 设计模型中架构的domain layer
@@ -935,7 +937,7 @@ uml2.0：
 ## 模型
 ### 1、领域模型
 不写方法，区别于类图
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/IH%]BLD$6CO7V2XUVRQ874A.jpg)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/IH%]BLD$6CO7V2XUVRQ874A.jpg?raw=true)
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-148.png?raw=true)
 - 领域模型是可视化的概念类的词典，是对现实世界概念类的表示
 - 领域模型中的类可以有属性
@@ -977,10 +979,18 @@ uml2.0：
 用例实现就是设计模型
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/faff094d9258c153b91dbfe33a73ead.png?raw=true)
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/fcc89a708152a7954fa1768fe83a044.png?raw=true)
-### 4、操作模型
-### 5、描述结构模型
-### 6、用例分析模型
-### 7、类中的职责分配
+# 2024选择题
+有人抄下来了，去找找；
+有外观模式、工厂模式、代理模式、时序图
+# 2024名词解释
+- OOA
+- uml
+- RUP
+- GRASP
+- pattern
+# 2024简答题
+- liskov替换原则，不遵循的eamples和后果
+- how to enhance adpater pattern with other patterns?
 # 建模题，场景
 - 定义一些类，画类图
 - 定一个用例，写用例文本，画用例图
@@ -989,54 +999,42 @@ uml2.0：
 - ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-229.png?raw=true)
 - ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-227.png?raw=true)
 - ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-228.png?raw=true)
-### 银行业务
-
-### 买股票
-
+### 银行业务+买股票（2024最终考了银行账户+买股票）
+- bank
+- customer
+- account
+    - forsaving
+        - interstrate
+    - forinvestment
+- stock
+    - ticker
+- stockorder
 ### 火车订票12306
 
 # 综合设计题
-## 用例图
-用例模型，用例文本
-## 领域模型
-
-## 状态机图
-## 采用GoF的一种设计模式来对状态图或者类图进行修正
+## 可能涵盖的内容
+- 用例图、用例模型，用例文本、领域模型、类图、状态机图、设计模式
+### 采用GoF的一种设计模式来对状态图或者类图进行修正
 从三个场景中选择：
 ### 智能家居中的远程控制
-### 汽车租赁，嘀嘀打车
+### 汽车租赁（2024考了汽车租赁画用例图、领域模型、状态图、状态模式修正reservationform类）滴滴打车
+- customer
+    - online or onphone
+    - make reservation
+    - fill reservation form
+        - states of form: submitted、approved、refused)
+    - query reservation form and record 
+- salesman
+    - process reservation form
+    - query customer personal information
+    - query reservation form and record
+- system
+    - store reservation form
+    - store reservation record
+- maintainer
+    - resgist
+    - query checkList of vehicles
 ### 电商拼多多
 #### 用例图和类图
 ![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-230.png?raw=true)
 
-# 选择题
-
-## 设计模式
-
-### 单例
-
-### 外观
-
-### 工厂
-
-### 代理
-
-### 参考往年
-
-## 活动图
-
-## 状态图
-
-## 类图
-
-## 时序图
-
-## 需求分析，用例图
-
-## 操作
-
-## 描述结构
-
-## 用例分析
-
-## 类中的职责分配：通讯图和时序图
