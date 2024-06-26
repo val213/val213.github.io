@@ -963,7 +963,83 @@ password=YourPassword
 >LinuxONE offers a sustainable and cyber-resilient platform for hybrid cloud and AI applications, which can also help reduce total cost of ownership through workload consolidation. 
 >LinuxONE提供了一个可持续且具备网络弹性的平台，可用于混合云和AI应用程序，通过工作负载整合，还可以帮助降低总体拥有成本。
 
-### 小讲座
-- 为什么选择cherrypy
-    - 轻量，简单，过了法务的，没有任何问题
-- 
+## Linuxone基础知识讲座
+### 基础介绍
+#### 什么是Linuxone
+![alt text](image-325.png)
+#### 发展历史
+![alt text](image-326.png)
+#### Rockhopper Ⅱ and Emperor Ⅱ
+![alt text](image-327.png)
+#### IBM z14 frame layout
+![alt text](image-312.png)
+- ibmZ**不提供磁盘** 
+### DPM (Dynamic Partition Manager)
+![alt text](image-313.png)
+- 资源管理工具，降低了解门槛
+![alt text](image-314.png)
+#### process and memory
+- 划分逻辑资源LPAR
+![alt text](image-315.png)
+- 双柜可以分80个分区
+![alt text](image-316.png)
+### CPU
+![alt text](image-317.png)
+- shared：一个CPU被多个分区共享
+- dedicated：一个CPU被一个分区独占
+- 频分比：一个CPU被多个分区共享时，每个分区的CPU时间比例
+### Memory
+![alt text](image-318.png)
+- 计划任务
+### Storage
+![alt text](image-319.png)
+- Linux one不提供磁盘，存储来自于外部存储
+- 通过光纤交换机看到存储
+- path：注意到路径的变化情况，说明了一些可能原因
+- 存储类型
+    - boot 用来装OS
+    - data 用来装数据，不能装OS
+- Storage Group
+    - 单个存储是storage volume，一个或者多个storage volume集合成group
+    - 每个SG可以同时map到多个area part，也可以只map到一个area part
+- FCP 光纤通道协议
+    - WWPN
+    - 世界范围唯一的光纤通道地址
+    - 类比MAC地址
+- VHBA
+    - 虚拟HBA
+    - 需要交换机支持
+    - 把网卡虚拟出多个网卡
+    - 用来连接存储
+### Network
+![alt text](image-320.png)
+- 10GB的卡叫OSD：Open System Adapter
+- 25GB的卡叫RoCE：
+同样可以划分逻辑资源，例如：
+- 05的卡被以下的partition共享：
+![alt text](image-321.png)
+- 17的卡被以下的partition独占：
+![alt text](image-322.png)
+### Monitor
+![alt text](image-323.png)
+![alt text](image-324.png)
+
+
+## 第三周考试周
+搭建本地API测试server
+![alt text](image-328.png)
+途中遇到了几个问题：
+1. `./local_test.sh init` 的时候，遇到报错
+    ![alt text](image-329.png)
+    - 解决方法：
+    查阅资料[stackoverflow: At least one invalid signature was encountered
+](https://stackoverflow.com/questions/62473932/at-least-one-invalid-signature-was-encountered)后进行尝试和排查，发现应该是磁盘空间不足了，进行虚拟机磁盘扩容
+2. 扩容后虚拟机启动不起来了：原因是因为虚拟机的磁盘扩容后，虚拟机的分区表没有更新，所以虚拟机无法识别新的磁盘空间。
+    - 解决方法：
+    [VMWare中给Ubuntu 虚拟机硬盘扩容后无法正常开机的相关问题](https://blog.csdn.net/Alan_Walker688/article/details/131889313)
+3. 启动之后网络不通，ens33网卡状态异常。连不到dockerhub，vscode也ssh不到
+    - 解决方法：
+    [Ubuntu上不了网：ifconfig查看只有lo,没有ens33问题解决参考方法](https://blog.csdn.net/qq_41969790/article/details/103222251)
+
+
+## 第四周
