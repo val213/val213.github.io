@@ -1043,3 +1043,87 @@ password=YourPassword
 
 
 ## 第四周
+任务分配： https://github.com/JasonCrash/LOP-API/issues/4
+
+### 什么是 `zhmc-prometheus-exporter` ?
+HMC：硬件管理控制台
+
+`zhmc-prometheus-exporter` 支持ZHMC提供的所有指标以及一些基于HMC资源属性（如LPAR的内存或CPU权重）的有用指标。基于资源属性的指标在后台通过HMC发出的更改通知以及不支持更改通知的属性的异步检索获得。
+
+[available-metrics](https://zhmc-prometheus-exporter.readthedocs.io/en/stable/usage.html#available-metrics)
+
+
+The following table shows the mapping between  `exporter metric groups` and `exported Prometheus metrics` in `the standard metric definition`. 请注意，集合和 zBX 相关的度量不在标准度量定义范围内（z15 版本已移除了对它们的支持）。有关 HMC 度量的更多信息，请参见 HMC API 手册中的“度量组”部分。有关 CPC 和分区（DPM 模式）以及逻辑分区（经典模式）的资源属性的更多信息，请参见 HMC API 手册中的相应数据模型。
+
+![alt text](image-357.png)
+
+Legend:
+- Type: The type of the metric group: M=metric service, R=resource property
+类型：度量组的类型：M=度量服务，R=资源属性
+- Mode: The operational mode of the CPC: C=Classic, D=DPM
+模式：CPC的操作模式：C=经典模式，D=DPM模式
+
+As you can see, the `zhmc_cpc_*` and `zhmc_partition_*` metrics are used for both `DPM mode` and `classic` mode. The names of the metrics are equal if and only if they have the same meaning in both modes.
+
+- hmccreds.yaml
+>Provide an HMC credentials file for use by the exporter.
+为出口商提供一个HMC证书文件。
+The HMC credentials file tells the exporter which HMC to talk to for obtaining metrics, and which userid and password to use for logging on to the HMC.
+HMC 认证文件告诉出口商要与哪个 HMC 进行通信以获取指标，以及要使用哪个用户 ID 和密码登录到 HMC。
+It also defines whether HTTP or HTTPS is used for Prometheus, and HTTPS related certificates and keys.
+它还定义了Prometheus使用的是HTTP还是HTTPS，以及与HTTPS相关的证书和密钥。
+Download the Sample HMC credentials file as hmccreds.yaml and edit that copy accordingly.
+下载 Sample HMC 凭据文件，然后根据需要进行编辑。
+For details, see HMC credentials file.
+详细信息请参见HMC凭据文件。
+
+
+
+- matrics.yaml
+>Provide a metric definition file for use by the exporter.
+为出口程序提供一个度量定义文件。
+The metric definition file maps the metrics returned by the HMC to metrics exported to Prometheus.
+度量定义文件将HMC返回的度量映射到Prometheus可导出的度量。
+Furthermore, the metric definition file allows optimizing the access time to the HMC by disabling the fetching of metrics that are not needed.
+此外，度量定义文件允许通过禁用不需要的度量来优化对HMC的访问时间。
+Download the Sample metric definition file as metrics.yaml. It can be used as it is and will have all metrics enabled and mapped properly. You only need to edit the file if you want to adjust the metric names, labels, or metric descriptions, or if you want to optimize access time by disabling metrics not needed.
+下载示例度量定义文件，将其保存为。该文件可以直接使用，并且会启用所有度量并正确映射。如果您想更改度量名称、标签或描述，或者想通过禁用不需要的度量来优化访问时间，只需编辑该文件即可。
+For details, see Metric definition file.
+详细信息请参见度量定义文件。
+
+**在这个文件中，exporter_name 是用来标识每个度量指标（metric）的唯一名称，它代表了特定的监控数据点。这些名称通常用于 Prometheus 配置中，以便于 Prometheus 识别和收集相应的指标数据。**
+### Demo setup with Grafana
+部署图
+![alt text](image-356.png)
+### prometheus metrics类型
+
+![alt text](image-358.png)
+
+|Metric 类型|	说明	|常用指标|
+|---|---|---|
+|Counter|Counter 类型的指标和计数器一样，只增不减（除非系统发生重置）。常见的监控指标，例如http_requests_total，node_cpu_seconds_total 都是 Counter 类型的监控指标。Counter 类型的指标名称常使用 _total 作为后缀。Counter 是一个简单但强大的指标，但需要明确的是，某项指标的累计值，对于用户了解系统状态来说，没什么直接的价值。因此，Counter 指标常搭配 rate 或 increase 函数，通过取 范围向量（range vector） 来使用。|CPU 使用时间，网络流量，请求量|
+|Gauge|	与 Counter 类型不同，Gauge 类型的指标侧重于反应系统的当前状态。因此这类指标的样本数据可增可减。例如 node_memory_MemFree_bytes（主机当前空闲的内存大小）、container_memory_usage_bytes （容器当前内存大小）都是 Gauge 类型的监控指标。|内存用量，硬盘空间，服务运行状态|
+|Histogram|Counter 指标存在一个问题：它只能被计算为均值。而对于类似 接口请求延迟 类的数据，仅仅有平均值还不够。还需要看到数据的分布情况，甚至计算百分位数（quantile）。对于这类数据，Prometheus 提供了 2 种指标类型：histogram 和 Summary。其中，Histogram 的原理是提前定义多个buckets，覆盖所有可能的样本；采集到新样本时，这个样本会落入某个 bucket 内。使用时，我们可以利用样本在各个 bucket 的分布情况计算 quantile。展示时，histogram 尤其适合绘制火焰图（heat map）。|各类延迟、耗时类指标|
+|Summary|Summary 与 Histogram 一样，可以用来查看数据的分布情况。但与 Histogram 不同的是，Summary 返回的是计算后数据（中位数的具体值）。因此，它相比 Histogram 省略了在查询时的计算消耗，但是也丢失了原始的样本数据。|各类延迟、耗时类指标|
+
+### 核心指标
+zhmc-prometheus-exporter的核心指标是什么？
+#### 整理概念
+首先理清楚几个概念和文件之间的关系。
+
+`metrics.yaml` 里定义了一批 **metrics group** 和对应的 **metrics**，metrics group 是一组相关的 metrics，metrics 是具体的指标，比如 `zhmc_cpc_processor_usage_ratio` 是一个metrics，属于 `cpc-usage-overview` 这个 metrics group。在 `metrics.yaml` 文件中，定义了 metrics group 和 metrics 之间的关系，以及 metrics 的一些属性，比如是否启用、是否需要计算、是否需要计算rate等。其中有一个属性是`exporter_name`，这个属性是用来标识每个度量指标（metric）的唯一名称，它代表了特定的监控数据点。这些名称通常用于 Prometheus 配置中，以便于 Prometheus 识别和收集相应的指标数据。可以通过 metrics group 和 exporter_name 来唯一确定 **mapping** 到的具体的 Prometheus metrics。
+
+
+
+参考前端同学的用到的部分Prometheus Metrics：
+- zhmc_cpc_processor_usage_ratio
+- zhmc_cpc_network_adapter_usage_ratio
+- zhmc_cpc_storage_adapter_usage_ratio
+- zhmc_partition_processor_usage_ratio
+- zhmc_partition_network_adapter_usage_ratio
+- zhmc_partition_storage_adapter_usage_ratio
+
+
+与老师交流：
+
+我找出的核心指标：
