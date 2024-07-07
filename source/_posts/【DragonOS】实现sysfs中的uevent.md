@@ -593,3 +593,30 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
 >这样，你就可以在多线程环境中安全地共享和修改`SkBuff`了。
 
 - mutex不支持borrow()和borrow_mut()方法，遂采用Rc<RefCell<T>>的方式。
+
+- 参考driver解决nlk_sk的问题
+- inet没有实现网络协议族的操作集。https://code.dragonos.org.cn/xref/linux-6.1.9/include/net/sock.h#1230
+- classic netlink还是generic netlink？
+    - generic netlink使用classic netlink的API。generic netlink是netlink的一种扩展，它支持1023个子协议号，弥补了netlink协议类型较少的缺陷。generic netlink基于netlink，但是在内核中，generic netlink的接口与netlink并不相同。generic netlink的API是通过netlink的API来实现的，因此generic netlink使用classic netlink的API。
+    - 经典Netlink和通用Netlink之间的主要区别是子系统标识符的动态分配和自省的可用性。 在理论上，协议没有显著的区别，然而，在实践中，经典Netlink实验了通用Netlink中被放弃的概念(实际上，它们通常只在一个单一子系统的一小角落中使用)。本节旨在解释一些这样的概念， 其明确的目标是让通用Netlink用户在阅读uAPI头时有信心忽略它们。
+- 图解NETLINK_ROUTE和NETLINK_GENERIC调用过程
+![alt text](image-361.png)
+![alt text](image-362.png)
+- kset_uevent_ops结构体
+ ```
+ struct kset_uevent_ops {
+     int (* const filter)(struct kset *kset, struct kobject *kobj);
+		//filter，当任何Kobject需要上报uevent时，它所属的kset可以通过该接口过滤，
+		//阻止不希望上报的event，从而达到从整体上管理的目的。
+     const char *(* const name)(struct kset *kset, struct kobject *kobj);
+		//name，该接口可以返回kset的名称。如果一个kset没有合法的名称，
+		//则其下的所有Kobject将不允许上报uvent
+     int (* const uevent)(struct kset *kset, struct kobject *kobj,
+         struct kobj_uevent_env *env);
+	//uevent，当任何Kobject需要上报uevent时，它所属的kset可以通过该接口统一为这些event添加环境变量。
+	//因为很多时候上报uevent时的环境变量都是相同的，因此可以由kset统一处理，就不需要让每个Kobject独自添加了。
+ };
+ ```
+
+用户空间使用netlink套接字和内核通信，和传统的套接字是一样首先使用socket系统调用要创建用户空间套接字，不同的是内核也要创建对应的内核套接字，两者通过nl_table链表进行绑定；创建内核套接字时，要定义接收用户空间netlink消息的input函数，如NETLINK_ROUTE簇的input函数就是rtnetlink_rcv。 nl_table是netlink机制的核心数据结构，围绕此结构的内核活动有： (1) 用户空间应用程序使用socket系统调用创建套接字，然后在bind系统调用时，内核netlink_bind函数将调用netlink_insert(sk, portid)将此用户态套接字和应用程序的进程pid插入nl_table，这里参数portid就是进程pid； (2) 创建内核套接字时，调用netlink_insert(sk, 0)将此用户态套接字插入nl_table（因为是内核套接字，这里portid是0）； (3) 用户空间向内核发送netlink消息时，调用netlink_lookup函数，根据协议簇和portid在nl_table快速查找对应的内核套接字对象； (4) 当内核空间向用户空间发送netlink消息时，调用调用netlink_lookup函数，根据协议簇和portid在nl_table快速查找对应的用户套接字对象.
+

@@ -1041,12 +1041,16 @@ password=YourPassword
     - 解决方法：
     [Ubuntu上不了网：ifconfig查看只有lo,没有ens33问题解决参考方法](https://blog.csdn.net/qq_41969790/article/details/103222251)
 
-
+> [vscode连接不上问题和解决方法合集](https://blog.csdn.net/White_lies/article/details/124093530)
+后来又遇到过一次 `Got error from ssh: spawn C:\Windows\System32\WindowsPowerShell\v1.0\ssh.exe ENOENT`
+![alt text](image-360.png)
 ## 第四周
 任务分配： https://github.com/JasonCrash/LOP-API/issues/4
 
 ### 什么是 `zhmc-prometheus-exporter` ?
 HMC：硬件管理控制台
+
+`zhmc-prometheus-exporter` 包含了 `zhmcclient` 作为其依赖库。它在内部使用 `zhmcclient` 的 API 来与 HMC 进行交互，并定期调用这些 API 获取最新的监控数据。
 
 `zhmc-prometheus-exporter` 支持ZHMC提供的所有指标以及一些基于HMC资源属性（如LPAR的内存或CPU权重）的有用指标。基于资源属性的指标在后台通过HMC发出的更改通知以及不支持更改通知的属性的异步检索获得。
 
@@ -1067,9 +1071,9 @@ As you can see, the `zhmc_cpc_*` and `zhmc_partition_*` metrics are used for bot
 
 - hmccreds.yaml
 >Provide an HMC credentials file for use by the exporter.
-为出口商提供一个HMC证书文件。
+为exporter提供一个HMC证书文件。
 The HMC credentials file tells the exporter which HMC to talk to for obtaining metrics, and which userid and password to use for logging on to the HMC.
-HMC 认证文件告诉出口商要与哪个 HMC 进行通信以获取指标，以及要使用哪个用户 ID 和密码登录到 HMC。
+HMC 认证文件告诉exporter要与哪个 HMC 进行通信以获取指标，以及要使用哪个用户 ID 和密码登录到 HMC。
 It also defines whether HTTP or HTTPS is used for Prometheus, and HTTPS related certificates and keys.
 它还定义了Prometheus使用的是HTTP还是HTTPS，以及与HTTPS相关的证书和密钥。
 Download the Sample HMC credentials file as hmccreds.yaml and edit that copy accordingly.
@@ -1081,7 +1085,7 @@ For details, see HMC credentials file.
 
 - matrics.yaml
 >Provide a metric definition file for use by the exporter.
-为出口程序提供一个度量定义文件。
+为 exporter 提供一个度量定义文件。
 The metric definition file maps the metrics returned by the HMC to metrics exported to Prometheus.
 度量定义文件将HMC返回的度量映射到Prometheus可导出的度量。
 Furthermore, the metric definition file allows optimizing the access time to the HMC by disabling the fetching of metrics that are not needed.
@@ -1116,7 +1120,7 @@ zhmc-prometheus-exporter的核心指标是什么？
 
 
 参考前端同学的用到的部分Prometheus Metrics：
-- zhmc_cpc_processor_usage_ratio
+- zhmc_cpc_processor_usage_ratio: Usage ratio across all processors of the CPC
 - zhmc_cpc_network_adapter_usage_ratio
 - zhmc_cpc_storage_adapter_usage_ratio
 - zhmc_partition_processor_usage_ratio
@@ -1124,6 +1128,168 @@ zhmc-prometheus-exporter的核心指标是什么？
 - zhmc_partition_storage_adapter_usage_ratio
 
 
-与老师交流：
+### investigate how to get network usage through zhmc exporter
 
-我找出的核心指标：
+![alt text](image-359.png)
+
+CPC（Central Processing Complex）可以看作是一台机器，其中划分了多个分区（partitions）。每个分区可能会连接一个或多个网络接口控制器（NIC），这些NIC可以理解为虚拟网卡。每个NIC又对应一个网络适配器（Adapter），其名称可能类似于OSD 010CA01B-05，而这个OSD 010CA01B-05实际上就是一块实际的物理网卡。
+
+我们目前的目标是实现以下效果：首先，获取一个网络适配器的使用量。如果这个网络适配器被多个分区共享，我们需要知道该适配器的总使用量，并且明确各个分区在总使用量中分别占据的份额。
+
+首先看看有哪些相关的metrics：
+
+
+- `zhmc_cpc_network_adapter_usage_ratio	`: Usage ratio across all network adapters of the CPC. CPC 所有网络适配器的使用率。
+
+- `zhmc_partition_network_adapter_usage_ratio`: Usage ratio of all network adapters of the partition. 该分区所有网卡的使用率。
+```yaml
+partition-usage:
+    network-usage:
+        percent: true
+        exporter_name: network_adapter_usage_ratio
+        exporter_desc: Usage ratio of all network adapters of the partition
+```
+
+- `partition-attached-network-interface` : 分区附加网络接口
+    - zhmc_nic_bytes_sent_count 已发送的单播数据包的字节数
+    - zhmc_nic_bytes_received_count 已接收的单播数据包的字节数
+    - zhmc_nic_packets_sent_count 已发送的单播数据包数
+    - zhmc_nic_packets_received_count 已接收的单播数据包数
+    - zhmc_nic_packets_sent_dropped_count 已丢弃的发送数据包数（资源短缺）
+    - zhmc_nic_packets_received_dropped_count 已丢弃的接收数据包数（资源短缺）
+    - zhmc_nic_packets_sent_discarded_count 已发送但被丢弃的数据包数量（格式错误）
+    - zhmc_nic_packets_received_discarded_count 已接收但被丢弃的数据包数量（格式错误）
+    - zhmc_nic_multicast_packets_sent_count 已发送的多播数据包数量
+    - zhmc_nic_multicast_packets_received_count 已接收的多播数据包数量
+    - zhmc_nic_broadcast_packets_sent_count 已发送的广播数据包数量
+    - zhmc_nic_broadcast_packets_received_count 已接收的广播数据包数量
+    - zhmc_nic_data_sent_bytes 通过集合发送的数据量间隔
+    - zhmc_nic_data_received_bytes 收集间隔内接收的数据量
+    - zhmc_nic_data_rate_sent_bytes_per_second 收集间隔内发送的数据速率
+    - zhmc_nic_data_rate_received_bytes_per_second 收集间隔内接收的数据速率
+
+#### zhmcclient 的 NIC 类
+https://python-zhmcclient.readthedocs.io/en/stable/resources.html#nics
+
+A NIC (Network Interface Card) is a logical entity that provides a Partition with access to external communication networks through a Network Adapter. More specifically, a NIC connects a Partition with a Network Port, or with a Virtual Switch which then connects to the Network Port.
+NIC（网络接口卡）是一种逻辑实体，它通过网络适配器为分区提供访问外部通信网络的途径。更确切地说，NIC将分区连接到网络端口或虚拟交换机，然后虚拟交换机再连接到网络端口。
+
+NIC resources are contained in Partition resources.
+NIC 资源包含在分区资源中。
+
+NICs only exist in CPCs that are in DPM mode.
+NICs只存在于处于DPM模式的CPC中。
+
+
+提供接口：
+- list List the NICs in this Partition.
+列出此分区中的 NIC。
+可以在过滤器参数中指定任何资源属性。有关过滤器参数的详细信息，请参阅过滤。
+资源列表以优化的方式处理：
+如果此管理器启用了自动更新，则使用本地维护的资源列表（通过 HMC 的库存通知自动更新）并应用提供的过滤器参数。
+否则，如果过滤器参数将资源名称指定为具有直接匹配字符串的单个过滤器参数（即没有正则表达式），则根据本地维护的名称 URI 缓存执行优化查找。
+否则，将使用父对象中此资源的相应数组属性来列出资源，并应用提供的过滤器参数。
+- create
+在此分区中创建并配置 NIC。
+NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）支持。
+
+此方法的“properties”参数中指定支持适配器端口的方式取决于适配器类型，如下所示：
+
+对于 OSA 和 Hipersockets 适配器，“virtual-switch-uri”属性用于指定与支持适配器端口关联的虚拟交换机的 URI。
+
+此虚拟交换机是一种资源，只要适配器资源存在，它就会自动存在。请注意，这些虚拟交换机不会显示在 HMC GUI 中；但它们会显示在 HMC REST API 中，因此也会显示在 zhmcclient API 中，作为 VirtualSwitch 类。
+
+“virtual-switch-uri”属性的值可以根据给定的适配器名称和端口索引确定。
+#### zhmcclient 的 nic
+- delete
+Delete this NIC.
+- update_properties
+Update writeable properties of this NIC.
+
+This method serializes with other methods that access or change properties on the same Python object.
+
+
+#### 思路
+##### 针对roCE和cna
+1. zhmcclient 来 list 出 CPCs 中每个 CPC 的partition list
+2. 获取每个 CPC 的网络适配器及其端口信息。
+3. 针对 partition list 中的每个 partition，获取其 NICs 和每个 NIC 对应的可用属性 network-adapter-port-uri，得到每一个 NIC 映射到的 adapter，也就是所有虚拟网卡和物理网卡的映射
+4. 通过获取每个分区的NIC使用统计信息来计算更具体的分区使用量
+
+##### 针对osd和iqd
+1. zhmcclient 来 list 出 CPCs 中每个 CPC 的partition list
+2. 遍历所有CPC，获取每个CPC的虚拟交换机。对每个虚拟交换机，获取其关联的物理网卡和端口信息。
+3. 通过 virtual-switch-uri 找到对应的虚拟交换机。通过虚拟交换机找到对应的物理网卡
+4. 针对 partition list 中的每个 partition，获取其 NICs 和每个 NIC 对应的 virtual-switch-uri，找到对应的虚拟交换机。通过虚拟交换机找到对应的物理网卡，得到每一个 NIC 映射到的 adapter，也就是所有虚拟网卡和物理网卡的映射
+5. 通过获取每个分区的NIC使用统计信息来计算更具体的分区使用量
+
+
+
+
+
+NIC的属性：[Data model - NIC element object](https://www.ibm.com/docs/en/systems-hardware/zsystems/Z16M-A01?topic=model-data-nic-element-object#epm_partitionobj_datamodel_nic)
+
+
+（linuxone 和 zsystem的api有些是一样的）
+[IBM SC27-2642-02, IBM Z Hardware Management Console Web Services API (Version 2.16.0)](https://www.ibm.com/docs/en/module_1675371155154/pdf/SC27-2642-02.pdf)
+
+
+The type of the NIC. The value of this property is derived implicitly from the backing adapter associated with this NIC on the Create NIC operation. Valid values are:
+• "roce" - RDMA over Converged Ethernet.
+• "iqd" - Internal Queued Direct.
+• "osd" - OSA Direct Express
+• "cna" - Cloud Network Adapter
+
+这四种网络接口卡（NIC）类型分别代表了不同的网络技术和用途：
+
+1. **"roce" - RDMA over Converged Ethernet**：
+   - RDMA over Converged Ethernet（RoCE）是一种网络技术，允许远程直接内存访问（RDMA）操作在以太网上执行。这意味着数据可以直接从一个服务器的内存传输到另一个服务器的内存，而无需CPU介入，从而减少延迟，提高数据传输效率。RoCE特别适用于高性能计算（HPC）和企业数据中心。
+
+2. **"iqd" - Internal Queued Direct**：
+   - Internal Queued Direct（IQD）是一种专为高速数据处理设计的内部队列直接传输技术。它通常用于处理大量数据包或高速数据流，通过优化数据路径来减少延迟和提高吞吐量。IQD技术适用于需要高速数据处理能力的场景，如网络分析、高频交易等。
+
+3. **"osd" - OSA Direct Express**：
+   - OSA Direct Express是指OSA（Open Systems Adapter）直接快速模式，是一种专为IBM Z系列计算机设计的网络适配器技术。它提供了高速、低延迟的网络通信能力，支持多种网络协议和服务。OSA Direct Express适用于需要高性能网络连接的大型企业环境。
+
+4. **"cna" - Cloud Network Adapter**：
+   - Cloud Network Adapter（CNA）是一种专为云计算环境设计的网络接口卡。它支持虚拟化和多租户技术，能够提供灵活的网络配置和优化的数据流量管理。CNA旨在提高云数据中心的网络性能和效率，支持大规模虚拟化部署和云服务。
+
+每种类型的NIC都针对特定的网络需求和应用场景进行了优化，从高性能计算到云计算环境，提供了不同的网络解决方案。
+
+NIC element object的有关属性：
+|Name|Qualifier|Type|Description|
+|---|---|---|---|
+network-adapter-port-uri|(w)(pc)|String/URI|The canonical URI path for the associated Network Port element object.Only present when type is **"roce" or "cna"**.|
+|virtual-switch-uri |(w)(pc)|String/URI|The canonical URI path for the associated Virtual Switch object. **Only present when type is "osd" or "iqd".** Constraint: If type is "iqd" and the Partition belongs to a CPC with API feature dpm-hipersockets-partition-link management available, this property is not writable. [Updated by feature dpm-hipersockets-partition-link-management]|
+
+
+底层原理
+- network-adapter-port-uri
+    - 每个NIC在创建时都会与一个特定的物理适配器端口关联，这个关联信息通过network-adapter-port-uri属性保存。底层的原理是通过URI路径唯一标识了物理适配器的端口。通过查询这个URI路径，可以定位到具体的物理适配器及其端口。
+    - 例如：
+        - NIC A的network-adapter-port-uri是/api/adapters/adapter1/ports/port1。
+        - 这个URI路径直接指向物理适配器adapter1的port1，因此可以确定NIC A使用了物理适配器adapter1的port1。
+- virtual-switch-uri
+    - 虚拟交换机（virtual switch）在底层实现了多个虚拟网卡（NIC）到物理网卡的连接。每个虚拟交换机都有一个唯一的URI路径，通过这个URI路径，可以找到连接到该交换机的所有NICs。
+    - 虚拟交换机的作用是将多个分区的虚拟网络流量汇聚到一起，并将其分配给一个或多个物理网络适配器。因此，通过查询虚拟交换机的URI路径，可以间接找到与该交换机关联的所有物理适配器。
+    - 例如：
+        - 虚拟交换机S的virtual-switch-uri是/api/virtual-switches/switch1。
+        - 连接到交换机S的所有NICs（如NIC B和NIC C）共享同一个virtual-switch-uri。
+        - 查询虚拟交换机switch1的配置，可以找到其底层连接的物理适配器，从而确定NIC B和NIC C使用的物理适配器。
+- 利用network-adapter-port-uri和virtual-switch-uri属性，可以从虚拟的NIC对象追溯到实际的物理网络适配器。这两个属性在确定NIC与物理网卡的关联性方面非常有用，能够帮助我们实现物理网卡的总用量监控，并进一步细化到每个分区的用量监控。
+#### virtual switch
+- 虚拟交换机是将 NIC 与网络端口连接起来的虚拟化网络交换机。每次检测到并配置新的网络适配器时，都会自动生成虚拟交换机。
+- 虚拟交换机资源包含在 CPC 资源中。
+- 虚拟交换机仅存在于处于 DPM 模式的 CPC 中。
+
+## 第五周
+本来想看看测试机上的文件怎么配置的,用find命令找到了三个metrics.yaml:
+![alt text](image-363.png)
+不小心 attach 到 `zhmc_promethues_exporter` 容器,然后误操作用 `ctrl z` 和 `ctrl c` 命令把容器的进程给中断了, 没想到容器直接被删除了(docker ps -a也没有)..
+控制台操作日志如下:
+![alt text](image-364.png)
+![alt text](image-365.png)
+![alt text](image-366.png)
+马上参照官方文档: 用docker(实际上是podman)运行zhmc_prometheus_exporter,再找到本机上的hmccreds.yaml文件,把hmccreds.yaml文件挂载到容器中,并且把容器的端口映射到本机的端口,启动容器.
+![alt text](image-367.png)
+重新启动成功后, 端口映射成功, 可以通过浏览器访问到zhmc_prometheus_exporter的web页面, 并且可以看到metrics数据. 同时Prometheus和Grafana也可以通过配置文件访问到zhmc_prometheus_exporter的metrics数据. 大概上是复原了.
