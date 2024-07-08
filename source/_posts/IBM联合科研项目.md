@@ -1293,3 +1293,69 @@ network-adapter-port-uri|(w)(pc)|String/URI|The canonical URI path for the assoc
 马上参照官方文档: 用docker(实际上是podman)运行zhmc_prometheus_exporter,再找到本机上的hmccreds.yaml文件,把hmccreds.yaml文件挂载到容器中,并且把容器的端口映射到本机的端口,启动容器.
 ![alt text](image-367.png)
 重新启动成功后, 端口映射成功, 可以通过浏览器访问到zhmc_prometheus_exporter的web页面, 并且可以看到metrics数据. 同时Prometheus和Grafana也可以通过配置文件访问到zhmc_prometheus_exporter的metrics数据. 大概上是复原了.
+
+### 脚本
+```python
+from zhmcclient import Session
+
+# 初始化 HMC 连接
+session = Session('hmc_host', 'hmc_user', 'hmc_password')
+client = session.client
+
+# 获取所有 CPC
+cpcs = client.cpcs.list()
+
+# 初始化数据结构
+adapter_usage = {}
+
+# 获取所有虚拟交换机及其关联的物理网卡
+virtual_switches = []
+for cpc in cpcs:
+    v_switches = cpc.virtual_switches.list()
+    virtual_switches.extend(v_switches)
+    for v_switch in v_switches:
+        adapters = v_switch.adapters.list()
+        for adapter in adapters:
+            ports = adapter.ports.list()
+            for port in ports:
+                adapter_usage[port.uri] = {'total_sent_bytes': 0, 'total_received_bytes': 0, 'partitions': {}}
+
+# 获取所有分区及其NIC信息，并收集使用统计信息
+for cpc in cpcs:
+    partitions = cpc.partitions.list()
+    for partition in partitions:
+        nics = partition.nics.list()
+        for nic in nics:
+            v_switch_uri = nic.get('virtual-switch-uri')
+            if v_switch_uri:
+                # 通过虚拟交换机找到对应的物理网卡
+                v_switch = next((vs for vs in virtual_switches if vs.uri == v_switch_uri), None)
+                if v_switch:
+                    adapters = v_switch.adapters.list()
+                    for adapter in adapters:
+                        ports = adapter.ports.list()
+                        for port in ports:
+                            if port.uri in adapter_usage:
+                                # 获取NIC的使用统计信息
+                                sent_bytes = get_prometheus_metric(f'zhmc_nic_bytes_sent_count{{nic="{nic.name}"}}')
+                                received_bytes = get_prometheus_metric(f'zhmc_nic_bytes_received_count{{nic="{nic.name}"}}')
+                                
+                                # 更新物理网卡的总用量
+                                adapter_usage[port.uri]['total_sent_bytes'] += sent_bytes
+                                adapter_usage[port.uri]['total_received_bytes'] += received_bytes
+                                
+                                # 更新分区的使用信息
+                                if partition.name not in adapter_usage[port.uri]['partitions']:
+                                    adapter_usage[port.uri]['partitions'][partition.name] = {'sent_bytes': 0, 'received_bytes': 0}
+                                adapter_usage[port.uri]['partitions'][partition.name]['sent_bytes'] += sent_bytes
+                                adapter_usage[port.uri]['partitions'][partition.name]['received_bytes'] += received_bytes
+
+# 输出结果
+for port_uri, usage in adapter_usage.items():
+    print(f"Adapter Port URI: {port_uri}")
+    print(f"Total Sent Bytes: {usage['total_sent_bytes']}")
+    print(f"Total Received Bytes: {usage['total_received_bytes']}")
+    for partition_name, partition_usage in usage['partitions'].items():
+        print(f"  Partition: {partition_name}, Sent Bytes: {partition_usage['sent_bytes']}, Received Bytes: {partition_usage['received_bytes']}")
+```
+需要的指标：
