@@ -1283,18 +1283,7 @@ network-adapter-port-uri|(w)(pc)|String/URI|The canonical URI path for the assoc
 - 虚拟交换机仅存在于处于 DPM 模式的 CPC 中。
 
 ## 第五周
-本来想看看测试机上的文件怎么配置的,用find命令找到了三个metrics.yaml:
-![alt text](image-363.png)
-不小心 attach 到 `zhmc_promethues_exporter` 容器,然后误操作用 `ctrl z` 和 `ctrl c` 命令把容器的进程给中断了, 没想到容器直接被删除了(docker ps -a也没有)..
-控制台操作日志如下:
-![alt text](image-364.png)
-![alt text](image-365.png)
-![alt text](image-366.png)
-马上参照官方文档: 用docker(实际上是podman)运行zhmc_prometheus_exporter,再找到本机上的hmccreds.yaml文件,把hmccreds.yaml文件挂载到容器中,并且把容器的端口映射到本机的端口,启动容器.
-![alt text](image-367.png)
-重新启动成功后, 端口映射成功, 可以通过浏览器访问到zhmc_prometheus_exporter的web页面, 并且可以看到metrics数据. 同时Prometheus和Grafana也可以通过配置文件访问到zhmc_prometheus_exporter的metrics数据. 大概上是复原了.
-
-### 脚本
+### 思路形成的py脚本（并不适用，只用来理解思路）
 ```python
 from zhmcclient import Session
 
@@ -1358,4 +1347,102 @@ for port_uri, usage in adapter_usage.items():
     for partition_name, partition_usage in usage['partitions'].items():
         print(f"  Partition: {partition_name}, Sent Bytes: {partition_usage['sent_bytes']}, Received Bytes: {partition_usage['received_bytes']}")
 ```
-需要的指标：
+
+> 文档：The exporter code is agnostic to the actual set of metrics supported by the HMC. A new metric exposed by the HMC metric service or a new property added to one of the auto-updated resources can immediately be supported by just adding it to the Metric definition file.
+
+本来想看看测试机上exporter的文件怎么配置的, 用find命令找到了三个metrics.yaml:
+![alt text](image-363.png)
+不小心 attach 到 `zhmc_promethues_exporter` 容器,然后误操作用 `ctrl z` 和 `ctrl c` 命令把容器的进程给中断了, 没想到容器直接被删除了(docker ps -a也没有)..
+控制台操作日志如下:
+![alt text](image-364.png)
+![alt text](image-365.png)
+![alt text](image-366.png)
+马上参照官方文档: 用docker(实际上是podman)运行zhmc_prometheus_exporter,再找到本机上的hmccreds.yaml文件,把hmccreds.yaml文件挂载到容器中,并且把容器的端口映射到本机的端口,启动容器.
+![alt text](image-367.png)
+重新启动成功后, 端口映射成功, 可以通过浏览器访问到zhmc_prometheus_exporter的web页面, 并且可以看到metrics数据. 同时Prometheus和Grafana也可以通过配置文件访问到zhmc_prometheus_exporter的metrics数据. 大概上是复原了.
+
+后来和fulong老师交流了一下，给我多开了一个跑exporter容器来用于有需要修改metrics.yaml的时候进行测试。
+
+
+### 疑惑1
+讨论的核心是如何有效地向 Prometheus 和 Grafana 提供所需的指标数据，以支持分析和监控。老师提出，通过修改 exporter 配置来直接获取所需的参数，并让这些参数被 Prometheus 抓取，是一种更自动化和高效的方法。这样做可以避免重复造轮子，即避免自己编写脚本去收集数据，因为这相当于重新实现 exporter 的功能。确认了后端代码将只与 Prometheus 交互，而不是直接与 zhmcclient 或 exporter 打交道，即使某些参数可以通过后端代码简单获取，最终仍然需要考虑如何将这些数据发送给 Prometheus。如果不这样做，应用程序将需要处理来自两个数据源的数据，这会增加数据整合和一致性的复杂性。
+
+结论是，为了简化数据流和避免不必要的复杂性，决定保持单一的数据源，即通过配置 exporter 来自动化地向 Prometheus 提供所需的指标数据，而不是在后端代码中自己处理数据收集和发送的任务。这种方法有助于保持系统的整洁和可维护性。
+### 可能需要调动的API：
+#### CPC
+- CPCManager(client)
+    - List(): List the CPCs managed by the HMC this client is connected to.
+- CPC
+    - partitions: Access to the Partitions in this CPC.
+    - adapters: Access to the Adapters in this CPC.
+    - virtual_switches: Access to the Virtual Switches in this CPC.
+#### Virtual Switch
+- VirtualSwitchManager(cpc)
+    - List(): List the Virtual Switches in this CPC.
+- VirtualSwitch
+    - List the NICs connected to this Virtual Switch.
+#### Adapter
+- AdapterManager(cpc)
+    - List(): List the Adapters in this CPC.
+- Adapter
+    - ports: Access to the Ports in this Adapter.
+#### Port
+- PortManager(adapter, port_type)
+    - List(): List the Ports in this Adapter.
+- port
+    - manager
+#### Partition
+- PartitionManager(cpc)
+    - List(): List the Partitions in this CPC.
+- Partition
+    - nics: Access to the NICs in this Partition.
+#### NIC
+- NicManager(partition)
+    - List(): List the NICs in this Partition.
+- NIC
+    - backing_port(): Return the backing adapter port of the NIC.
+    - get_property(name): Get the value of a property of this NIC.
+    - property:
+        - network_adapter_port_uri: The URI of the Network Adapter Port associated with this NIC.
+        - virtual_switch_uri: The URI of the Virtual Switch associated with this NIC.
+
+
+NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）支持。
+
+此方法的“properties”参数中指定支持适配器端口的方式取决于适配器类型，如下所示：
+
+对于 OSA 和 Hipersockets 适配器，“virtual-switch-uri”属性用于指定与支持适配器端口关联的虚拟交换机的 URI。
+
+此虚拟交换机是一种资源，只要适配器资源存在，它就会自动存在。请注意，这些虚拟交换机不会显示在 HMC GUI 中；但它们会显示在 HMC REST API 中，因此也会显示在 zhmcclient API 中，作为 VirtualSwitch 类。
+
+“virtual-switch-uri”属性的值可以根据给定的适配器名称和端口索引确定。
+
+### 疑惑2
+- 类似于list的API有没有作为指标提供？似乎没有。
+- 如何提供作为指标？似乎不是量化的，跟原有的指标不一样，因为不是简单的数字
+- 是属于资源指标吗？跟量化指标不一样吗？
+![alt text](image-368.png)
+![alt text](image-369.png)
+和李老师交流了一下，重新确认了需求和思路：
+- 一方面，获取拓扑结构相关的东西这个公司以前都是有的，但是直接拿出来不合规；
+- 另一方面，拓扑结构和数据可能存在不一致的可能：
+    - listen同步机制，理论上是一致的，但是可能存在更新的时间节点不一样的情况。数据不一致的时候两个数据源可能还需要取舍等等。而且如果发生错误，定位错误的时候会比较麻烦。
+- 所以调整思路：就只从exporter的角度出发，不要从拓扑结构出发，也不需要zhmcclient的API了，原有的指标输出就已足够。
+- 接下来的问题是怎么展示（[issue16](https://github.com/JasonCrash/LOP-API/issues/16)）：
+    - adapter的用量总数和每个partition的用量
+    - 比如机器上有一百张卡，要怎么展示视图？
+        - 所有的网卡的实时流量数据，点一下detail，展示所有的用到的partition的流量数据
+- 明确业务开发逻辑：grafana的作用是可以通过promQL给前端提供视图；而后端可以通过promQL给前端提供API来获取数据。
+
+### 最终解决方案
+最终，使用一部分可用的指标，通过grafana中的promQL来展示视图，而不是直接从zhmcclient中获取数据。
+在Grafana上新建一个Adapter view，里面有一个表格panel，点击可以实时调整packets和bytes这两个panel，展示对应adapter的具体用量分配情况。
+
+具体如何使用grafana进行满足需求的配置和操作。
+- dashboard variable：设置dashboard 范围内的变量 `$adapter_name`，可以在整个 dashboard 中使用，可以用query从数据源中的指标标签中获取变量允许的值。
+- data link：支持数据点作为链接，点击可以跳转到设置的url
+    - url设置格式：( `Field` 是adapter名称那一列的表头名称，用 `${__data.fields.Field}` 获取)：
+        - `http://172.16.36.127:3000/d/aa37fb63-90cd-46ef-abf1-861f71b31745/adapter-view?var-adapter_name=${__data.fields.Field}`
+- 目标panel的query语句中使用变量：
+    - `sum(zhmc_nic_packets_sent_count_total{adapter="$adapter_name"}) by (partition)`
+## 第六周

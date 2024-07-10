@@ -619,3 +619,8 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
  ```
 
 用户空间使用netlink套接字和内核通信，和传统的套接字是一样首先使用socket系统调用要创建用户空间套接字，不同的是内核也要创建对应的内核套接字，两者通过nl_table链表进行绑定；创建内核套接字时，要定义接收用户空间netlink消息的input函数，如NETLINK_ROUTE簇的input函数就是rtnetlink_rcv。 nl_table是netlink机制的核心数据结构，围绕此结构的内核活动有： (1) 用户空间应用程序使用socket系统调用创建套接字，然后在bind系统调用时，内核netlink_bind函数将调用netlink_insert(sk, portid)将此用户态套接字和应用程序的进程pid插入nl_table，这里参数portid就是进程pid； (2) 创建内核套接字时，调用netlink_insert(sk, 0)将此用户态套接字插入nl_table（因为是内核套接字，这里portid是0）； (3) 用户空间向内核发送netlink消息时，调用netlink_lookup函数，根据协议簇和portid在nl_table快速查找对应的内核套接字对象； (4) 当内核空间向用户空间发送netlink消息时，调用调用netlink_lookup函数，根据协议簇和portid在nl_table快速查找对应的用户套接字对象.
+
+
+2 question：
+- 如何借鉴rust-netlink？
+- 关于netlink协议注册
