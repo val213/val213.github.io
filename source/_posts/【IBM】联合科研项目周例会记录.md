@@ -159,3 +159,13 @@ AI组：从两个方面逐步清晰我们的目标
 - 目前还没有详细的需求，前端同学的工作重点是方法论，形而上
 
 ## 第六周汇报
+后端：
+- ljy：slack bot
+- hyk：prometheus util
+- ylw：adapter view
+前端：
+- frt：grafana 面板嵌入前端
+- dyr：grafana接口获取
+- zzx：后端接口调用
+AI：
+- 算法demo

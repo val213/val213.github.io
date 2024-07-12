@@ -1446,3 +1446,4 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
 - 目标panel的query语句中使用变量：
     - `sum(zhmc_nic_packets_sent_count_total{adapter="$adapter_name"}) by (partition)`
 ## 第六周
+![alt text](image-370.png)
