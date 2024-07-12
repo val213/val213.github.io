@@ -20,6 +20,13 @@ categories: 技术分享
         - 解决方法：
     [Ubuntu上不了网：ifconfig查看只有lo,没有ens33问题解决参考方法](https://blog.csdn.net/qq_41969790/article/details/103222251)
     - [vscode连接不上问题和解决方法合集](https://blog.csdn.net/White_lies/article/details/124093530)
+2. 每次启动虚拟机后，都要重新配置ens33网卡，而且ens33相关的配置文件（ifcfg-ens33、）都是空的
+3. 执行重启网络服务相关命令的时候遇到：
+    - `unit network service not found ubuntu`
+    - `Ubuntu Server: Fail to restart networking.service: Unit network.service not found`
+4. 启动的时候网络挂起太久
+    - "a start job is running for wait for network"
+    - https://askubuntu.com/questions/1421785/a-start-job-is-running-for-wait-for-network-to-be-configured-because-ipv6-blocke
 # GUI相关
 1. GUI突然消失，只能进入tty1，并且 `startx` 报错；运行 gdm3 相关的命令报错 `gdm3 is broken or not fully installed`
     - https://askubuntu.com/questions/1050672/gdm3-does-not-start-in-ubuntu-18-04
