@@ -618,9 +618,16 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
  };
  ```
 
-用户空间使用netlink套接字和内核通信，和传统的套接字是一样首先使用socket系统调用要创建用户空间套接字，不同的是内核也要创建对应的内核套接字，两者通过nl_table链表进行绑定；创建内核套接字时，要定义接收用户空间netlink消息的input函数，如NETLINK_ROUTE簇的input函数就是rtnetlink_rcv。 nl_table是netlink机制的核心数据结构，围绕此结构的内核活动有： (1) 用户空间应用程序使用socket系统调用创建套接字，然后在bind系统调用时，内核netlink_bind函数将调用netlink_insert(sk, portid)将此用户态套接字和应用程序的进程pid插入nl_table，这里参数portid就是进程pid； (2) 创建内核套接字时，调用netlink_insert(sk, 0)将此用户态套接字插入nl_table（因为是内核套接字，这里portid是0）； (3) 用户空间向内核发送netlink消息时，调用netlink_lookup函数，根据协议簇和portid在nl_table快速查找对应的内核套接字对象； (4) 当内核空间向用户空间发送netlink消息时，调用调用netlink_lookup函数，根据协议簇和portid在nl_table快速查找对应的用户套接字对象.
+- 用户空间使用netlink套接字和内核通信，和传统的套接字是一样首先使用socket系统调用要创建用户空间套接字，不同的是内核也要创建对应的内核套接字，两者通过 nl_table 链表进行绑定；创建内核套接字时，要定义接收用户空间 netlink 消息的 input 函数，如 NETLINK_ROUTE 簇的 input 函数就是 rtnetlink_rcv。 nl_table 是 netlink 机制的核心数据结构，围绕此结构的内核活动有：
+    -  用户空间应用程序使用 socket 系统调用创建套接字，然后在 bind 系统调用时，内核netlink_bind 函数将调用 netlink_insert(sk, portid) 将此用户态套接字和应用程序的进程 pid 插入 nl_table，这里参数 portid 就是进程 pid；
+    - 创建内核套接字时，调用 netlink_insert(sk, 0) 将此用户态套接字插入 nl_table（因为是内核套接字，这里 portid 是0）； 
+    - 用户空间向内核发送 netlink 消息时，调用 netlink_lookup 函数，根据协议簇和 portid 在nl_table 快速查找对应的内核套接字对象；
+    - 当内核空间向用户空间发送 netlink 消息时，调用调用netlink_lookup 函数，根据协议簇和 portid 在 nl_table 快速查找对应的用户套接字对象.
+
+- 初始化数组nl_table 每个netlink协议簇对应nl_table数组的一个条目（struct netlink_table类型），一共32个。nl_table是netlink子系统的实现的一个关键表结构，其实是一个hash链结构，只要创建netlink套接字，不管是内核的还是用户空间的，都要调用netlink_insert将netlink套接字本身和它的信息一并插入到这个链表结构中（用户态套接字在bind系统调用的时候调用netlink_insert插入nl_table；内核套接字是在创建的时候调用netlink_insert插入nl_table），然后在发送时，只要调用netlink_lookup遍历这个表就可以快速定位要发送的目标套接字。
+- 在Linux6.1.9中，netlink_table 的 hash 是重新实现的 rhashtable，为了方便先使用 HashMap 实现，后续如果有需要再替换为 rhashtable。
 
 
-2 question：
+
+
 - 如何借鉴rust-netlink？
-- 关于netlink协议注册
