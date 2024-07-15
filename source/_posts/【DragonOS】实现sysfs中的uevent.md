@@ -628,6 +628,6 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
 - 在Linux6.1.9中，netlink_table 的 hash 是重新实现的 rhashtable，为了方便先使用 HashMap 实现，后续如果有需要再替换为 rhashtable。
 
 
-
+- lazy<>初始化的问题
 
 - 如何借鉴rust-netlink？
