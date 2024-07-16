@@ -1446,22 +1446,31 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
 - 目标panel的query语句中使用变量：
     - `sum(zhmc_nic_packets_sent_count_total{adapter="$adapter_name"}) by (partition)`
 ## 第六周
-![alt text](image-370.png)
+![alt text](image-381.png)
+![alt text](image-380.png)
 ![alt text](image-377.png)
 ![alt text](image-378.png)
 ![alt text](image-379.png)
 ### 相似产品调研
-- Zabbix
-- Nagios
+- Zabbix 
+- Nagios 需要下载
 - solarwinds
     - [interactive-demos 主页](https://www.solarwinds.com/interactive-demos)
     - [Hybrid Cloud Observability](https://hco.demo.solarwinds.com/Orion/SummaryView.aspx?viewkey=Summary+Home+Narrow)
     - [SolarWinds Observability](https://demo.na-01.cloud.solarwinds.com/?program=999&campaign=7012J000001J8VVQA0&parentCampaign=7012J000001J8VVQA0&duration=3600)
         ![alt text](image-375.png)
         ![alt text](image-376.png)
-- PRTG?
+- PRTG? 
 - Netdata
     - [Netdata console](https://app.netdata.cloud/spaces/netdata-demo/rooms/all-nodes/overview?_gl=1*hdpqyi*_gcl_au*NzM1NDE2NjQ0LjE3MjEwMjc4NjE.*_ga*Mzc5NjA0NTQ1LjE3MjEwMjc4NjE.*_ga_J69Z2JCTFB*MTcyMTAyNzg2MS4xLjEuMTcyMTAyNzg2MS42MC4wLjA.#metrics_correlation=false&after=-900&before=0&utc=Asia%2FShanghai&offset=%2B8&timezoneName=Beijing%2C%20Chongqing%2C%20Hong%20Kong%2C%20Urumqi&modal=&modalTab=&modalParams=&selectedIntegrationCategory=deploy.operating-systems&force_play=false&d8a4e0c5-7c79-4145-900e-83a9f06fcb6a--chartName-val=menu_system)
     ![alt text](image-374.png)
     ![alt text](image-372.png)
     ![alt text](image-373.png)
+
+### 展示
+比如你是一个用户，你现在打开页面看到什么，查看每一个网卡具体内容的时候具体有哪些内容，页面大体长什么样子，你可以简单用ppt画两个框，说明一下问题。
+
+#### 调整stat panel 进行排序
+![alt text](image-382.png)
+![alt text](image-383.png)
+![alt text](image-384.png)
