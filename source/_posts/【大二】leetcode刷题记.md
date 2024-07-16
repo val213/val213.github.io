@@ -416,6 +416,9 @@ public:
     - 图的存储：邻接表
     - 有向图的拓扑排序
 4. 实现trie（前缀树）
+    - unordered_map<char, Trie*> children;
+    - bool isEnd;
+    - TrieNode() : isEnd(false) {}    
 ## 回溯
 ## 二分查找
 ## 栈
