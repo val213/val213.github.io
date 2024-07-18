@@ -629,5 +629,5 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
 
 
 - lazy<>初始化的问题
-
+- nltable 如果用 Arc 无法修改，转为使用RWLock
 - 如何借鉴rust-netlink？

@@ -1453,8 +1453,8 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
 ![alt text](image-379.png)
 ### 相似产品调研
 - Zabbix 
-- Nagios 需要下载
-- solarwinds
+- Nagios 预览版需要下载部署
+- SolarWinds
     - [interactive-demos 主页](https://www.solarwinds.com/interactive-demos)
     - [Hybrid Cloud Observability](https://hco.demo.solarwinds.com/Orion/SummaryView.aspx?viewkey=Summary+Home+Narrow)
     - [SolarWinds Observability](https://demo.na-01.cloud.solarwinds.com/?program=999&campaign=7012J000001J8VVQA0&parentCampaign=7012J000001J8VVQA0&duration=3600)
@@ -1469,8 +1469,30 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
 
 ### 展示
 比如你是一个用户，你现在打开页面看到什么，查看每一个网卡具体内容的时候具体有哪些内容，页面大体长什么样子，你可以简单用ppt画两个框，说明一下问题。
-
-#### 调整stat panel 进行排序
+### 重新迭代
+- 重新设计 CPC/Adapter view，Adapter/Partition view
+- 调整 stat panel 进行排序
 ![alt text](image-382.png)
 ![alt text](image-383.png)
-![alt text](image-384.png)
+- 优化饼状图
+    - 记得选中 Legend
+- 三个 panel
+![alt text](image-385.png)
+    - 时间序列
+    - 指标数据 top5 的 Adapter 时间序列展示
+        - 合理利用 grafana 的内置变量和 promQL 的函数，如 `topk`、`__range`、`__interval` 等
+        ```PromQL
+        topk(5, sum(rate(zhmc_adapter_usage_ratio{cpc="$cpc_name"}[$__range])) by (adapter))
+        ```
+        - [内置变量官方文档](https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables)
+        ![alt text](image-388.png)
+    - 大表格细节展示
+        - **Data Transform 可以针对每一个查询的结果进行处理！**
+            - reduce：用来简化时间序列
+            ![alt text](image-387.png)
+            - join by fileds：可以将两个查询的结果按照某个字段进行合并
+            -  Filter data by values：可以根据某个字段的值进行过滤
+            - organize fields：可以对table中的列进行排序、重命名
+        - override fields：可以对table中具体某一列进行特殊处理，例如设置别名、单位、空值处理等
+#### 迭代历程：
+![alt text](image-386.png)

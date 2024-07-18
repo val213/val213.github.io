@@ -169,3 +169,29 @@ AI组：从两个方面逐步清晰我们的目标
 - zzx：后端接口调用
 AI：
 - 算法demo
+## 第七周
+后端
+ljy：
+- 模板表
+- 增删改查
+- 模糊搜索
+hyk：
+- 获取指定指标下某个属性的值
+- message controller
+ylw：
+- CPC/Adapter view
+- Adapter/Partition view
+前端
+frt：
+- 用户过滤选择
+- 分享 grafana view 的具体设置
+dyr：
+- 页面的色彩元素啥的，后续需要替换为 IBM 现有的产品搭配
+zzx：
+- message page
+- 封装后端API提供给其他前端组员
+
+AI：
+模型训练，得到一系列参数文件在目录下；
+预测的过程中一段时间后workload如果总是偏移，已经不适合了，那么拿着最新的值再去训练，参数覆盖，重新加载模型
+如果偏移超出容忍值，自动触发训练覆盖模型，重新加载模型
