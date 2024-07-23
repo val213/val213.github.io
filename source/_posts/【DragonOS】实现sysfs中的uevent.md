@@ -631,3 +631,5 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
 - lazy<>初始化的问题
 - nltable 如果用 Arc 无法修改，转为使用RWLock
 - 如何借鉴rust-netlink？
+- 借鉴rust for linux？
+- 关于sk_buff的实现，原本是在 PacketBuffer 的基础上封装了一层，但是缺少需要的接口和字段（如 len() 和 sk），因此需要调研一下是否需要重新封装或者用别的库。
