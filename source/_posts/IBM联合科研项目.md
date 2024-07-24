@@ -1496,3 +1496,25 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
         - override fields：可以对table中具体某一列进行特殊处理，例如设置别名、单位、空值处理等
 #### 迭代历程：
 ![alt text](image-386.png)
+## 第七周
+### nvestigate how to call own API through grafana alert #35
+grafana 一旦触发了 alert 之后，如何调用让 grafana 调用我们自己的接口？
+
+设置告警条件来触发alter：
+![alt text](image-389.png)
+Contact points：
+![alt text](image-391.png)
+测试：
+![alt text](image-392.png)
+
+### Design API for alert #36
+设计一个我们自己的接口，这个接口的作用是收到grafana 的信息之后，把这个信息转换成我们自己的message，保存数据库
+
+![alt text](image-394.png)
+
+这里面涉及到的是后端我们自己的 message 的数据格式。
+
+接口设计出来之后，要写 API doc，找钥开问一下
+
+接口具体实现后面再说
+### 配合前端集成页面
