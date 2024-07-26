@@ -1518,3 +1518,8 @@ Contact points：
 
 接口具体实现后面再说
 ### 配合前端集成页面
+## 第八周
+### 重建 Grafana 的 dashboard
+很不幸，被覆盖了
+### Alert-Manager
+- [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/)

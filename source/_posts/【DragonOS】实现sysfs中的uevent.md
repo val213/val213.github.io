@@ -633,3 +633,35 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
 - 如何借鉴rust-netlink？
 - 借鉴rust for linux？
 - 关于sk_buff的实现，原本是在 PacketBuffer 的基础上封装了一层，但是缺少需要的接口和字段（如 len() 和 sk），因此需要调研一下是否需要重新封装或者用别的库。
+- skb的类型 `Arc<RwLock<>>` 
+- sk的类型 `Arc<dyn NetlinkSocket>`? -> `Arc<RwLock<Box<dyn NetlinkSocket>>>`，解决了Arc内部可变性
+- Borrowed data escapes outside of function
+    - 更换SkBuff的实现方式
+- new方法循环初始化
+    - 解决方法：Option<Weak>初始化为None
+- 套接字中的回调函数为 sk_data_ready()
+    - 默认的 ->sk_data_ready() 回调函数是 sock_def_readable()。
+```c
+void sock_init_data(struct socket *sock, struct sock *sk) 
+{
+    sk->sk_data_ready   =   sock_def_readable;
+    sk->sk_write_space  =   sock_def_write_space;
+    sk->sk_error_report =   sock_def_error_report;
+}
+```
+```c
+static void sock_def_readable(struct sock *sk, int len)
+{                       
+        struct socket_wq *wq;
+
+        rcu_read_lock();
+        wq = rcu_dereference(sk->sk_wq);
+        if (wq_has_sleeper(wq))
+                wake_up_interruptible_sync_poll(&wq->wait, POLLIN | POLLPRI |
+                                                POLLRDNORM | POLLRDBAND);
+        sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
+        rcu_read_unlock();
+}
+```
+- 回调函数是否需要通知链？
+- ![alt text](image-397.png)
