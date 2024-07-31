@@ -462,7 +462,7 @@ pub trait NetlinkSocket :Sync + Send + Debug + Any{
 }
 ```
 #### struct `NetlinkSock` 
-`NetlinkSock`实现了`PartialEq`、自己的一套作为`socket`特有的经典的收发、绑定、解绑和注册等方法。
+`NetlinkSock`实现了自己的一套作为`socket`特有的经典的收发、绑定、解绑和注册等方法。
 ```rust
 /* linux：struct sock has to be the first member of netlink_sock */
 #[derive(Debug)]
@@ -665,3 +665,12 @@ static void sock_def_readable(struct sock *sk, int len)
 ```
 - 回调函数是否需要通知链？
 - ![alt text](image-397.png)
+- 事件等待队列
+- netlink_rcv 回调
+- static const struct proto_ops netlink_ops 规定接口的操作的具体执行函数，-》实现socket trait
+- 由于netlink_bind 函数接受的是 NetlinkSocket ，而 Socket 似乎是无法转换为 NetlinkSocket 的
+    - 解决方法：
+可以使用intertrait库来做，参考“dyn device转 dyn platformDevice（或者I8042PlatformDevice)”：
+https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/input/serio/i8042/i8042_device.rs?r=da152319797436368304cbc3f85a3b9ec049134b#22 
+device继承KObject，实现了CastFromSync https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/kobject.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#26 
+dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/platform/subsys.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#134 
