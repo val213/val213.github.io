@@ -1524,3 +1524,7 @@ Contact points：
 ### Alert-Manager
 - [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/)
 ## 第九周
+在 value 里面 传 cpc name，partition name， cpu rate，还有一个时间戳，这样就能够明确说明 哪个cpc里面的哪个partition在什么时间cpu利用率过高 高达X%
+
+- add alter_controller
+- modify message_service

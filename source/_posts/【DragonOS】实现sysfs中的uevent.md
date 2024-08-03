@@ -673,4 +673,6 @@ static void sock_def_readable(struct sock *sk, int len)
 可以使用intertrait库来做，参考“dyn device转 dyn platformDevice（或者I8042PlatformDevice)”：
 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/input/serio/i8042/i8042_device.rs?r=da152319797436368304cbc3f85a3b9ec049134b#22 
 device继承KObject，实现了CastFromSync https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/kobject.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#26 
-dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/platform/subsys.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#134 
+dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/platform/subsys.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#134
+
+bind 如何调用到 netlink_bind 函数？
