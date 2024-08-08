@@ -1528,3 +1528,14 @@ Contact points：
 
 - add alter_controller
 - modify message_service
+![alt text](image-417.png)
+### 备份grafana
+## 第十周
+grafana 的 webhook 还是 altermanager 的 webhook？
+x509 证书过期或者未启用，无法绕过 tls 验证，测试发不出来
+
+
+后续的接口：
+前后端是否有一个 alter 接口，前端页面显示，点了一下跳转前端的 message 页面
+前端用户查看 metrics
+后端异步告警，前端查询后端，从后端获取告警信息，提示用户
