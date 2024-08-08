@@ -675,4 +675,8 @@ https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/input/serio/i8042/i
 device继承KObject，实现了CastFromSync https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/kobject.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#26 
 dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/driver/base/platform/subsys.rs?r=2eab6dd743e94a86a685f1f3c01e599adf86610a#134
 
-bind 如何调用到 netlink_bind 函数？
+- bind 如何调用到 netlink_bind 函数？
+- 用户空间传递正确的 SockAddr 对象
+- 发生 panic
+
+- 进度记录：https://bbs.dragonos.org.cn/t/topic/312
