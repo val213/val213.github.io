@@ -680,3 +680,4 @@ dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/dri
 - 发生 panic
 
 - 进度记录：https://bbs.dragonos.org.cn/t/topic/312
+- metadata()
