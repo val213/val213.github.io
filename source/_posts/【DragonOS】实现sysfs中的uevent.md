@@ -681,3 +681,6 @@ dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/dri
 
 - 进度记录：https://bbs.dragonos.org.cn/t/topic/312
 - metadata()
+- posix_item()
+8.10: socket_handle() todo!
+socket trait 中基于smoltcp 的 socket 结构体构造了一个 GlobalSocketHandle 类型的变量 handle 作为数据成员。在handle 初始化的时候需要该 socket 结构体对象传入；而由于 NetlinkSock 不包含 smoltcp 的 socket 结构体，无法直接通过添加 handle 字段并初始化的方式来实现该方法，从而引发了 panic。
