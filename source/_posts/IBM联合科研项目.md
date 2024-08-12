@@ -1532,13 +1532,71 @@ Contact points：
 ### 备份grafana
 ## 第十周
 grafana 的 webhook 还是 altermanager 的 webhook？
-x509 证书过期或者未启用，无法绕过 tls 验证，测试发不出来
 
+grafana
 
-后续的接口：
-前后端是否有一个 alter 接口，前端页面显示，点了一下跳转前端的 message 页面
-前端用户查看 metrics
+### 业务逻辑梳理：
+后续前后端可能要有一个 alter 接口，用于前端页面显示，点一下跳转前端的 message 页面
+前端一般提供给用户来查看 metrics 的时候
 后端异步告警，前端查询后端，从后端获取告警信息，提示用户
 
+### 测试过程中的问题及其解决
+#### 关于远程的测试机无法访问我本地的服务：
+- 使用 ngrok 暴露本地服务端口到公网供测试访问。
+```shell
+ngrok http https://localhost:18443
+```
+注意：免费版ip不稳定，每次运行都会变。
+#### 关于证书的问题：
+1. 证书过期了
+```shell
+# grafana 报错
+Failed to send test alert.: Post
+"https://xxx:18443/api/v1/message": tls: failed to verifycertificate: x509: certificate has expired or is not yet valid: current time2024-08-09T03:47:01Zis after 2022-06-22T02:58:48Z
+```
+日志：
+```shell
+# 容器日志
+ssl.SSLError: [SSL: SSLV3_ALERT_BAD_CERTIFICATE] sslv3 alert bad certificate (_ssl.c:1131)
+```
+```shell
+# 容器日志
+server.go:3214: http: TLS handshake error from 10.0.2.23:57123: remote error: tls: unknown certificate
+```
+x.509 证书过期或者未启用，而 grafana 不支持绕过 tls 验证。
+重新生成证书，替换之后，遇到新的问题。
+2. 证书中不包含IP地址
+```shell
+# grafana 报错
+Failed to send test alert.: Post
+"https://xxx:18443/api/v1/auth/token": tls: failed to verifycertificate: x509: cannot validate certificate for xxx because itdoesn't contain any IP SANs
+```
 
-- 使用 ngrok 暴露本地服务到公网供测试访问。
+- 尝试解决自签名证书问题
+先在 openssl.cnf 中配置 IP 的信息
+```shell
+[ alt_names ]   
+# one Common Name   
+DNS.1 = test.ibm.com 
+# other extra DNS name   
+IP.1 = xx.xx.xx.xx
+```
+然后基于更新后的 openssl.cnf 重新生成自签名证书。
+```sh
+openssl req -new -nodes -keyout server.key -out server.csr -config openssl.cnf
+openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt -extensions v3_req -extfile openssl.cnf
+```
+
+然后报错信息变化了：提示证书是自签名的，不是由可信的CA签发的：
+```shell
+# grafana 报错
+Failed to send test alert.: Post"https://xxx:18443/api/v1/auth/token": tls: failed to verifycertificate: x509: certificate signed by unknown authority (possiblybecause of "crypto/rsa: verification error" while trying to verifycandidate authority certificate "Default Company Ltd"")
+```
+接下来要做的就是让 grafana 认可我们自己的 CA 证书，这样就可以通过自签名证书来解决问题了。具体来说，需要将自签名证书的 CA 证书添加到 grafana 容器的信任证书列表中。
+```shell
+docker cp ca.crt grafana:/etc/ssl/certs/ca.crt
+docker exec -it grafana /bin/bash
+update-ca-certificates
+```
+
+问题解决。
