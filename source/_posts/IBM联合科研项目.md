@@ -1542,7 +1542,8 @@ grafana
 
 ### 测试过程中的问题及其解决
 #### 关于远程的测试机无法访问我本地的服务：
-- 使用 ngrok 暴露本地服务端口到公网供测试访问。
+- 使用 ngrok 暴露本地服务端口到公网供测试访问
+
 ```shell
 ngrok http https://localhost:18443
 ```
@@ -1572,8 +1573,7 @@ Failed to send test alert.: Post
 "https://xxx:18443/api/v1/auth/token": tls: failed to verifycertificate: x509: cannot validate certificate for xxx because itdoesn't contain any IP SANs
 ```
 
-- 尝试解决自签名证书问题
-先在 openssl.cnf 中配置 IP 的信息
+- 在 openssl.cnf 中配置 IP 的信息
 ```shell
 [ alt_names ]   
 # one Common Name   
@@ -1587,7 +1587,7 @@ openssl req -new -nodes -keyout server.key -out server.csr -config openssl.cnf
 openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt -extensions v3_req -extfile openssl.cnf
 ```
 
-然后报错信息变化了：提示证书是自签名的，不是由可信的CA签发的：
+3. 然后报错信息变化了：提示证书是自签名的，不是由可信的CA签发的：
 ```shell
 # grafana 报错
 Failed to send test alert.: Post"https://xxx:18443/api/v1/auth/token": tls: failed to verifycertificate: x509: certificate signed by unknown authority (possiblybecause of "crypto/rsa: verification error" while trying to verifycandidate authority certificate "Default Company Ltd"")
@@ -1600,3 +1600,24 @@ update-ca-certificates
 ```
 
 问题解决。
+
+### 研究 grafana webhook 提供具体信息的具体设置
+
+https://grafana.com/docs/grafana/latest/alerting/alerting-rules/templating-labels-annotations/
+
+#### alert rules
+- 根据查询返回的指标字段，自动提取识别labels，供自定义配置使用
+- 告警规则如何针对多个对象？
+    - 因为告警规则是在没有仪表板上下文的环境中执行的。因此，你需要修改查询以支持多维度告警，这样 Grafana 可以在告警规则中根据每个分区的 CPU 使用率自动生成告警实例。
+- TODO!在同一个告警规则中，如果设置了label不同的多条查询语句，会有明明查询到了非零值，annotation 里却显示为0的问
+#### contact points
+- 与 alert rules 的关系是多对一
+- 只支持的账号密码验证和 token 验证，而且两者不能同时使用
+- 不支持绕过 tls 检验
+#### notification policies
+#### code
+- constant.py 新增字典映射，匹配 alertname 到 template_name
+- status 的含义是该消息已读/未读
+- value 的拼装，labels + value + timestamp + 分析调优建议
+
+## 第十一周
