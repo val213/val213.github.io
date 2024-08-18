@@ -95,7 +95,6 @@ https://code.dragonos.org.cn/xref/linux-6.1.9/net/netlink/
 包含高级配置和电源接口（ACPI）的驱动程序，用于电源管理和设备配置。
 - **base**
 包含核心的设备、总线、和驱动模型的基础代码，这是Linux设备驱动架构的基础。
-    - 
 - block
 包含块设备驱动程序，比如硬盘驱动和控制器。
 - bluetooth
@@ -248,7 +247,7 @@ struct kset_uevent_ops {
 目前 netlink 协议族支持32种协议类型，它们定义在 include/uapi/linux/netlink.h 中.
 
 内核Netlink的初始化在系统启动阶段完成，初始化代码在`af_netlink.c`的`netlink_proto_init()`函数
-### /af_netlink.c
+### af_netlink.c
 #### _netlink_proto_init()
 
 本初始化函数`首先向内核注册netlink协议`；
@@ -684,3 +683,6 @@ dyn Device向上转换 https://code.dragonos.org.cn/xref/DragonOS/kernel/src/dri
 - posix_item()
 8.10: socket_handle() todo!
 socket trait 中基于smoltcp 的 socket 结构体构造了一个 GlobalSocketHandle 类型的变量 handle 作为数据成员。在handle 初始化的时候需要该 socket 结构体对象传入；而由于 NetlinkSock 不包含 smoltcp 的 socket 结构体，无法直接通过添加 handle 字段并初始化的方式来实现该方法，从而引发了 panic。
+- socketInode
+- GlobalSocketHandle
+# 网络子系统重构后
