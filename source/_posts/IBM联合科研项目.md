@@ -1620,4 +1620,17 @@ https://grafana.com/docs/grafana/latest/alerting/alerting-rules/templating-label
 - status 的含义是该消息已读/未读
 - value 的拼装，labels + value + timestamp + 分析调优建议
 
-## 第十一周
+## 第十一、十二周（休假）
+### 一键备份 grafana 配置
+[grafana-backup-tool](https://github.com/ysde/grafana-backup-tool)
+![alt text](image-418.png)
+```
+docker run --user $(id -u):$(id -g) --rm --name grafana-backup-tool \
+           -e GRAFANA_TOKEN= YOUR_TOKEN \
+           -e GRAFANA_URL= YOUR_API \
+           -e GRAFANA_ADMIN_ACCOUNT= USER \
+           -e GRAFANA_ADMIN_PASSWORD= PASSWORD \
+           -e VERIFY_SSL= False \
+           -v /tmp/backup/ : /opt/grafana-backup-tool/_OUTPUT_  \
+           ysde/docker-grafana-backup-tool
+```

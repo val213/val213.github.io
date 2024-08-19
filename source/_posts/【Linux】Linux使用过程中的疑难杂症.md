@@ -31,3 +31,10 @@ categories: 技术分享
 1. GUI突然消失，只能进入tty1，并且 `startx` 报错；运行 gdm3 相关的命令报错 `gdm3 is broken or not fully installed`
     - https://askubuntu.com/questions/1050672/gdm3-does-not-start-in-ubuntu-18-04
     - 解决方法：![alt text](image-371.png)
+
+# Docker相关
+最新可用镜像源（2024.8.19）：
+```
+"https://docker.anyhub.us.kg",
+"https://docker.awsl9527.cn",
+```
