@@ -27,6 +27,8 @@ categories: 技术分享
 4. 启动的时候网络挂起太久
     - "a start job is running for wait for network"
     - https://askubuntu.com/questions/1421785/a-start-job-is-running-for-wait-for-network-to-be-configured-because-ipv6-blocke
+5. /etc/resolv.conf 在服务重启后总是会被重置
+[重新夺回对 /etc/resolv.conf 的控制权](https://icloudnative.io/posts/resolvconf-tutorial/#2-networkmanager)
 # GUI相关
 1. GUI突然消失，只能进入tty1，并且 `startx` 报错；运行 gdm3 相关的命令报错 `gdm3 is broken or not fully installed`
     - https://askubuntu.com/questions/1050672/gdm3-does-not-start-in-ubuntu-18-04
