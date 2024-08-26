@@ -12,3 +12,4 @@ title: LLM+ 应用开发学习经验记录
 ### 训练集准备
 格式：prompt + completion
 ### 测试集准备
+# mi-gpt
