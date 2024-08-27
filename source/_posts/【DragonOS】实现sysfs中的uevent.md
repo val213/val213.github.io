@@ -686,3 +686,13 @@ socket trait 中基于smoltcp 的 socket 结构体构造了一个 GlobalSocketHa
 - socketInode
 - GlobalSocketHandle
 # 网络子系统重构后
+在 netlink 中有两套发送及接收数据的接口，分别是 sendto和recvfrom、sendmsg和recvmsg
+在Linux 6.1.9中，sendmsg和recvmsg对应的是
+```
+static int netlink_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len, int flags)
+```
+应该对应实现为netlinksocket的read和write方法。
+
+
+暂时不实现：scm，SCM（Socket Control Message）用于传递额外的控制信息
