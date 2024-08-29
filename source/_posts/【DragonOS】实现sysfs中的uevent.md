@@ -698,3 +698,5 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len, 
 暂时不实现：scm，SCM（Socket Control Message）用于传递额外的控制信息
 
 这个SYS_RECVMSG系统调用传递的参数是不是太少了？只有buf
+
+socketfs文件系统
