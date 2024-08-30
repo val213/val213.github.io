@@ -700,3 +700,10 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len, 
 这个SYS_RECVMSG系统调用传递的参数是不是太少了？只有buf
 
 socketfs文件系统
+
+在 Netlink 通信中，每个消息都包含一个 nlmsghdr 头部，后面跟随的是协议特定的数据。Netlink 协议本身并不区分数据报和原始套接字（raw sockets），即使用 SOCK_RAW 或 SOCK_DGRAM 作为 socket 类型都是可行的。
+
+Netlink 套接字接收数据时，每个消息必须作为独立的数据报接收。如果用户空间提供的缓冲区太小，不足以容纳整个消息，消息将会被截断，recvmsg() 系统调用的 msghdr 结构中的 MSG_TRUNC 标志将被设置。如果发生截断，消息的其余部分将被丢弃。为了避免消息截断，建议用户空间的接收缓冲区至少为 8kB 或 CPU 架构的页面大小，以较大者为准。对于大多数情况，推荐使用 32kB 的缓冲区，这样可以更高效地处理大量数据
+
+
+今天被一个事情困扰了：之前写netlink这一块的时候主要是参照Linux的sk_buff结构，来作为网络数据包，然后参照了aya_ebpf的库，搞了一个sk_buff, 涉及到比较多的相关的操作。然后今晚看zcore和aster好像都是直接没有这个数据包的结构？直接用vec进行数据的读取。我们的inet里的datagram参考他们似乎也是这样的，不过看到后面是smoltcp的recv_slice调用。就我现在有点不知道是该继续沿用Linux或者aya_ebpf这一套去操作底层的unsafe实现一大堆sk_buff的这个操作还是全都简化成类似于Arc<Mutex<Vec<Vec<u8>>>>的data
