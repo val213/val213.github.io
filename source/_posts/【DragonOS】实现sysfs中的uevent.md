@@ -707,3 +707,10 @@ Netlink 套接字接收数据时，每个消息必须作为独立的数据报接
 
 
 今天被一个事情困扰了：之前写netlink这一块的时候主要是参照Linux的sk_buff结构，来作为网络数据包，然后参照了aya_ebpf的库，搞了一个sk_buff, 涉及到比较多的相关的操作。然后今晚看zcore和aster好像都是直接没有这个数据包的结构？直接用vec进行数据的读取。我们的inet里的datagram参考他们似乎也是这样的，不过看到后面是smoltcp的recv_slice调用。就我现在有点不知道是该继续沿用Linux或者aya_ebpf这一套去操作底层的unsafe实现一大堆sk_buff的这个操作还是全都简化成类似于Arc<Mutex<Vec<Vec<u8>>>>的data
+
+没有实现异步
+简化！前面很多跟skb有关的代码都暂时没用了
+内存异步没实现呢
+可以默认一切内存读写都是同步的
+
+Endpoint这个东西到底怎么说
