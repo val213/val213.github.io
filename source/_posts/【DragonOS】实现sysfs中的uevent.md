@@ -721,3 +721,9 @@ Endpoint这个东西到底怎么说
 
 
 msghdr这个结构在socket变成中就会用到，并不算Netlink专有的，这里不在过多说明。只说明一下如何更好理解这个结构的功能。我们知道socket消息的发送和接收函数一般有这几对：recv／send、readv／writev、recvfrom／sendto。当然还有recvmsg／sendmsg，前面三对函数各有各的特点功能，而recvmsg／sendmsg就是要囊括前面三对的所有功能，当然还有自己特殊的用途。msghdr的前两个成员就是为了满足recvfrom／sendto的功能，中间两个成员msg_iov和msg_iovlen则是为了满足readv／writev的功能，而最后的msg_flags则是为了满足recv／send中flag的功能，剩下的msg_control和msg_controllen则是满足recvmsg／sendmsg特有的功能。
+
+
+
+
+这一行出现了Location: File: src/driver/base/uevent/kobject_uevent.rs Line: 116, Column: 38 Message: called Option::unwrap() on a None value
+更改：let mut top_kobj = kobj.clone();
