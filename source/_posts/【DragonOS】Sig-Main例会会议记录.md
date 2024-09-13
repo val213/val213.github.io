@@ -147,3 +147,11 @@ Syzkaller 的工作流程通常包括以下几个步骤：
 - 相关的讨论：
     - https://bbs.dragonos.org.cn/t/topic/341
     - https://bbs.dragonos.org.cn/t/topic/343/1
+
+
+## 第四次会议总结 09012
+- overlayerfs
+- eBPF
+### 联合文件系统 overlayfs
+![alt text](image-458.png)
+### eBPF 的运行过程
