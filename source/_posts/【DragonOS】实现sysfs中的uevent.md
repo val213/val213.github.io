@@ -727,3 +727,30 @@ msghdr这个结构在socket变成中就会用到，并不算Netlink专有的，�
 
 这一行出现了Location: File: src/driver/base/uevent/kobject_uevent.rs Line: 116, Column: 38 Message: called Option::unwrap() on a None value
 更改：let mut top_kobj = kobj.clone();
+
+
+
+
+## 用户空间的库函数期望返回的值跟内核不兼容
+NetlinkEndpoint 和 SockAddr 之间的转换
+>the trait bound `NetlinkEndpoint: socket::addr::private::SockaddrLikePriv` is not satisfied
+the following other types implement trait `socket::addr::private::SockaddrLikePriv`:
+  ()
+  AlgAddr
+  LinkAddr
+  NetlinkAddr
+  SockAddr
+  SockaddrIn
+  SockaddrIn6
+  SockaddrStorage
+and 2 others
+`SockaddrLike` is a "sealed trait", because to implement it you also need to implement `nix::sys::socket::addr::private::SockaddrLikePriv`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+the following types implement the trait:
+  nix::sys::socket::UnixAddr
+  ()
+  nix::sys::socket::SockaddrIn
+  nix::sys::socket::SockaddrIn6
+  nix::sys::socket::SockaddrStorage
+  nix::sys::socket::SockAddr
+  nix::sys::socket::NetlinkAddr
+  nix::sys::socket::AlgAddr
