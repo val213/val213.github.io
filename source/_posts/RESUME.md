@@ -15,11 +15,10 @@ categories: 个人记录
  - **Email：val213666@gmail.com**
  - **QQ/微信号：104259489/val213**
 ---
-# 实习经历
+# 实习/项目经历
 - [DragonOS开源社区]() 国产操作系统 DragonOS 开源社区的贡献者，担任 SIG-Main 的主要负责人参与社区运营，同时参与内核子系统的开发和维护，主要负责内核中 Netlink 和 Uevent 机制的实现，以及对内核中的一些 bug 的修复。
 - [LinuxOne可观测告警平台]() IBM 和华南理工大学的校企合作科研项目，作为后台开发者，参与开发了一套 LinuxOne 平台的可观测告警系统。技术栈为 Prometheus + grafana + CherryPy + MariaDB。主要负责 grafana 配置及其与后端交互的告警信息接口等的开发。
 - 2024.1 在华工创业基地的广州寰宇未来公司实习数据处理岗实习。主要负责为医药领域LLM微调训练数据进行清洗工作，编写各种脚本工具从甲方提供的文档中提取符合要求的文本、表格、图片等数据转换为LLM训练所需格式，落地数据清洗全流程。
-# 开源项目和作品
 ## 项目经历
 
 - [万象Editor]() 项目组长 全栈开发 websocket yjs 分布式锁
@@ -32,11 +31,6 @@ categories: 个人记录
  - [***ML_algorithms***](https://val213.github.io/2023/08/07/ML_algorithms/): 记录和介绍一些基础的机器学习算法的原理和代码实现学习过程。
  - [***NUS-CV summer school***](https://val213.github.io/2023/07/25/NUS-CV%20summer%20school/): 整理了在NUS参与计算机视觉项目期间的课程讲义。
  - [***Hash Table***](https://val213.github.io/2023/08/14/Hash%20table/): 翻译整理哈佛大学的CS50 Introduction to Computer Science中数据结构哈希表的PPT
-
-
-## 演讲、讲义与视频
- - [**Blender的介绍、基础用法和功能展示**](): 作为校级讲座主题讲师介绍强大的3D开源软件blender，超过40人收听了此次讲座。
- - [**盛夏狮城**](https://www.bilibili.com/video/BV1p8411Q7mp/?spm_id_from=333.999.0.0&vd_source=847221b55474b08239f9c09c5099e6ac): 一支vlog，重点介绍了新国大的暑期项目以及在新加坡旅行的一些感悟
 
 ---
 
@@ -54,7 +48,7 @@ categories: 个人记录
  - 2023年高教社杯数学建模竞赛（国赛） **省级二等奖**
  - 2023年深圳杯数学建模竞赛 **省级三等奖**
  ## 在校期间担任职责
- - 华南理工大学IBM主机创新俱乐部 主席
+ - 2023~2024年度 华南理工大学IBM主机创新俱乐部 主席
 ---
 
 # 技能清单
