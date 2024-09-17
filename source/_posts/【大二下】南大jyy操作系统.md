@@ -338,6 +338,23 @@ CPU registers can be classified as volatile and non-volatile by calling convensi
 
 >A non-volatile register is a type of register with contents that must be preserved over subroutine calls. Whenever the value of a nonvolatile register is changed by the routine, the old value has to be saved on the stack prior to changing the register and that value has to be restored before returning. A register is similar to a variable, except that there is a fixed number of registers. Every register is a unique location in the CPU in which a single value is saved. A register is the one and only place where mathematical functions, such as addition, multiplication, subtraction, etc., can be carried out. Registers often hold pointers that refer to the memory. Moving values between memory and registers is a common phenomenon.
 非易失性寄存器是一种寄存器类型，其内容必须在子例程调用中保存。每当例程更改了非易失性寄存器的值时，必须在更改寄存器之前将旧值保存在堆栈上，并且必须在返回之前恢复该值。寄存器类似于变量，不同之处在于寄存器的数量是固定的。每个寄存器在CPU中都是一个唯一的位置，其中保存一个值。寄存器是唯一可以执行诸如加、乘、减等数学函数的地方。寄存器通常保存指向内存的指针。在内存和寄存器之间移动值是一种常见的现象。
+
+#### System V ABI
+x86-64 调用约定（System V ABI）
+前 6 个参数寄存器：
+
+前 6 个函数参数分别保存在 rdi, rsi, rdx, rcx, r8, r9 寄存器中。
+co_yield 没有参数，因此这些寄存器的值在 co_yield 中没有意义，可以任意修改。
+可任意改写的寄存器：
+
+co_yield 可以任意改写以下寄存器的值：rdi, rsi, rdx, rcx, r8, r9, rax（返回值寄存器）, r10, r11。
+返回后，调用者（如 foo 函数）仍然能够正确执行。
+必须保持一致的寄存器：
+
+co_yield 返回时，必须保证以下寄存器的值和调用时保持一致：rbx, rsp, rbp, r12, r13, r14, r15。
+这些寄存器称为 "callee saved" 或 "non-volatile registers" 或 "call preserved" 寄存器。
+与之相对的是 "caller saved" 或 "volatile" 或 "call-clobbered" 寄存器。
+
 ### 问题分析
 - co_start 会在共享内存中创建一个新的状态机 (堆栈和寄存器也保存在共享内存中)，仅此而已。新状态机的 %rsp 寄存器应该指向它独立的堆栈，%rip 寄存器应该指向 co_start 传递的 func 参数。根据 32/64-bit，参数也应该被保存在正确的位置 (x86-64 参数在 %rdi 寄存器，而 x86 参数在堆栈中)。main 天然是个状态机，就对应了一个协程；
 - co_yield 会将当前运行协程的寄存器保存到共享内存中，然后选择一个另一个协程，将寄存器加载到 CPU 上，就完成了 “状态机的切换”；
@@ -350,6 +367,7 @@ CPU registers can be classified as volatile and non-volatile by calling convensi
 1. 为每一个协程分配独立的堆栈；堆栈顶的指针由 %rsp 寄存器确定；
 2. 在 co_yield 发生时，将寄存器保存到属于该协程的 struct co 中 (包括 %rsp)；
 3. 切换到另一个协程执行，找到系统中的另一个协程，然后恢复它 struct co 中的寄存器现场 (包括 %rsp)。
+
 
 #### setjmp/longjmp 实现寄存器现场的保存和恢复
 使用 C 语言标准库中的 setjmp/longjmp 函数来实现寄存器现场的保存和恢复。
@@ -387,7 +405,7 @@ int main() {
 
 ps: POSIX.1没有指定 setjmp 和 longjmp 是否保存和恢复当前阻塞信号集;如果一个程序使用信号处理，它应该使用POSIX的 sigsetjmp / siglongjmp 。
 
-#### 实现寄存器现现场切换
+#### 实现寄存器现场切换
 
 ```
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
@@ -404,10 +422,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   );
 }
 ```
->您好，这是必应。我很乐意为您解释以下代码。😊
->
->这段代码是一个**汇编语言**中的**函数调用**函数，用于在**栈上切换**不同的函数。它使用了**volatile**关键字，表示这些指令不会被优化器或内存管理器改变。它还使用了**条件编译**和**内联汇编**的技术，根据不同的平台（__x86_64__或__x86__）选择合适的寄存器和地址。
->
+
 >这个函数的参数包括：
 >- **sp**: 栈指针，指向当前执行函数的栈帧。
 >- **entry**: 要调用的函数的入口地址。
@@ -415,15 +430,11 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
 >
 >这个函数的作用是在栈上创建一个新的栈帧，将入口地址和参数压入栈中，然后执行调用指令。当调用完成后，栈帧会被弹出，并恢复原来的栈指针和返回地址。
 >
->我希望这能够帮助您理解这段代码。如果您有任何其他问题或想要了解更多关于汇编语言或函数调用的信息，请随时与我联系。😊
->
->源: 与必应的对话， 2/24/2024
 
+每当 `co_yield()` 发生时，我们都会选择一个协程继续执行，此时必定为以下两种情况之一 (思考为什么)：
 
-每当 co_yield() 发生时，我们都会选择一个协程继续执行，此时必定为以下两种情况之一 (思考为什么)：
-
-1. 选择的协程是新创建的，此时该协程还没有执行过任何代码，我们需要首先执行 stack_switch_call 切换堆栈，然后开始执行协程的代码；
-2. 选择的协程是调用 yield() 切换出来的，此时该协程已经调用过 setjmp 保存寄存器现场，我们直接 longjmp 恢复寄存器现场即可。
+1. 选择的协程是新创建的，此时该协程还没有执行过任何代码，我们需要首先执行 `stack_switch_call` 切换堆栈，然后开始执行协程的代码；
+2. 选择的协程是调用 `yield()` 切换出来的，此时该协程已经调用过 `setjmp` 保存寄存器现场，我们直接 `longjmp` 恢复寄存器现场即可。
 
 
 #### 管理co_start 时分配的 struct co 结构体资源

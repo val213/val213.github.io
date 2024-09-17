@@ -179,10 +179,55 @@ public:
 # Hot 100
 ## 哈希
 1. 两数之和
+暴力时间复杂度较高的原因是寻找 target - x 的时间复杂度过高。因此，我们需要一种更优秀的方法，能够快速寻找数组中是否存在目标元素。如果存在，我们需要找出它的索引。
+使用哈希表，可以将寻找 target - x 的时间复杂度降低到从 O(N) 降低到 O(1)。
+这道题的思路是**使用哈希表来存储每个元素的下标，然后遍历数组**，对于每个元素，查找哈希表中是否存在目标元素，如果存在，返回两个元素的下标。
+- 注意哈希表的api。
+```C++
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int,int> hashtable;
+        for(int i=0;i<nums.size();i++){
+            auto it = hashtable.find(target-nums[i]);
+            if (it != hashtable.end()){
+                return {it->second,i};
+            }
+            hashtable[nums[i]]=i;
+        }
+        return {};
+    }
+};
+```
 2. 字母异位词分组
+思路1，排序：由于互为字母异位词的两个字符串包含的字母相同，因此对两个字符串分别进行排序之后得到的字符串一定是相同的，故可以将排序之后的字符串作为哈希表的键
+思路2，计数：由于互为字母异位词的两个字符串包含的字母相同，因此两个字符串中的相同字母出现的次数一定是相同的，故可以将每个字母出现的次数使用字符串表示，作为哈希表的键。
+```C++
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string,vector<string>> hash;
+        for (string& str: strs){
+            string key = str;
+            sort(key.begin(),key.end());
+            hash[key].emplace_back(str);
+        }
+        vector<vector<string>> ans;
+        for(auto it = hash.begin(); it!=hash.end();it++){
+            ans.emplace_back(it->second);
+        }
+        return ans;
+    }
+};
+```
+- 注意哈希表的api。
+- `emplace_back()` 函数是C++11中引入的新函数，用于在容器的尾部插入一个元素，与push_back()函数的功能类似，但是效率更高。
 3. 最长连续序列
+    哈希表，把所有的数放入哈希表中，然后遍历数组中的每个数，如果这个数是连续序列的第一个数，那么就往后找，直到找到连续序列的最后一个数，更新最长连续序列的长度。
+    注意用 if 判断中断剪枝。
 ## 双指针
 1. 移动零
+>这道题的思路是使用双指针，一个指针a用于遍历数组，另一个指针b用于指向下一个非零元素应该放置的位置。遍历数组，当遇到非零元素时，将其放置到指针指向的位置，然后将指针向后移动一位。遍历结束后，将指针后的所有元素置为 0。
 2. 盛最多水的容器
 >这道题非常适合使用双指针技巧来解决。这里的双指针主要指的是左右指针。你可以考虑以下思路：
 >1. **初始化**：左指针`left`置于数组的开始位置，右指针`right`置于数组的末尾位置。这代表了容器的最大宽度。
@@ -193,7 +238,7 @@ public:
 3. 接雨水
 > 方法三：双指针
 动态规划的做法中，需要维护两个数组 leftMax 和 rightMax，因此空间复杂度是 O(n)。是否可以将空间复杂度降到 O(1)？
-注意到下标 i 处能接的雨水量由 leftMax[i] 和 rightMax[i] 中的最小值决定。由于数组 leftMax 是从左往右计算，数组 rightMax 是从右往左计算，因此可以使用双指针和两个变量代替两个数组。
+注意到**下标 i 处能接的雨水量由 leftMax[i] 和 rightMax[i] 中的最小值决定**。由于数组 leftMax 是从左往右计算，数组 rightMax 是从右往左计算，因此可以使用双指针和两个变量代替两个数组。
 维护两个指针 left 和 right，以及两个变量 leftMax 和 rightMax，初始时 left=0,right=n−1,leftMax=0,rightMax=0。指针 left 只会向右移动，指针 right 只会向左移动，在移动指针的过程中维护两个变量 leftMax 和 rightMax 的值。
 当两个指针没有相遇时，进行如下操作：
 使用 height[left] 和 height[right] 的值更新 leftMax 和 rightMax 的值；
@@ -204,9 +249,67 @@ public:
 链接：https://leetcode.cn/problems/trapping-rain-water/solutions/692342/jie-yu-shui-by-leetcode-solution-tuvc/
 来源：力扣（LeetCode）
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```C++
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int ans = 0;
+        int left = 0, right = height.size() - 1;
+        int leftMax = 0, rightMax = 0;
+        while (left < right) {
+            leftMax = max(leftMax, height[left]);
+            rightMax = max(rightMax, height[right]);
+            if (height[left] < height[right]) {
+                ans += leftMax - height[left];
+                ++left;
+            } else {
+                ans += rightMax - height[right];
+                --right;
+            }
+        }
+        return ans;
+    }
+};
 
+```
 ## 滑动窗口
 1. 无重复字符的最长子串
+- 这道题的思路是使用滑动窗口，维**护一个哈希集合，用于存储每个字符的下标**。遍历字符串，当遇到重复字符时，移动左指针，**直到窗口中不再有重复字符**。在遍历的过程中，更新最长子串的长度。
+- 如何判断窗口中是否有重复字符？可以使用哈希表来存储窗口中的字符，然后在遍历的过程中，**判断当前字符是否在哈希集合中**。
+- 如何检验左指针的移动是否完成？
+注意使用哈希集合的接口：
+- `unordered_set::erase()`：在哈希集合中删除元素，如果元素存在，返回 1；否则，返回 0。
+- `unordered_set::insert()`：在哈希集合中插入元素，如果元素已存在，返回 0；否则，返回 1。
+- `unordered_set::count()`：返回哈希集合中元素的个数。
+- `unordered_set::find()`：在哈希集合中查找元素，如果找到，返回指向该元素的迭代器；否则，返回指向集合末尾的迭代器。
+对比哈希map的接口：
+
+```C++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_set<char> hash;
+        int n = s.size();
+        int rk = -1;
+        int maxans = 0;
+        for(int i=0;i<n;i++){
+            if (i!=0){
+                // 遇到了重复，左边界收缩直到没有重复的
+                // 左指针向右移动一格，移除一个字符
+                hash.erase(s[i - 1]);
+            }
+            // 固定左边界，如果没遇到重复的，右边界不断向右扩展
+            while(!hash.count(s[rk+1]) && rk+1<n){
+                hash.insert(s[rk+1]);
+                rk++;
+            }
+            int ans = rk-i+1;
+            maxans = max(maxans,ans);
+        }
+        return maxans;
+    }
+};
+```
 2. 找到字符串中所有字母异位词
 
 滑动窗口类型的题目，通常都是在一个字符串（或数组）上通过滑动窗口来求解的。滑动窗口的思路是这样的：
@@ -293,7 +396,7 @@ public:
         - 如果同时遍历两个链表，当一个链表到达末尾时跳到另一个链表的头部继续遍历，另一个链表也是如此，那么它们会在交点处相遇或在链表末尾的nullptr处相遇（如果不相交）。
         - 这种方法的时间复杂度为O(N+M)，空间复杂度为O(1)，其中N和M分别是两个链表的长度。
 2. 反转链表
-    - 递归和迭代两种方法，递归的方法是比较直观的，迭代的方法是比较高效的。
+    - 递归和迭代两种方法，递归比较直观，迭代比较高效。
     - 使用迭代进行链表反转的操作可以记下来，因为这种方法在其他链表题目中也经常用到。
     ```cpp
     ListNode *prev = nullptr, *curr = head;
@@ -319,6 +422,8 @@ public:
     dummy.next = head;
     ListNode* curr = &dummy; // curr指针指向哨兵节点，用于追踪当前处理的节点对的前一个节点
     ```
+    不要混淆节点和指针，节点是链表的基本单元，指针是用于访问节点的引用。在这个问题中，我们只需要一个指针来追踪当前节点，因为我们只需要访问当前节点。
+    dummpy是节点，curr是指针。
 7. 两数相加
     - 同样用到了哨兵节点和tail指针来构建新的链表。
 8. 删除链表的倒数第N个节点
@@ -397,7 +502,7 @@ public:
 8. 验证二叉搜索树
     - 递归，每次传入上下界，判断左右子树是否满足条件。初始上下界是LONG_MIN, LONG_MAX。
 9. 二叉搜索树中第k小的元素
-    - 中序遍历即可
+    - **中序遍历**即可，用stack；先找到最小的元素，过程中将左子树的节点入栈，然后出栈，k--，如果找到了第k个就跳出循环；否则再将右子树的节点入栈。
     - 如果你需要频繁地查找第 k 小的值，你将如何优化算法？
         - 在方法一中，我们之所以需要中序遍历前 k 个元素，是因为我们**不知道子树的结点数量**，不得不通过遍历子树的方式来获知。因此，我们可以**记录下以每个结点为根结点的子树的结点数**，并在查找第 k 小的值时，使用如下方法搜索：
         - 令 node 等于根结点，开始搜索。
@@ -695,3 +800,31 @@ NP完全问题的一个关键特性是，目前没有已知的多项式时间算
     ![alt text](image-398.png)
     - 将 fast 重新指向数组的第一个元素，然后两个指针每次都移动一步，直到它们再次相遇。相遇点就是重复数字。
     - 跟某一道找链表重合点的题目有点像，可以证明这么处理快慢指针一定会在环的入口处相遇
+
+# 企业题库
+- 字符串转换整数 (atoi)
+    自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
+    ```C++
+    unordered_map<string, vector<string>> table = {
+        {"start", {"start", "signed", "in_number", "end"}},
+        {"signed", {"end", "end", "in_number", "end"}},
+        {"in_number", {"end", "end", "in_number", "end"}},
+        {"end", {"end", "end", "end", "end"}}
+    };
+    ```
+
+本题可能产生溢出的步骤在于推入、乘以 10 操作和累加操作都可能造成溢出。对于溢出的处理方式通常可以转换为 INT_MAX 的逆操作。比如判断某数乘以 10 是否会溢出，那么就把该数和 INT_MAX 除以 10 进行比较。
+
+- 寻找旋转排序数组中的最小值
+    - 二分查找
+    - 二分查找的关键在于判断左右两边哪个是有序的，然后根据有序的一边判断目标值在不在这一边，然后更新左右边界
+    - 二分查找的模板：
+    ```C++
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] < nums[right]) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
