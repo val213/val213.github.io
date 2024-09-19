@@ -389,11 +389,24 @@ public:
     6. 如果没有找到`target`，返回`false`。
 这种方法的时间复杂度为O(m+n)，其中m是矩阵的行数，n是矩阵的列数。
 ## 链表
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+```
 1. 相交链表
     - 第一反应用哈希表来检测重复的节点即为相交的起点，但是需要O(n)的额外空间。时间复杂度为O(n)。
     - 有一种更高效的解法，不需要额外的存储空间。这种方法基于两个观察结果：
         - 两个链表相交后，后面的部分必然相同。
-        - 如果同时遍历两个链表，当一个链表到达末尾时跳到另一个链表的头部继续遍历，另一个链表也是如此，那么它们会在交点处相遇或在链表末尾的nullptr处相遇（如果不相交）。
+        - 如果同时遍历两个链表，**当一个链表到达末尾时跳到另一个链表的头部继续遍历，另一个链表也是如此**，那么它们会在交点处相遇或在链表末尾的nullptr处相遇（如果不相交）。
+        - A 链表 + B 链表，与 B 链表 + A 链表必然是相同的长度，所以一定会同时遍历到结尾
         - 这种方法的时间复杂度为O(N+M)，空间复杂度为O(1)，其中N和M分别是两个链表的长度。
 2. 反转链表
     - 递归和迭代两种方法，递归比较直观，迭代比较高效。
@@ -411,6 +424,44 @@ public:
 3. 回文链表
     - 直接想到用哈希表，没用上回文的性质，空间复杂度O(n)，时间复杂度O(n)；
     - 链表反转一半，反转后检查链表半部分是否一样
+    ```C++
+        class Solution {
+    public:
+        // 迭代判断链表是否相等 
+        bool Listequals(ListNode* pA, ListNode* pB) {
+            while (pA && pB) {
+                if (pA->val != pB->val) return false; // 比较值而不是节点本身
+                pA = pA->next;
+                pB = pB->next;
+            }
+            return pB == nullptr; // 确保 pB 已经遍历完
+        }
+
+        bool isPalindrome(ListNode* head) {
+            if (!head || !head->next) return true;
+
+            // 快慢指针先找到链表的中点
+            ListNode *fast = head;
+            ListNode *slow = head;
+            while (fast && fast->next) {
+                fast = fast->next->next;// 不用担心fast->next->next，就是要可以是nullptr
+                slow = slow->next;
+            }
+
+            // 反转后半部分
+            ListNode *prev = nullptr, *curr = slow;
+            while (curr) {
+                ListNode *next = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = next;
+            }
+
+            // 比较前半部分和反转后的后半部分
+            return Listequals(head, prev);
+        }
+    };
+    ```
 4. 环形链表
     - 快慢指针
 5. 环形链表Ⅱ
@@ -420,12 +471,43 @@ public:
     ```cpp
     ListNode dummy(0); // 创建一个哨兵节点
     dummy.next = head;
-    ListNode* curr = &dummy; // curr指针指向哨兵节点，用于追踪当前处理的节点对的前一个节点
+    ListNode* curr = &dummy; // curr指针指向哨兵节点的地址，用于追踪当前处理的节点对的前一个节点
     ```
     不要混淆节点和指针，节点是链表的基本单元，指针是用于访问节点的引用。在这个问题中，我们只需要一个指针来追踪当前节点，因为我们只需要访问当前节点。
     dummpy是节点，curr是指针。
 7. 两数相加
-    - 同样用到了哨兵节点和tail指针来构建新的链表。
+    - 由于输入的两个链表都是逆序存储数字的位数的，因此两个链表中同一位置的数字可以直接相加。我们同时遍历两个链表，逐位计算它们的和，并与当前位置的进位值相加。
+    ```cpp
+    class Solution {
+    public:
+        ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+            ListNode *head = nullptr, *tail = nullptr;
+            int carry = 0;
+            while (l1 || l2) {
+                int n1 = l1 ? l1->val: 0;
+                int n2 = l2 ? l2->val: 0;
+                int sum = n1 + n2 + carry;
+                if (!head) {
+                    head = tail = new ListNode(sum % 10);
+                } else {
+                    tail->next = new ListNode(sum % 10);
+                    tail = tail->next;
+                }
+                carry = sum / 10;
+                if (l1) {
+                    l1 = l1->next;
+                }
+                if (l2) {
+                    l2 = l2->next;
+                }
+            }
+            if (carry > 0) {
+                tail->next = new ListNode(carry);
+            }
+            return head;
+        }
+    };
+    ```
 8. 删除链表的倒数第N个节点
     - 尝试使用一趟遍历完成
     - 双指针，一个指针先走n步，然后两个指针一起走，直到第一个指针走到末尾，第二个指针就是要删除的节点的前驱节点。
@@ -460,6 +542,95 @@ public:
 14. LRU 缓存
     - 类似操作系统实验的作业，用双向链表和哈希表实现。
     - 通过链表头节点和尾节点的增加删除移动来实现。
+    ```cpp
+    struct DLinkedNode {
+        int key, value; 
+        DLinkedNode* prev;
+        DLinkedNode* next;
+        DLinkedNode(): key(0), value(0), prev(nullptr), next(nullptr) {}
+        DLinkedNode(int _key, int _value): key(_key), value(_value), prev(nullptr), next(nullptr) {}
+    };
+
+    class LRUCache {
+    private:
+        unordered_map<int, DLinkedNode*> cache; // 哈希表, key 映射到节点, O(1)时间查找 
+        DLinkedNode* head; // 头部伪节点
+        DLinkedNode* tail; // 尾部伪节点
+        int size; // 当前队列大小
+        int capacity; // 最大容量
+
+    public:
+        LRUCache(int _capacity): capacity(_capacity), size(0) {
+            // 使用伪头部和伪尾部节点
+            head = new DLinkedNode();
+            tail = new DLinkedNode();
+            // 初始化链表，头部指向尾部，尾部指向头部
+            head->next = tail;
+            tail->prev = head;
+        }
+        // 从哈希表中查找 key，如果 key 存在，将其移动到链表头部并返回 value，否则返回 -1
+        int get(int key) {
+            // 如果 key 不存在，返回 -1
+            if (!cache.count(key)) {
+                return -1;
+            }
+            // 如果 key 存在，先通过哈希表定位，再移到头部
+            DLinkedNode* node = cache[key];
+            moveToHead(node);
+            return node->value;
+        }
+        // 如果 key 不存在，返回 -1。如果 key 存在，先通过哈希表定位，修改 value，并移到头部
+        void put(int key, int value) {
+            if (!cache.count(key)) {
+                // 如果 key 不存在，创建一个新的节点
+                DLinkedNode* node = new DLinkedNode(key, value);
+                // 添加进哈希表
+                cache[key] = node;
+                // 添加至双向链表的头部
+                addToHead(node);
+                ++size; // 队列大小加1
+                if (size > capacity) {
+                    // 如果超出容量，删除双向链表的尾部节点
+                    DLinkedNode* removed = removeTail();
+                    // 删除哈希表中对应的项
+                    cache.erase(removed->key);
+                    // 防止内存泄漏, delete 是 C++ 中释放内存的操作
+                    delete removed;
+                    --size;
+                }
+            }
+            else {
+                // 如果 key 存在，先通过哈希表定位，再修改 value，并移到头部
+                DLinkedNode* node = cache[key];
+                node->value = value;
+                moveToHead(node);
+            }
+        }
+
+        void addToHead(DLinkedNode* node) {
+            node->prev = head;
+            node->next = head->next;
+            head->next->prev = node;
+            head->next = node;
+        }
+        
+        void removeNode(DLinkedNode* node) {
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+        }
+
+        void moveToHead(DLinkedNode* node) {
+            removeNode(node);
+            addToHead(node);
+        }
+
+        DLinkedNode* removeTail() {
+            DLinkedNode* node = tail->prev;
+            removeNode(node);
+            return node;
+        }
+    };
+    ```
 ## 二叉树
 >前序遍历：中，左，右
 >中序遍历：左，中，右
@@ -828,3 +999,78 @@ NP完全问题的一个关键特性是，目前没有已知的多项式时间算
             left = mid + 1;
         }
     }
+
+- 用 Rand7() 实现 Rand10()
+>已知 rand_N() 可以等概率的生成[1, N]范围的随机数,那么：(rand_X() - 1) × Y + rand_Y() ==> 可以等概率的生成[1, X * Y]范围的随机数,即实现了 rand_XY()
+```c++
+class Solution extends SolBase {
+    public int rand10() {
+        while(true) {
+            int num = (rand7() - 1) * 7 + rand7(); // 等概率生成[1,49]范围的随机数
+            if(num <= 40) return num % 10 + 1; // 拒绝采样，并返回[1,10]范围的随机数
+        }
+    }
+}
+```
+
+## wxg一面
+- Q1：lc172. 阶乘后的零 medium 数学题
+    给定一个整数n，返回n!的结果中尾随零的数量。（0 <= n <= 10^4）
+    - 朴素想法：计算n!，然后计算末尾有多少个0。但是这样会溢出。int32的范围是[-2^31, 2^31-1]，n最大为10^4，10^4!的位数是35660，所以不能直接计算n!。
+    - **首先末尾有多少个 0 ，只需要给当前数乘以一个 10 就可以加一个 0**。
+    再具体对于 5!，也就是 5 * 4 * 3 * 2 * 1 = 120，我们发现结果会有一个 0，原因就是 2 和 5 相乘构成了一个 10。而**对于 10 的话，其实也只有 2 * 5 可以构成**。有 2 的因子每两个出现一次，含有 5 的因子每 5 个出现一次，所有 2 出现的个数远远多于 5，换言之**找到一个 5，一定能找到一个 2 与之配对。所以我们只需要找有多少个 5**。直接的，我们**只需要判断每个累乘的数有多少个 5 的因子**即可。
+    - 进一步分析：但还没有结束，继续分析。`... * (1 * 5) * ... * (1 * 5 * 5) * ... * (2 * 5 * 5) * ... * (3 * 5 * 5) * ... * n` 每隔 25 个数字，出现的是两个 5，所以除了每隔 5 个数算作一个 5，每隔 25 个数，还需要多算一个 5。
+    - 优化：写程序的话，如果直接按照上边的式子计算，分母可能会造成溢出。所以算 n / 25 的时候，我们先把 n 更新，n = n / 5，然后再计算 n / 5 即可。后边的同理。
+    ```C++
+    int trailingZeroes(int n) {
+        int count = 0;
+        for (int i = 5; i <= n; i *= 5) {
+            count += n / i;
+        }
+        return count;
+    }
+    ```
+- Q2：lc1669. 合并两个链表 medium
+    给你两个链表 list1 和 list2 ，他们包含的元素分别为n个和m个。请你将list1中下标从 a 到 b 的全部节点都删除，并将list2 接在被删除节点的位置。
+    - 直接模拟：找到a的前一个节点，b的后一个节点，然后删除a到b的节点，然后将list2接在a的前一个节点和b的后一个节点之间。但是要注意内存泄漏，要释放删除的节点。
+    ```C++
+    ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
+        ListNode* dummy = new ListNode(0);
+        dummy->next = list1;
+        ListNode* pre = dummy;
+        
+        // 找到第 a 个节点的前一个节点
+        for (int i = 0; i < a; i++) {
+            pre = pre->next;
+        }
+        
+        // 找到第 b 个节点
+        ListNode* cur = pre;
+        for (int i = 0; i <= b - a; i++) {
+            cur = cur->next;
+        }
+        
+        // 处理被删除的节点
+        ListNode* temp = pre->next;
+        while (temp != cur->next) {
+            ListNode* next = temp->next;
+            delete temp;
+            temp = next;
+        }
+        // Update the next pointer of pre to cur->next
+        pre->next = cur->next;
+        
+        // 连接 list2
+        pre->next = list2;
+        while (list2->next) {
+            list2 = list2->next;
+        }
+        list2->next = cur->next;
+        
+        ListNode* result = dummy->next;
+        delete dummy; // 释放 dummy 节点
+        return result;
+    }
+    ```
+- Q3：lc1146. 快照数组 medium
+想半天不知道要用什么数据结构形成这个快照数组的结构，最后还是看了题解，有一个答案是：vector<vector<pair<int,int>>> data;意义是data[i]表示第i个快照，data[i][j]表示第i个快照的第j个元素，pair的first是元素的值，second是元素的快照的值。这样就可以实现快照数组的功能。pair的意义是，如果一个元素没有被修改过，那么就不需要存储这个元素，只需要存储这个元素的快照的值即可。

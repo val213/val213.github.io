@@ -754,3 +754,4 @@ the following types implement the trait:
   nix::sys::socket::SockAddr
   nix::sys::socket::NetlinkAddr
   nix::sys::socket::AlgAddr
+

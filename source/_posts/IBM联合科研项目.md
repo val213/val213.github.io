@@ -1652,3 +1652,15 @@ docker run --user $(id -u):$(id -g) --rm --name grafana-backup-tool \
 - 动画制作：通过动画的形式展示项目的流程和结果，让观众更加直观地了解项目的实现过程和效果
 - 配音录制：录制配音，为视频增添声音
 - 视频剪辑：将录制好的视频和配音进行剪辑，制作成最终的成品
+
+### 数据库连接
+```
+docker exec -it ecs_db /bin/bash
+mysql -h localhost -P 3306 -u root -p
+SHOW DATABASES;
+USE ecs_api;
+SHOW TABLES;
+```
+
+### 性能优化
+用了https之后网页打开速度特别慢
