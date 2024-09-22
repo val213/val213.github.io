@@ -4,7 +4,25 @@ tags:
 	- data structure
 categories: 复习笔记
 ---
+# STL
+## vector
 
+## unordered_map
+
+## unordered_set
+
+## queue
+
+## stack
+
+## priority_queue
+
+## pair
+
+## map
+
+## map
+# 杂题
 ## linked list
 ### 2. Add Two Numbers
 > You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
@@ -972,6 +990,151 @@ NP完全问题的一个关键特性是，目前没有已知的多项式时间算
     - 将 fast 重新指向数组的第一个元素，然后两个指针每次都移动一步，直到它们再次相遇。相遇点就是重复数字。
     - 跟某一道找链表重合点的题目有点像，可以证明这么处理快慢指针一定会在环的入口处相遇
 
+# 面试150
+## 数学
+- 回文数
+```c++
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        // 思路一，转换为字符串，反转后半部分比较，不行，还有正负的判断，不够优雅，肯定不是最优
+        // 思路二，利用除法和取余来获得每一位的数字？但问题是如何判定
+        // 首先判断是否有符号，筛除
+        if (x<0) return false;
+        // 特判0
+        if (x==0) return true;
+        // 此外，个位数为0的也应该筛除
+        if (x%10==0) return false;
+        
+        // 在思路二的基础上思考怎么反转一半，如何判断到达中点了
+        // 当原始数字小于或等于反转后的数字时，就已经到达一半了
+        // 反转后的后半部分数字
+        int y = 0;// 
+        while(x>y){
+            y=y*10+x%10; 
+            x/=10;
+        }
+        if (x==y||x==y/10) return true;
+        else return false;
+    }
+};
+```
+- 加一
+```c++
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        // 思路1，定位到最后一位元素，+1，如果有进位就一直往前加
+        int sz = digits.size();
+        int carry = 1;
+        int i = sz-1;
+        for (int i = sz - 1; i >= 0; --i) {
+            digits[i] += carry;
+            if (digits[i] >= 10) {
+                digits[i] -= 10;
+                carry = 1;
+            } else {
+                carry = 0;
+                break; // 无需再继续处理
+            }
+        }
+        if (carry) {
+            // 如果最后还有进位，则在最前面插入1
+            digits.insert(digits.begin(), 1); 
+        }
+        return digits;
+    }
+};
+```
+- x 的平方根
+```c++
+class Solution {
+public:
+    int mySqrt(int x) {
+        if (x==0) return 0;
+        if  (x==1||x==2) return 1;
+        // 二分查找该平方根的上下界
+        int left = 0;
+        int right = x;
+        int ans = -1;
+        while(left<=right){
+            int mid = left+(right-left)/2;
+            if((long long)mid*mid<=x) {
+                left = mid+1;
+                ans = mid;
+            }
+            else{
+                right = mid-1;
+            }
+        }
+        return ans;
+    }
+};
+```
+- pow(x, n)
+```c++
+// 递归版本
+class Solution {
+public:
+    double quickMul(double x, long n){
+        if (n==0){
+            return 1.0;
+        }
+        // 快速幂的思路是，从n入手，拆分出多个数的平方或者平方乘上x，最终的积是x^n
+        // 递归分治
+        double y =  quickMul(x,n/2);
+        // 如果n/2不是整数
+        if (n%2) return y*y*x;
+        else return y*y;
+    }
+
+    double myPow(double x, int n) {
+        // 没啥思路，好像是什么快速幂算法？直接看题解
+        // 快速幂+递归
+        // 注意把-n转换一下
+        long N = n;
+        return N >= 0?quickMul(x,N):1.0/quickMul(x,-N);
+    }
+};
+```
+由于递归需要使用额外的栈空间，我们试着将递归转写为迭代。
+迭代的方法涉及到二进制的位运算，我们可以将 N 的二进制表示看做是 1 的指数相乘。例如，如果 N = 9，其二进制表示为 1001，那么 x^9 = x^{2^3} * x^{2^0} = x^8 * x^1。通过二进制的位运算，我们就可以得到 x^{2^3} 和 x^{2^0}。
+
+那么就有
+```c++
+class Solution {
+public:
+    double myPow(double x, int n) {
+        // 处理 n 为负数的情况
+        long long N = n;
+        if (N < 0) {
+            x = 1 / x;
+            N = -N;
+        }
+
+        double result = 1.0;
+        double current_product = x;
+
+        while (N > 0) {
+            // 如果 N 是奇数（即 N % 2 == 1），则将 result 乘以 current_product。这是因为在二进制表示中，奇数的最低位是 1，这意味着我们需要将当前的 current_product 乘到 result 中
+            if (N % 2 == 1) {
+                result *= current_product;
+            }
+            // 将 current_product 值乘以自身，来到更高位的指数
+            current_product *= current_product;
+            // 将 N 右移一位（即除以 2）。这是因为我们已经处理了当前的最低位，现在需要处理更高位的指数。
+            N /= 2;
+        }
+
+        return result;
+    }
+};
+```
+- 直线上最多的点数
+```c++
+class Solution {
+
+
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
@@ -1074,3 +1237,37 @@ class Solution extends SolBase {
     ```
 - Q3：lc1146. 快照数组 medium
 想半天不知道要用什么数据结构形成这个快照数组的结构，最后还是看了题解，有一个答案是：vector<vector<pair<int,int>>> data;意义是data[i]表示第i个快照，data[i][j]表示第i个快照的第j个元素，pair的first是元素的值，second是元素的快照的值。这样就可以实现快照数组的功能。pair的意义是，如果一个元素没有被修改过，那么就不需要存储这个元素，只需要存储这个元素的快照的值即可。
+```C++
+#include <vector>
+#include <map>
+
+class SnapshotArray {
+public:
+    SnapshotArray(int length) : snap_id(0) {
+        data.resize(length);
+        for (int i = 0; i < length; ++i) {
+            data[i][0] = 0; // 初始时，每个元素都等于 0
+        }
+    }
+
+    void set(int index, int val) {
+        data[index][snap_id] = val;
+    }
+
+    int snap() {
+        return snap_id++;
+    }
+
+    int get(int index, int snap_id) {
+        auto it = data[index].upper_bound(snap_id);
+        if (it == data[index].begin()) {
+            return 0; // 如果没有找到快照，返回初始值 0
+        }
+        return std::prev(it)->second;
+    }
+
+private:
+    std::vector<std::map<int, int>> data;
+    int snap_id;
+};
+```

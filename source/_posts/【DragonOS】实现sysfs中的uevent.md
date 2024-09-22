@@ -755,3 +755,6 @@ the following types implement the trait:
   nix::sys::socket::NetlinkAddr
   nix::sys::socket::AlgAddr
 
+
+闭包、泛型的定义和限制
+回调函数
