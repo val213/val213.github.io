@@ -757,4 +757,8 @@ the following types implement the trait:
 
 
 闭包、泛型的定义和限制
-回调函数
+回调函数?
+
+跑通现有的函数；监听？udev！
+
+## udev

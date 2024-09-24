@@ -149,9 +149,47 @@ Syzkaller 的工作流程通常包括以下几个步骤：
     - https://bbs.dragonos.org.cn/t/topic/343/1
 
 
-## 第四次会议总结 09012
+## 第四次会议总结 0912
 - overlayerfs
 - eBPF
+
 ### 联合文件系统 overlayfs
+分享人：操丰毅
+主题：联合文件系统 overlayfs 的作用和实现方式
 ![alt text](image-458.png)
-### eBPF 的运行过程
+主要分享了联合文件系统（overlayfs）的作用和实现方式。overlayfs可以将一个或多个文件系统结合在一起。主要有两个层次：上层为读写层，下层为只读层。在容器启动时，下层的只读层会提供最小的OS内核，而上层读写层的容器镜像则可以共享下层的资源。可以简单理解为内核态和用户态的关系；
+
+overlayfs 是 Union File System的一种实现，它可以将多个文件系统合并为一个虚拟的文件系统。overlayfs 有三个层次：上层、下层和合并层。上层是可读写的，下层是只读的，合并层是上层和下层的结合的结果。
+
+通过 COW(写时复制) 机制，在上层创建文件和文件夹，然后将其拷贝到下层进行修改，最后合并成一个虚拟的 merge 层。
+
+此外，还介绍了 WhiteOut 和透明文件夹（opaque directory）两个比较特殊的机制。
+![alt text](image-464.png)
+#### WhiteOut
+上层文件会把下层文件覆盖掉，这种覆盖关系是通过 WhiteOut 文件来实现的。
+WhiteOut 是一个特殊的文件，用于标记上层文件系统中被删除的文件。当上层文件系统中的文件被删除时，overlayfs 会在下层文件系统中创建一个 WhiteOut 文件，表示该文件已被删除。WhiteOut 文件的存在会覆盖下层文件系统中的同名文件，使其在上层文件系统中不可见。
+#### Opaque Directory
+默认合并行为：
+当上下层某个路径下有同名目录的时候，默认情况下他们的内容会合并在一起，合并层中会看到两者的所有文件。
+
+不透明目录的作用：
+上层标记为透明目录的话，下层的文件会被隐藏，即使原本不应该被覆盖到，所以合并层中只会看到上层的文件。
+### eBPF in DragonOS
+分享人：陈林峰
+主题：eBPF in DragonOS——ebpf的运行流程，用户态支持和内核支持
+#### eBPF 的运行过程
+![alt text](image-465.png)
+从用户态和内核态的角度简述一下 eBPF 的运行过程：
+1. generate：用户态程序通过 BPF 系列的系统调用生成 eBPF 字节码。
+2. load：将 eBPF 字节码加载到内核中，在内核中verifier会对 eBPF 字节码进行验证，然后通过kprobe, uprobes, tracepoint, perf_event等机制将 eBPF 字节码挂载到内核的各个 hook 点上。
+3. async read：eBPF 程序在 hook 点上运行，执行完毕后将结果(statistics)写入到 eBPF map 中。perf_output 机制可以将结果(per-event data)异步输出到用户态。
+#### 用户态支持
+用户态的eBPF工具库很多，原理大致相同。目前 DragonOS 选择了AYA框架作为用户态支持。但是由于部分系统调用的支持问题，需要对AYA框架进行删改。
+##### Tokio
+Tokio 是一个基于 Rust 的异步运行时，用于构建高性能的网络应用程序。DragonOS 现在已经基本支持 Tokio 运行时。
+#### 内核态支持
+内核态支持主要分，kprobe，rbpf，系统调用支持，helper 函数支持。
+- kprobe 需要在上一次 PR 的基础上进行修改，配合 eBPF 的运行机制。
+- 原版 rbpf 功能比较简单，因为不是原生为了支持 eBPF，DragonOS 已经基本支持，但是需要结合rust实际的生命周期和所有权规则等添加一些数据结构的支持。
+- 系统调用方面，除了bpf，联通 eBPF 和 kprobe 的系统调用在 Linux 里是 perf_event_open，这个系统调用比较复杂。
+- 预期输出的地点是伪文件系统下，目前暂时以打印的方式呈现。

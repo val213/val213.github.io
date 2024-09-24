@@ -1132,9 +1132,113 @@ public:
 ```
 - 直线上最多的点数
 ```c++
+// 枚举直线 + 枚举统计 ON^3
 class Solution {
+public:
+    int maxPoints(vector<vector<int>>& points) {
+        int n = points.size(), ans = 1;
+        for (int i = 0; i < n; i++) {
+            vector<int> x = points[i];
+            for (int j = i + 1; j < n; j++) {
+                vector<int> y = points[j];
+                // 枚举点对 (i,j) 并统计有多少点在该线上, 起始 cnt = 2 代表只有 i 和 j 两个点在此线上
+                int cnt = 2;
+                for (int k = j + 1; k < n; k++) {
+                    vector<int> p = points[k];
+                    int s1 = (y[1] - x[1]) * (p[0] - y[0]);
+                    int s2 = (p[1] - y[1]) * (y[0] - x[0]);
+                    if (s1 == s2) cnt++;
+                }
+                ans = max(ans, cnt);
+            }
+        }
+        return ans;
+    }
+};
+```
 
+```c++
+// 枚举直线 + 哈希表统计，通过哈希表统计每个斜率的点数 ON^2
+class Solution {
+public:
+    int maxPoints(vector<vector<int>>& points) {
+        int n = points.size(), ans = 1;
+        for (int i = 0; i < n; i++) {
+            map<string, int> map;
+            int maxv = 0;
+            for (int j = i + 1; j < n; j++) {
+                int x1 = points[i][0], y1 = points[i][1], x2 = points[j][0], y2 = points[j][1];
+                int a = x1 - x2, b = y1 - y2;
+                int k = gcd(a, b);
+                string key = to_string(a / k) + "_" + to_string(b / k);
+                map[key]++;
+                maxv = max(maxv, map[key]);
+            }
+            ans = max(ans, maxv + 1);
+        }
+        return ans;
+    }
+    int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+};
 
+```
+
+## 数组
+- 移除元素
+```c++
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        // 双指针，一个从前面找val，一个从后面找非val，都找到就交换
+        int l = 0;
+        int r = nums.size()-1;
+        int k = 0;
+        while(l<=r){
+            // 忘记加 l<=r 的条件
+            while (l <= r && nums[l]!=val) {
+                k++;
+                l++;
+            }
+            // 忘记加 l<=r 的条件
+            while (l <= r && nums[r]==val) r--;
+            // 只有 l < r 才能交换，避免不必要的交换和重复计数
+            if (l < r) {
+                swap(nums[l], nums[r]);
+                l++;
+                r--;
+                k++;
+            }
+        }
+        return k;
+    }
+};
+```
+
+- 双指针优化：
+```c++
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int left = 0, right = nums.size();
+        while (left < right) {
+            if (nums[left] == val) {
+                nums[left] = nums[right - 1];
+                right--;
+            } else {
+                left++;
+            }
+        }
+        return left;
+    }
+};
+```
+
+- 删除有序数组中的重复项
+```c++
+
+- 
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
