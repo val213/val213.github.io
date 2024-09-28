@@ -762,3 +762,6 @@ the following types implement the trait:
 跑通现有的函数；监听？udev！
 
 ## udev
+udev通过对sysfs下的文件读/写来实现对设备的控制。
+比如udevadm trigger，会对/sys/devices/pci0000:00/../uevent写入'add','remove'或'change'等命令，调用到sysfs的ops接口，最终操纵到对应的device。
+同时，当device发生变化时，比如接入/拔出了一个设备，又会通过内核的uevent机制，将这个变化通知到udev。udev根据uevent中的内容，与/lib/udev/rules.d/下的规则做匹配。匹配到相同类型的device后，可以在/sys/下创建设备或是执行一些命令。

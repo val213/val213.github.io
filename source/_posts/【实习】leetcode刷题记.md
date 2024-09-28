@@ -855,8 +855,8 @@ public:
 - 买卖股票的最佳时机
     - 一次遍历：找到最小值，然后算最大利润
 - 跳跃游戏
-    - 一次遍历：如果当前位置小于最远距离，可以作为起跳点；则计算更新最远距离，如果当前位置大于最远距离，说明无法到达，返回false
-- 跳跃游戏Ⅱ
+    - 一次遍历：如果当前位置小于最远距离，可以作为起跳点；则计算更新最远距离，**如果当前位置大于最远距离**，说明无法到达，返回false
+- 跳跃游戏 II
     - 通过比较当前的位置 i 和当前能到达的最远的位置 currentEnd 来判断是否应该更新 currentEnd 和 jumps
 - 划分字母区间
     - 两次遍历，第一次遍历得到每个字母最后出现的位置，第二次遍历根据最后出现的位置划分区间，维护一个 end 变量，不断更新为遍历到的字母的最后出现位置。当遍历到的位置等于end时，说明当前区间结束。计算 len 将区间长度加入结果，更新 start 为下一个区间的起始位置。
@@ -1237,8 +1237,425 @@ public:
 
 - 删除有序数组中的重复项
 ```c++
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        // 快慢指针，快指针（遍历），覆盖
+        int slow = 0;
+        for (auto num:nums){
+            if (slow < 1 || num!=nums[slow-1]){
+                nums[slow++]=num;
+            }
+        }
+        return slow;
+    }
+};
+```
+- 删除排序数组中的重复项 II
+原本的想法不好，试图用一个字段来记录重复的次数，其实没有必要；没有利用到数组是有序的特性，结合双指针，比较的时候多往前比较一位就行，然后多加一点细节的优化。
+```c++
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.size() <= 2) return nums.size(); // 如果数组长度小于等于2，直接返回长度
 
-- 
+        int slow = 2; // 从第三个元素开始处理
+        for (int fast = 2; fast < nums.size(); fast++) {
+            if (nums[fast] != nums[slow - 2]) {
+                nums[slow++] = nums[fast];
+            }
+        }
+        return slow;
+    }
+};
+// 为了让解法更具有一般性，我们还可以将原问题的「保留 2 位」修改为「保留 k 位」。只需要将 if (nums[fast] != nums[slow - 2]) 修改为 if (nums[fast] != nums[slow - k]) 即可。
+```
+- 多数元素
+第二次做这道题，只能想到用哈希表，不过这样空间复杂度不是O(1)。看了题解，对下面三种方法再加深一下印象：
+1. 随机化
+因为超过一半的元素被众数占据了，这样我们随机挑选一个下标对应的元素并验证，有很大的概率能找到众数。理论上最坏情况下的时间复杂度为 O(∞)，因为如果我们的运气很差，这个算法会一直找不到众数，随机挑选无穷多次，所以最坏时间复杂度是没有上限的。然而，**运行的期望时间是线性的（期望的随机次数是常数2）**。为了更简单地分析，先说服你自己：由于众数占据 超过 数组一半的位置，期望的随机次数会小于众数占据数组恰好一半的情况。随机方法只需要常数级别的额外空间。
+```cpp
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        while (true) {
+            int candidate = nums[rand() % nums.size()];
+            int count = 0;
+            for (int num : nums)
+                if (num == candidate)
+                    ++count;
+            if (count > nums.size() / 2)
+                return candidate;
+        }
+        return -1;
+    }
+};
+```
+2. 分治
+如果数 a 是数组 nums 的众数，如果我们将 nums 分成两部分，那么 a 必定是至少一部分的众数。这样以来，我们就可以使用分治法解决这个问题：将数组分成左右两部分，分别求出左半部分的众数 a1 以及右半部分的众数 a2，随后在 a1 和 a2 中选出正确的众数。我们使用经典的分治算法递归求解，直到所有的子问题都是长度为 1 的数组。长度为 1 的子数组中唯一的数显然是众数，直接返回即可。
+
+尽管分治算法没有直接分配额外的数组空间，但在递归的过程中使用了额外的栈空间。算法每次将数组从中间分成两部分，所以数组长度变为 1 之前需要进行 O(logn) 次递归，即空间复杂度为 O(logn)。
+```C++
+class Solution {
+    int count_in_range(vector<int>& nums, int taget, int low,int high){
+        int count = 0;
+        for(int i = low; i<=high;i++){
+            if (nums[i]== taget) count ++;
+        }
+        return count;
+    }
+    int majority_element_rec(vector<int>& nums, int low, int high){
+        if (low == high) return nums[low];
+        int mid = (low + high)/2;
+        // 得到左右范围两个众数
+        int left = majority_element_rec(nums,low,mid);
+        int right = majority_element_rec(nums,mid+1,high);
+        // 如果其中某个众数在范围内的数量超过一半，他就是这个范围的众数
+        if (count_in_range(nums,left,low,high) > (high-low+1)/2) return left;
+        if (count_in_range(nums,right,low,high) > (high-low+1)/2) return right;
+        else return -1;
+    }
+public:
+    int majorityElement(vector<int>& nums) {
+        // 分治
+        return majority_element_rec(nums,0,nums.size() -1);
+    }
+};
+```
+
+3. Boyer-Moore 投票算法
+这个算法只对数组进行了一次遍历，只需要常数级别的额外空间。
+```c++
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int n =  nums.size();
+        if (n==1||n==2) return nums[0];
+
+        // 投票算法
+        int maj;
+        int cnt = 0;
+        for(auto num:nums){
+            if (cnt == 0){
+                maj = num;
+            }
+            if (num == maj) cnt ++;
+            else cnt --;
+        }
+        return maj;
+    }
+};
+```
+
+- 轮转数组
+```c++
+// 自己写的空间O1的版本，下面有更漂亮的解法
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        int n = nums.size();
+        if (n<=1) return;
+        // 处理反转次数
+        k%=n;
+        // 首先反转整个数组
+        for (int i=0;i<n/2;i++){
+            swap(nums[i],nums[n-1-i]);
+        }
+        // 然后分别反转前k个和后n-k个元素
+        for (int i =0;i<k/2;i++){
+            swap(nums[i],nums[k-1-i]);
+        }
+        for (int i = k,j=0;i<(k+n)/2;i++,j++){
+            swap(nums[i],nums[n-1-j]);
+        }
+    }
+};
+```
+
+```c++
+// 更漂亮的解法
+class Solution {
+public:
+    void reverse(vector<int>& nums, int start, int end) {
+        while (start < end) {
+            swap(nums[start], nums[end]);
+            start += 1;
+            end -= 1;
+        }
+    }
+
+    void rotate(vector<int>& nums, int k) {
+        k %= nums.size();
+        reverse(nums, 0, nums.size() - 1);
+        reverse(nums, 0, k - 1);
+        reverse(nums, k, nums.size() - 1);
+    }
+};
+```
+还有一种环状替换的方法，这个方法是把数组看成一个环，每次移动一个位置，直到回到起点，这样就能把所有的元素都移动到正确的位置。需要一个额外的变量记录当前位置的元素，只有常量的额外空间。
+```c++
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        int n = nums.size();
+        k = k % n;
+        int count = gcd(k, n);
+        for (int start = 0; start < count; ++start) {
+            int current = start;
+            int prev = nums[start];
+            do {
+                int next = (current + k) % n;
+                swap(nums[next], prev);
+                current = next;
+            } while (start != current);
+        }
+    }
+};
+```
+- 买卖股票的最佳时机
+用一个dp数组来根本不需要，只需要一个变量来记录最小值，然后不断更新最大利润即可。
+```c++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int inf = 1e9;
+        int minprice = inf, maxprofit = 0;
+        for (int price: prices) {
+            maxprofit = max(maxprofit, price - minprice);
+            minprice = min(price, minprice);
+        }
+        return maxprofit;
+    }
+};
+```
+- 买卖股票的最佳时机 II
+累计每一次涨幅即可
+```c++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        // 累计每一次涨幅就是最大利润
+        int n = prices.size();
+        if (n<=1) return 0;
+        int maxProfit = 0;
+        for(int i=1; i<n;i++){
+            if (prices[i]>prices[i-1]) maxProfit +=prices[i]-prices[i-1];
+        }
+        return maxProfit;
+    }
+};
+```
+- 跳跃游戏
+```c++
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int n = nums.size();
+        if (n<=1) return true;
+        int maxdis = 0;
+        // 维护能跳到的最远距离，大于数组长度即可
+        // 递归？不需要，只需要记录比较maxdis和计算nums[i]+i即可
+        for (int i =0;i<n;i++)
+        {
+            // 检查当前索引 i 是否超过了当前能跳到的最远距离 maxdis
+            if (i>maxdis) return false;
+            maxdis = max(maxdis,nums[i]+i);
+        }
+        return true;
+        
+    }
+};
+```
+- ※跳跃游戏 II
+返回到达 nums[n - 1] 的最小跳跃次数。生成的测试用例可以到达 nums[n - 1]
+
+**只有每次跳槽都选择能够帮助你升级最多的公司，才能以最少的跳槽次数到达最高级别的公司**。
+
+```c++
+class Solution {
+    public int jump(int[] nums) {
+        int ans = 0; //跳槽次数
+        int curUnlock = 0; //当前你的水平能入职的最高公司级别
+        int maxUnlock = 0; //当前可选公司最多能帮你提到几级
+        for (int i = 0; i < nums.length - 1; i++) { //从前向后遍历公司，最高级公司(nums.length-1)是目标，入职后不再跳槽，所以不用看，故遍历范围是左闭右开区间[0,nums.length-1)
+            maxUnlock = Math.max(maxUnlock, i + nums[i]); //计算该公司最多能帮你提到几级(公司级别i+成长空间nums[i])，与之前的提级最高记录比较，打破记录则更新记录
+            if (i == curUnlock) { // 把你当前水平级别能选的公司都看完了，你选择跳槽到记录中给你提级最多的公司，以解锁更高级公司的入职权限
+                curUnlock = maxUnlock; // 你跳槽到了该公司，你的水平级别被提升了
+                ans++; //这里记录你跳槽了一次
+            }
+        }
+        return ans; //返回跳槽总次数
+    }
+}
+```
+- H指数
+
+```c++
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        // 排序后判断citations[i]后面有没有多于等于citations[i]个元素
+        int n = citations.size();
+        if (n==0) return 0;
+        sort(citations.begin(),citations.end());
+        for(int i = n-1; i>0 ;i--){
+            // citations[i] 引用第n-i的被引数
+            if (citations[i] <= n-i) return citations[i];
+        }
+        // [100],[0]
+        return citations[0]>0?min(n,citations[0]):0;
+        // [4,4,0,0]
+    }
+};
+// 边界条件处理不当：
+
+// 当 citations[i] 恰好等于 n-i 时，代码会返回 citations[i]，但这并不总是正确的。例如，对于输入 [0, 1, 3, 5, 6]，正确的 h-index 应该是 3，但代码会返回 1。
+// 循环条件错误：
+
+// 循环条件 for(int i = n-1; i>0 ;i--) 应该是 i >= 0，否则会漏掉 i = 0 的情况。
+// 返回值逻辑错误：
+
+// 最后的返回值逻辑 return citations[0]>0?min(n,citations[0]):0; 也有问题，因为它没有考虑到所有可能的情况。
+```
+
+- O(1)时间插入、删除和获取随机元素
+```c++
+class RandomizedSet {
+private:
+    unordered_map<int,int> map;
+public:
+    RandomizedSet(){
+
+    }
+    
+    bool insert(int val) {
+        if (map.find(val)!=map.end()) return false;
+        else {
+            map.emplace(val);
+            return true;
+        }
+    }
+    
+    bool remove(int val) {
+        if (map.find(val) != map.end()){
+            map.erase(map.find(val));
+            return true;
+        }
+        else return false;
+    }
+    
+    int getRandom() {
+        // 随机返回集合中一项
+        std::random_device rd; // 用于获取随机数种子
+        std::mt19937 gen(rd()); // 创建随机数生成器
+        std::uniform_int_distribution<> dis(1, map.size()); // 定义一个范围在 1 到 10 之间的均匀分布
+
+        int n = dis(gen); // 生成一个随机数
+        return map.at(n);
+    }
+};
+
+/**
+    这个代码有几个问题：
+
+    unordered_map 的 emplace 用法错误：
+
+    unordered_map::emplace 需要两个参数：键和值。当前代码只传递了一个参数。
+    getRandom 方法的实现有问题：
+
+    unordered_map 是无序的，不能通过索引直接访问元素。
+    随机数生成的范围应该是从 0 到 map.size() - 1。
+    需要一种方法来随机访问 unordered_map 中的元素。
+    性能问题：
+
+    getRandom 方法的实现效率较低，因为它需要遍历 unordered_map。
+    修正后的代码
+    为了修正这些问题，可以使用一个 vector 来存储元素，并使用 unordered_map 来存储元素及其在 vector 中的位置。这样可以在 O(1) 时间复杂度内实现插入、删除和随机访问。
+ */ 
+ ```
+
+```c++
+#include <unordered_map>
+#include <vector>
+#include <random>
+
+class RandomizedSet {
+private:
+    std::unordered_map<int, int> map; // 存储值及其在 vector 中的位置
+    std::vector<int> values; // 存储所有值
+public:
+    RandomizedSet() {}
+
+    bool insert(int val) {
+        if (map.find(val) != map.end()) return false;
+        map[val] = values.size();
+        values.push_back(val);
+        return true;
+    }
+
+    bool remove(int val) {
+        // 与最后一个元素交换，然后删除
+        if (map.find(val) == map.end()) return false;
+        int lastElement = values.back();
+        int idx = map[val];
+        values[idx] = lastElement;
+        map[lastElement] = idx;
+        values.pop_back();
+        map.erase(val);
+        return true;
+    }
+
+    int getRandom() {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, values.size() - 1);
+        return values[dis(gen)];
+    }
+};
+
+/**
+ * Your RandomizedSet object will be instantiated and called as such:
+ * RandomizedSet* obj = new RandomizedSet();
+ * bool param_1 = obj->insert(val);
+ * bool param_2 = obj->remove(val);
+ * int param_3 = obj->getRandom();
+ */
+```
+
+- 除自身以外数组的乘积
+```c++
+// 一种看不懂的写法
+std::vector<int> productExceptSelf2(std::vector<int>& nums) {
+    std::vector<int> answer(nums.size(), 1);
+    int left = 0, right = nums.size() - 1;
+    int lp = 1, rp = 1;
+    while (right >= 0 && left < nums.size()) {
+        answer[right] *= rp;
+        answer[left] *= lp;
+        lp *= nums[left++];
+        rp *= nums[right--];
+    }
+    return answer;
+}
+```
+
+- 加油站
+```c++
+```
+# 每日一题
+- 0927 每种字符至少取k个
+（字符串，哈希表，滑动窗口）
+思路：
+比如 s 中有 3 个 a，4 个 b，5 个 c，k=2，每种字母至少取走 2 个，等价于剩下的字母至多有 1 个 a，2 个 b 和 3 个 c。
+
+由于只能从 s 最左侧和最右侧取走字母，所以**剩下的字母是 s 的子串**。
+
+**由于子串越短越能满足要求，越长越不能满足要求，有单调性，可以用滑动窗口解决**。
+
+```C++
+
+```
+
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
