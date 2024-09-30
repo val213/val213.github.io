@@ -59,6 +59,7 @@ IBM 和华南理工大学的校企合作科研项目，作为后台开发者，�
 - **Javaweb 全栈开发**：云服务器部署上线 Javaweb 网站应用，对于 vue、Nuxt、springboot、mybatis、mysql 等常用 Javaweb 技术栈较为熟悉；有 typescript及其 RPC 框架开发经验，对dockers、k8s等容器化技术有一定了解。
 - **C++ PC客户端开发**：基于QT框架的桌面应用程序开发、基于socket的联网功能开发、多线程技术、API调用等。
 - **操作系统实践**：在Linux系统各个发行版（centos、ubuntu等）上都有过一段时间的使用和操作经历，较为熟悉Linux系统上使用gdb、tmux、strace等工具调试和开发程序。善于"折腾"。
+- **CI/CD**：熟悉 CI/CD workflow 的配置和使用，熟悉 github 的 PR 流程，熟悉 github actions 的配置和使用。
 - **生产力工具：版本控制/文档排版编写/博客框架等**：git, Markdown, LaTex, mermaid, hexo 等。个人博客网站：http://val213.github.io
 ---
 

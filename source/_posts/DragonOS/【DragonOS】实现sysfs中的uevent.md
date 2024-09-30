@@ -437,7 +437,20 @@ Netlink 是一种在内核与用户应用间进行双向数据传输的非常好
 - [x] netlink_unicast: 发送单播消息
 - [√] netlink_broadcast: 发送广播消息 
 
-
+查找kobj本身或者其parent是否从属于某个kset，如果不是，则报错返回（注2：由此可以说明，如果一个kobject没有加入kset，是不允许上报uevent的）
+    查看kobj->uevent_suppress是否设置，如果设置，则忽略所有的uevent上报并返回（注3：由此可知，可以通过Kobject的uevent_suppress标志，管控Kobject的uevent的上报）
+    如果所属的kset有kset->filter函数，则调用该函数，过滤此次上报（注4：这佐证了3.2小节有关filter接口的说明，kset可以通过filter接口过滤不希望上报的event，从而达到整体的管理效果）
+    判断所属的kset是否有合法的名称（称作subsystem，和前期的内核版本有区别），否则不允许上报uevent
+    分配一个用于此次上报的、存储环境变量的buffer（结果保存在env指针中），并获得该Kobject在sysfs中路径信息（用户空间软件需要依据该路径信息在sysfs中访问它）
+    调用add_uevent_var接口（下面会介绍），将Action、路径信息、subsystem等信息，添加到env指针中
+    如果传入的envp不空，则解析传入的环境变量中，同样调用add_uevent_var接口，添加到env指针中
+    如果所属的kset存在kset->uevent接口，调用该接口，添加kset统一的环境变量到env指针
+    根据ACTION的类型，设置kobj->state_add_uevent_sent和kobj->state_remove_uevent_sent变量，以记录正确的状态
+    调用add_uevent_var接口，添加格式为"SEQNUM=%llu”的序列号
+    如果定义了"CONFIG_NET”，则使用netlink发送该uevent
+    以uevent_helper、subsystem以及添加了标准环境变量（HOME=/，PATH=/sbin:/bin:/usr/sbin:/usr/bin）的env指针为参数，调用kmod模块提供的call_usermodehelper函数，上报uevent。
+    其中uevent_helper的内容是由内核配置项CONFIG_UEVENT_HELPER_PATH(位于./drivers/base/Kconfig)决定的(可参考lib/kobject_uevent.c, line 32)，该配置项指定了一个用户空间程序（或者脚本），用于解析上报的uevent，例如"/sbin/hotplug”。
+    call_usermodehelper的作用，就是fork一个进程，以uevent为参数，执行uevent_helper。 
 #### 测试
 对netlink的测试分为两部分，一部分是内核提供接收用户空间消息，并响应发送功能；另一部分是用户空间发送netlink到内核，并等待回复。
 
@@ -763,5 +776,28 @@ the following types implement the trait:
 
 ## udev
 udev通过对sysfs下的文件读/写来实现对设备的控制。
+
 比如udevadm trigger，会对/sys/devices/pci0000:00/../uevent写入'add','remove'或'change'等命令，调用到sysfs的ops接口，最终操纵到对应的device。
+
 同时，当device发生变化时，比如接入/拔出了一个设备，又会通过内核的uevent机制，将这个变化通知到udev。udev根据uevent中的内容，与/lib/udev/rules.d/下的规则做匹配。匹配到相同类型的device后，可以在/sys/下创建设备或是执行一些命令。
+
+
+前面在提及/sys/devices的初始化函数devices_init时，涉及到了结构体kset与入参device_uevent_ops。
+
+kset下有成员uevent_ops，即这个目录对应的uevent操作。device_uevent_ops就是当/sys/devices这个目录发生变化时会调用的uevent操作。
+
+
+发送uevent后，udev就能够用env中的字符串同.rules中的规则进行匹配，匹配到相同规则的device后可以进行处理。
+
+通过netlink广播uevent事件。udev监听socket，sysfs通过socket将uevent广播，事件最终被udev接收到。
+
+内核态在uevent_net_init创建netlink的socket：
+
+在uevent_net_broadcast_untagged中遍历uevent_sock_list的所有socket并广播uevent：
+
+
+
+Netlink socket是内核和用户进程之间的一种通信方式，同时它也用于在不同的用户进程间进行通讯，在这一点上有点像Unix domain sockets。
+跟Unix domain sockets（apue-第17.3章）一样，Netlink socket也只能用于同一主机上的进程通讯，不能像 INET sockets（网络套接字）一样可以用于不同主机间的进程通讯。因此，Netlink socket的效率比 INET sockets高。
+Netlink socket和Unix domain sockets挺相似的，它们区别在于：
+while the Unix domain sockets use the file system namespace, Netlink processes are usually addressed by process identifiers

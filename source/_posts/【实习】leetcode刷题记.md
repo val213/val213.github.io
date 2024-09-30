@@ -21,7 +21,96 @@ categories: 复习笔记
 
 ## map
 
-## map
+## set
+set 是 C++ 标准库中的一种关联容器，其底层实现通常是红黑树（Red-Black Tree）。红黑树是一种自平衡二叉搜索树，能够保证插入、删除和查找操作的时间复杂度为 O(log n)。
+
+### 特点：
+- 有序性：set 中的元素是有序的，按照键值的升序排列。
+- 唯一性：set 中的元素是唯一的，不允许重复。
+- 自动平衡：红黑树会在插入和删除操作后自动调整，以保持树的平衡。
+
+### 各种操作的时间复杂度
+
+1. **插入元素 (`insert`)**：
+   - 时间复杂度：O(log n)
+   - 解释：由于 set 底层实现为红黑树，插入操作需要在树中找到正确的位置并进行平衡调整。
+
+2. **删除元素 (`erase`)**：
+   - 时间复杂度：O(log n)
+   - 解释：删除操作需要在树中找到元素并进行删除，同时保持树的平衡。
+
+3. **查找元素 (`find`)**：
+   - 时间复杂度：O(log n)
+   - 解释：查找操作需要在树中进行二分查找。
+
+4. **获取最小元素 (`begin`)**：
+   - 时间复杂度：O(1)
+   - 解释：红黑树的最左节点即为最小元素，直接访问即可。
+
+5. **获取最大元素 (`rbegin`)**：
+   - 时间复杂度：O(1)
+   - 解释：红黑树的最右节点即为最大元素，直接访问即可。
+
+6. **检查元素是否存在 (`count`)**：
+   - 时间复杂度：O(log n)
+   - 解释：`count` 方法实际上是调用 `find` 方法来检查元素是否存在。
+
+7. **遍历元素**：
+   - 时间复杂度：O(n)
+   - 解释：遍历整个 set 需要访问每个元素一次。
+
+### 使用场景
+
+1. **需要有序集合**：
+   - 当你需要一个有序的集合时，set 是一个很好的选择。它可以自动维护元素的顺序，方便进行范围查询和有序输出。
+
+2. **需要唯一性**：
+   - 当你需要确保集合中的元素唯一时，set 可以自动处理重复元素的插入，保证集合中没有重复元素。
+
+3. **频繁查找最小/最大元素**：
+   - 如果你的应用场景需要频繁查找集合中的最小或最大元素，set 提供了高效的 O(1) 时间复杂度的访问方式。
+
+4. **需要高效的插入和删除操作**：
+   - set 提供了 O(log n) 时间复杂度的插入和删除操作，适合需要频繁进行这些操作的场景。
+
+
+### 常用API：
+```C++
+#include <set>
+#include <iostream>
+
+int main() {
+    // 定义
+    std::set<int> s;
+
+    // 插入元素-insert
+    s.insert(5);
+    s.insert(3);
+    s.insert(8);
+
+    // 查找元素-find
+    auto it = s.find(5);
+    if (it != s.end()) {
+        std::cout << "Found 5" << std::endl;
+    }
+
+    // 获取最小和最大元素-begin, end, rbegin, rend
+    // begin() 返回指向第一个元素的迭代器
+    // end() 返回指向最后一个元素的下一个位置的迭代器
+    // rbegin() 返回指向最后一个元素的迭代器
+    // rend() 返回指向第一个元素的前一个位置的迭代器
+    int minElement = *s.begin();
+    int maxElement = *s.rbegin();
+    std::cout << "Min: " << minElement << ", Max: " << maxElement << std::endl;
+
+    // 遍历元素
+    for (int x : s) {
+        std::cout << x << " ";
+    }
+
+    return 0;
+}
+```
 # 杂题
 ## linked list
 ### 2. Add Two Numbers
@@ -1641,21 +1730,174 @@ std::vector<int> productExceptSelf2(std::vector<int>& nums) {
 
 - 加油站
 ```c++
+
 ```
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
 思路：
-比如 s 中有 3 个 a，4 个 b，5 个 c，k=2，每种字母至少取走 2 个，等价于剩下的字母至多有 1 个 a，2 个 b 和 3 个 c。
+比如 s 中有 3 个 a，4 个 b，5 个 c，k=2，每种字母至少取走 2 个，**等价于剩下的字母至多有** 1 个 a，2 个 b 和 3 个 c。
 
 由于只能从 s 最左侧和最右侧取走字母，所以**剩下的字母是 s 的子串**。
 
 **由于子串越短越能满足要求，越长越不能满足要求，有单调性，可以用滑动窗口解决**。
 
 ```C++
+class Solution {
+public:
+    int takeCharacters(string s, int k) {
+        // 最长字串
+        // 正难则反，等价于找到最长的字串，满足被取走的字母个数都不少于K个
+        // 维护滑动窗口外（被取走的）字母个数
+        // 一开始全部取走，记录数量
+        int cnt[3]{};
+        for(char c:s){
+            cnt[c-'a']++;
+        }
+        // 如果字母原本的数量就不足以取出k个，直接返回-1
+        if (cnt[0] <k || cnt[1]<k || cnt[2]<k){
+            return -1;
+        }
 
+        int mx = 0,left = 0;
+        // 遍历
+        for (int right = 0; right<s.length(); right++){
+            // left：滑动窗口的左边界，表示当前窗口的起始位置。
+            // right：滑动窗口的右边界，表示当前窗口的结束位置。
+            // 尝试从左往右放回字母
+            // char c 是s串中从左往右遍历的字母
+            char c = s[right] -'a';
+            // 放回
+            cnt[c]--;
+            // 只要此时取走的字母c少于k，就不断取走，收缩左边界
+            while(cnt[c]<k){
+                cnt[s[left]-'a']++;// 取走左边界上的字母
+                left++;// 左边界向右滑动，直到被取走的cnt[c]不少于k个，又一次到达满足条件的窗口
+            }
+            // 此时被取走的cnt[c]不少于k个
+            // mx 更新为最新窗口的最长长度，即维护一个满足条件的最长窗口
+            mx = max(mx,right-left+1);
+            // 右边界向右扩张，继续尝试放回下一个字母
+        }
+        // 要求返回取走的最少次数，也就是字符数量，原长度减去最长字串长度即可
+        return s.length()-mx;
+    }
+};
+```
+- 0928 以组为单位订音乐会的门票
+线段树
+
+- 0929 买票的时间
+法1队列模拟，法2遍历一次计数
+
+参考吕浩天同学的题解：
+![alt text](image-466.png)
+
+- 0930 座位预约管理系统
+```c++
+class SeatManager {
+private:
+set<int> s;
+public:
+    SeatManager(int n) {
+        // 初始化 set
+        for (int i = 1; i <= n; i++) {
+            s.insert(i);
+        }
+    }
+    
+    int reserve() {
+        // 找到未被预约的最小值
+        int res = *s.begin(); // O(1)
+        s.erase(s.begin());   // O(log n)
+        return res;
+    }
+    
+    void unreserve(int seatNumber) {
+        // 需要支持随机访问的数据结构，将对应的座位重置为零
+        s.insert(seatNumber); // O(log n)
+    }
+};
 ```
 
+优先队列实现
+```c++
+#include <queue>
+#include <vector>
+
+class SeatManager {
+private:
+    std::priority_queue<int, std::vector<int>, std::greater<int>> pq; // 小顶堆
+public:
+    SeatManager(int n) {
+        // 初始化优先队列
+        for (int i = 1; i <= n; ++i) {
+            pq.push(i);
+        }
+    }
+    
+    int reserve() {
+        // 找到未被预约的最小值
+        int res = pq.top(); // O(1)
+        pq.pop();           // O(log n)
+        return res;
+    }
+    
+    void unreserve(int seatNumber) {
+        // 将对应的座位重置为可用
+        pq.push(seatNumber); // O(log n)
+    }
+};
+```
+吕浩天同学版本的手写堆：
+```c++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+class SeatManager {
+private:
+    std::vector<int> h; // 最小堆
+    int s; // 堆的大小
+
+    void up(int k) {
+        while (k / 2 && h[k / 2] > h[k]) {
+            std::swap(h[k / 2], h[k]);
+            k /= 2;
+        }
+    }
+
+    void down(int u) {
+        int k = u;
+        if ((u << 1) <= s && h[k] > h[u << 1]) k = u << 1;
+        if ((u << 1 | 1) <= s && h[k] > h[u << 1 | 1]) k = u << 1 | 1;
+        if (k != u) {
+            std::swap(h[k], h[u]);
+            down(k);
+        }
+    }
+
+public:
+    SeatManager(int n) : h(n + 1), s(n) {
+        std::ios::sync_with_stdio(false);
+        std::cin.tie(nullptr);
+        for (int i = 1; i <= n; ++i) h[i] = i;
+        for (int i = n / 2; i; --i) down(i);
+    }
+
+    int reserve() {
+        int x = h[1];
+        h[1] = h[s--];
+        down(1);
+        return x;
+    }
+
+    void unreserve(int seatNumber) {
+        h[++s] = seatNumber;
+        up(s);
+    }
+};
+```
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
