@@ -6,8 +6,58 @@ categories: 复习笔记
 ---
 # STL
 ## vector
+### 特点：
+- 动态数组：vector 是一个动态数组，可以根据需要动态增加或减少数组的大小。
+- 随机访问：vector 支持通过下标随机访问元素，时间复杂度为 O(1)。
+- 尾部插入和删除：vector 支持在尾部插入和删除元素，时间复杂度为 O(1)。
+- 自动扩容：当 vector 的容量不足时，会自动扩容，一般情况下，扩容策略是将容量翻倍。
+- 连续内存：vector 中的元素在内存中是连续存储的，因此支持高效的随机访问。
+- 无需手动释放内存：vector 会自动管理内存，不需要手动释放内存。
+
+### 各种操作
+```C++
+#include <vector>
+#include <iostream>
+
+int main() {
+    // 定义
+    std::vector<int> v;
+
+    // 初始化
+    std::vector<int> v1 = {1, 2, 3};
+    std::vector<int> v2(5, 0);  // 初始化 5 个元素，每个元素的值为 0
+
+    // 插入元素-push_back
+    v.push_back(1);
+
+    // 访问元素-[]
+    std::cout << v[0] << std::endl;  // 输出 1
+
+    // 获取元素个数-size
+    std::cout << v.size() << std::endl;  // 输出 3
+
+    // 遍历元素
+    for (int i = 0; i < v.size(); i++) {
+        std::cout << v[i] << " ";
+    }
+    return 0;
+}
+```
 
 ## unordered_map
+map 和 unordered_map 都是 C++ 标准库中的关联容器，它们都提供了键值对的映射关系。map 是基于红黑树实现的，支持自动排序，而 unordered_map 是基于哈希表实现的，不支持自动排序。
+二者的区别主要有以下几点：
+- 有序性：map 中的元素是有序的，按照键的升序排列；unordered_map 中的元素是无序的，不会按照键的大小进行排序。
+- 哈希表：unordered_map 是基于哈希表实现的，可以快速查找键值对；map 是基于红黑树实现的，查找效率较低。
+- 自动排序：map 中的元素是有序的，会根据键的大小自动排序；unordered_map 中的元素是无序的，不会自动排序。
+- 时间复杂度：map 和 unordered_map 都支持常数时间复杂度的插入、删除和查找操作，但是 unordered_map 的常数时间复杂度更低。
+
+### 特点：
+- 键值对：unordered_map 是一个键值对容器，每个元素都是一个键值对。
+- 哈希表：unordered_map 是基于哈希表实现的，可以快速查找键值对。
+- 无序性：unordered_map 中的元素是无序的，不会按照键的大小进行排序。
+- 自动扩容：unordered_map 会自动扩容，当元素个数超过容量的 75% 时，会自动扩容为原来的两倍。
+- 时间复杂度：unordered_map 支持常数时间复杂度的插入、删除和查找操作。
 
 ## unordered_set
 
@@ -16,6 +66,71 @@ categories: 复习笔记
 ## stack
 
 ## priority_queue
+### 特点：
+- 优先队列：priority_queue 是一个优先队列，支持在队列的任意位置插入元素，并且能够在 O(1) 时间内访问队列中的最大或最小元素。
+- 自动排序：priority_queue 会根据元素的大小自动排序，可以通过自定义比较函数来改变排序规则。默认情况下，priority_queue 是一个最大堆，即根节点是堆中的最大元素。
+- 堆实现：priority_queue 通常使用堆来实现，堆是一种完全二叉树，可以快速找到最大或最小元素。
+- 有序性：priority_queue 中的元素是有序的，可以按照升序或降序排列。
+- 插入和删除：priority_queue 支持在队列的任意位置插入元素，并且能够在 O(1) 时间内访问队列中的最大或最小元素。
+
+### 各种操作的时间复杂度
+```C++
+#include <queue>
+#include <iostream>
+
+int main() {
+    // 定义
+    std::priority_queue<int> pq;
+
+    // 插入元素-push
+    pq.push(3);
+    pq.push(5);
+    pq.push(1);
+
+    // 获取队首元素-top
+    std::cout << pq.top() << std::endl;  // 输出 5
+
+    // 删除队首元素-pop
+    pq.pop();
+
+    // 遍历元素
+    while (!pq.empty()) {
+        std::cout << pq.top() << " ";
+        pq.pop();
+    }
+
+    return 0;
+}
+```
+如果需要自定义比较函数，可以使用 `std::priority_queue` 的第三个模板参数，例如：
+```C++
+#include <queue>
+#include <iostream>
+
+int main() {
+    // 定义最小堆
+    std::priority_queue<int, std::vector<int>, std::greater<int>> pq;
+
+    // 插入元素-push
+    pq.push(3);
+    pq.push(5);
+    pq.push(1);
+
+    // 获取队首元素-top
+    std::cout << pq.top() << std::endl;  // 输出 1
+
+    // 删除队首元素-pop
+    pq.pop();
+
+    // 遍历元素
+    while (!pq.empty()) {
+        std::cout << pq.top() << " ";
+        pq.pop();
+    }
+
+    return 0;
+}
+```
 
 ## pair
 
@@ -349,7 +464,8 @@ public:
 维护两个指针 left 和 right，以及两个变量 leftMax 和 rightMax，初始时 left=0,right=n−1,leftMax=0,rightMax=0。指针 left 只会向右移动，指针 right 只会向左移动，在移动指针的过程中维护两个变量 leftMax 和 rightMax 的值。
 当两个指针没有相遇时，进行如下操作：
 使用 height[left] 和 height[right] 的值更新 leftMax 和 rightMax 的值；
-如果 height[left]<height[right]，则必有 leftMax<rightMax，下标 left 处能接的雨水量等于 leftMax−height[left]，将下标 left 处能接的雨水量加到能接的雨水总量，然后将 left 加 1（即向右移动一位）；
+如果 `height[left] < height[right]`，则必有 `leftMax < rightMax`，下标 left 处能接的雨水量等于 
+`leftMax − height[left]`，将下标 left 处能接的雨水量加到能接的雨水总量，然后将 left 加 1（即向右移动一位）；
 如果 height[left]≥height[right]，则必有 leftMax≥rightMax，下标 right 处能接的雨水量等于 rightMax−height[right]，将下标 right 处能接的雨水量加到能接的雨水总量，然后将 right 减 1（即向左移动一位）。
 当两个指针相遇时，即可得到能接的雨水总量。
 作者：力扣官方题解
@@ -1729,9 +1845,252 @@ std::vector<int> productExceptSelf2(std::vector<int>& nums) {
 ```
 
 - 加油站
+通过推导，能够得出结论：从 x,y 之间的任何一个加油站出发，都无法到达加油站 y 的下一个加油站。其中 y 是从 x 出发无法到达的第一个加油站。z 是 x 和 y 之间的任何一个加油站。因此，我们可以直接跳过 y，从 y 的下一个加油站开始尝试。
 ```c++
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        int n = gas.size();
+        int i= 0;
+        while(i<n){
+            // 初始化每一个起点的参数
+            int sumofgas = 0, sumofcost = 0;
+            // 到达加油站的个数
+            int cnt = 0;
+            while(cnt<n){
+                // 下一个加油站的索引
+                int j = (i+cnt)%n;
+                sumofgas += gas[j];
+                sumofcost += cost[j];
+                // 无法到达
+                if (sumofcost > sumofgas){
+                    break;
+                }
+                cnt++;
+            }
+            if (cnt == n) return i;
+            // 直接从能到达最远的那个加油站的下一个加油站开始重新尝试
+            else i=i+cnt+1;
+        }
+        return -1;
+    }
+};
+```
+- K 次操作后最大化顶端元素
+```c++
+class Solution {
+public:
+    int maximumTop(vector<int>& nums, int k) {
+        // 特判
+        int n = nums.size(); 
+        if (n==1 && k%2) return -1;
+        if (k==0 && n>0) return nums[0];
+        // 一开始自己分析的都是错的，某个元素能否作为栈顶要看i和k的大小关系，而不是孤立的看i和k的奇偶性
+        // 实际上，可以让 i<k−1 或 i=k 的数组元素作为 k 次操作后的栈顶
+        // 不能把topnum初始化为原来的栈顶元素，k=1是做不到的
+        int topnum = -1;
+        for (int i=0;i<n;i++){
+            if (i<k-1 || i==k) topnum=max(topnum,nums[i]);
+        }
+        return topnum;
+    }
+};
+```
+- 分发糖果
+左右规则，两次遍历，一次从左到右，一次从右到左，取最大值
+```c++
+class Solution {
+public:
+    int candy(vector<int>& ratings) {
+        int n = ratings.size();
+        vector<int> left(n);
+        for (int i = 0; i < n; i++) {
+            if (i > 0 && ratings[i] > ratings[i - 1]) {
+                left[i] = left[i - 1] + 1;
+            } else {
+                left[i] = 1;
+            }
+        }
+        int right = 0, ret = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            if (i < n - 1 && ratings[i] > ratings[i + 1]) {
+                right++;
+            } else {
+                right = 1;
+            }
+            ret += max(left[i], right);
+        }
+        return ret;
+    }
+};
 
 ```
+常数空间遍历
+```c++
+// 记录上一个递减序列的长度
+class Solution {
+public:
+    int candy(vector<int>& ratings) {
+        int n = ratings.size();
+        int ret = 1;
+        int inc = 1, dec = 0, pre = 1;
+        for (int i = 1; i < n; i++) {
+            if (ratings[i] >= ratings[i - 1]) {
+                dec = 0;
+                pre = ratings[i] == ratings[i - 1] ? 1 : pre + 1;
+                ret += pre;
+                inc = pre;
+            } else {
+                dec++;
+                if (dec == inc) {
+                    dec++;
+                }
+                ret += dec;
+                pre = 1;
+            }
+        }
+        return ret;
+    }；
+};
+
+```
+- 接雨水
+- 罗马数字转整数
+思路很简单，就是模拟，但是这两种做法在时间和空间复杂度上有一些差异。我们来详细分析一下。
+    做法1
+    ```cpp
+    class Solution {
+    private:
+        unordered_map<char, int> symbolValues = {
+            {'I', 1},
+            {'V', 5},
+            {'X', 10},
+            {'L', 50},
+            {'C', 100},
+            {'D', 500},
+            {'M', 1000},
+        };
+
+    public:
+        int romanToInt(string s) {
+            int ans = 0;
+            int n = s.length();
+            for (int i = 0; i < n; ++i) {
+                int value = symbolValues[s[i]];
+                if (i < n - 1 && value < symbolValues[s[i + 1]]) {
+                    ans -= value;
+                } else {
+                    ans += value;
+                }
+            }
+            return ans;
+        }
+    };
+    ```
+
+    做法2
+    ```cpp
+    class Solution {
+    public:
+        // 首先存储罗马字符和数值的关系
+        map<char, int> mp;
+        int romanToInt(string s) {
+            mp['I'] = 1;
+            mp['V'] = 5;
+            mp['X'] = 10;
+            mp['L'] = 50;
+            mp['C'] = 100;
+            mp['D'] = 500;
+            mp['M'] = 1000;
+            int res = 0;
+            int N = s.size();
+            vector<int> num;
+            // 先全部转换为数字数组
+            for (auto c : s) {
+                num.push_back(mp[c]);
+            }
+            int i = 0;
+            while (i < N) {
+                if (i + 1 == N) {
+                    res += num[i];
+                    return res;
+                }
+                if (num[i] < num[i + 1]) {
+                    res += (num[i + 1] - num[i]);
+                    i += 2;
+                } else {
+                    res += num[i];
+                    i++;
+                }
+            }
+            return res;
+        }
+    };
+    ```
+
+    时间复杂度：
+    - **做法1**：时间复杂度为 O(n)，其中 n 是字符串 s 的长度。每个字符只被访问一次，`unordered_map` 的查找操作平均时间复杂度为 O(1)。
+    - **做法2**：时间复杂度为 O(n)，但由于使用了 `map`，其查找操作的时间复杂度为 O(log n)。此外，`for` 循环和 `while` 循环各遍历了一次字符串，因此总体时间复杂度为 O(n log n)。
+
+    空间复杂度
+    - **做法1**：空间复杂度为 O(1)，因为 `unordered_map` 的大小是固定的，不随输入字符串的长度变化。
+    - **做法2**：空间复杂度为 O(n)，因为使用了一个 `vector<int>` 来存储转换后的数字数组。此外，`map` 的大小也是固定的，但 `vector` 的大小随输入字符串的长度变化。
+
+- 整数转罗马数字
+```c++
+const pair<int, string> valueSymbols[] = {
+    {1000, "M"},
+    {900,  "CM"},
+    {500,  "D"},
+    {400,  "CD"},
+    {100,  "C"},
+    {90,   "XC"},
+    {50,   "L"},
+    {40,   "XL"},
+    {10,   "X"},
+    {9,    "IX"},
+    {5,    "V"},
+    {4,    "IV"},
+    {1,    "I"},
+};
+
+class Solution {
+public:
+    string intToRoman(int num) {
+        string roman;
+        for (const auto &[value, symbol] : valueSymbols) {
+            while (num >= value) {
+                num -= value;
+                roman += symbol;
+            }
+            if (num == 0) {
+                break;
+            }
+        }
+        return roman;
+    }
+};
+```
+
+- 最后一个单词的长度
+```c++
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+        int end = s.size() - 1;
+        // 处理结尾的空格
+        while (end >= 0 && s[end] == ' ') end--;
+        // 如果字符串全是空格，返回0
+        if (end < 0) return 0;
+        // 从后往前找到第一个空格的位置
+        int start = end;
+        while (start >= 0 && s[start] != ' ') start--;
+        return end - start;
+    }
+};
+```
+- 最长公共前缀
+```c++
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
@@ -1849,7 +2208,7 @@ public:
     }
 };
 ```
-吕浩天同学版本的手写堆：
+吕浩天同学版本的手写堆(看不懂，记不住……)：
 ```c++
 #include <iostream>
 #include <vector>
@@ -1898,6 +2257,65 @@ public:
     }
 };
 ```
+- 10.01 最低票价
+```c++
+class Solution {
+int dp[366];
+public:
+    int mincostTickets(vector<int>& days, vector<int>& costs) {
+        // dp[i]表示开始到第i天的最小花费
+        memset(dp,0x3f,sizeof(dp));
+        dp[0]=0;
+        int n = days.size();
+        for(int i=1, j=0; i<=365 && j<n;i++){
+            if (i!=days[j]) {
+                dp[i]=dp[i-1];
+                continue;
+            }
+            dp[i]= min(min(dp[max(0,i-1)]+costs[0],dp[max(0,i-7)]+costs[1]),dp[max(0,i-30)]+costs[2]);
+            j++;
+        }
+
+        return dp[days.back()];
+    }
+};
+```
+```c++
+class Solution {
+    // 优化：记忆化搜索，用一个memo来记录dp的结果
+    int memo[366] = {0};
+    unordered_set<int> dayset;
+    vector<int>costs;
+public:
+    int mincostTickets(vector<int>& days, vector<int>& costs) {
+        // dp[i]表示1~i天内列出的每一天旅游的最低消费
+        // dp[i] = min(min(dp[i+1]+costs[0],dp[i+7]+costs[1]),dp[i+30]+costs[2]);
+        // 初始化
+        memset(memo,-1,sizeof(memo));
+        this->costs=costs;
+        for(auto day:days){
+            dayset.insert(day);
+        }
+        return dp(1);
+    }
+    int dp(int i){
+        if (i>365){
+            return 0;
+        }
+        if (memo[i]!=-1){
+            return memo[i];
+        }
+        if (dayset.find(i)!=dayset.end()){
+            memo[i]=min(min(dp(i+1)+costs[0],dp(i+7)+costs[1]),dp(i+30)+costs[2]);
+        }
+        else{
+            memo[i]=dp(i+1);
+        }
+        return memo[i];
+    }
+};
+```
+
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)

@@ -6,6 +6,10 @@ categories: DragonOS
 ### UserBufferReader
 需要使用UserbufferReader对来自用户态的指针进行校验，然后通过UserBufferReader进行读操作，否则不安全。
 
+在验证地址安全性之前，不允许访问用户内存。
+应该是userbuffer的功能你还没理解。如果不校验的话，要是用户传一个内核地址进来，那就会造成系统崩溃之类的问题了。
+
+userbuffer的操作应该在filesystem/vfs下进行。
 
 
 `chown`、`lchown` 和 `fchown` 是 Linux 系统中用于更改文件或目录所有权的命令。
