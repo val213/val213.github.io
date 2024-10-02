@@ -2091,6 +2091,266 @@ public:
 ```
 - 最长公共前缀
 ```c++
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        string res = "";
+        if (strs.empty()) return "";
+        int i = 0;
+        while(1){
+            // 这一句很重要，如果不加这一句，会出现 "" 被识别为 "\u0000" 的情况
+            if (i >= strs[0].size()) return res;
+            char first = strs[0][i];
+            for(const auto& c:strs){
+                if (c.size()-1<i || c[i] != first ) return res;
+            }
+            res += first;
+            i++;
+        }
+        return res;
+
+    }
+};
+```
+
+- 反转字符串中的单词
+```c++
+// 使用C++内置的字符串API完成，熟悉API的使用，但是不是最优解
+class Solution {
+public:
+    string reverseWords(string s) {
+        // istringstream 用于处理字符串输入输出
+        istringstream is(s);
+        string res, tmp;
+        // 从字符串中读取单词
+        while (is >> tmp) {
+            res = tmp + " " + res;
+        }
+        // 去掉最后一个空格
+        res.pop_back();
+        return res;
+    }
+};
+```
+```c++
+// 熟悉API的使用，但是不是最优解
+class Solution {
+public:
+    string reverseWords(string s) {
+        vector<string> words;
+        int n = s.size();
+        int i = 0;
+        while (i < n) {
+            while (i < n && s[i] == ' ') {
+                i++;
+            }
+            if (i == n) {
+                break;
+            }
+            int start = i;
+            while (i < n && s[i] != ' ') {
+                i++;
+            }
+            words.push_back(s.substr(start, i - start));
+        }
+        // 反转存储了所有单词的数组
+        reverse(words.begin(), words.end());
+        string ret;
+        // 拼接
+        for (const string& word : words) {
+            ret += word;
+            ret += ' ';
+        }
+        // 去掉最后一个空格
+        ret.pop_back();
+        return ret;
+    }
+};
+```
+```c++
+class Solution {
+public:
+    string reverseWords(string s) {
+        // 反转整个字符串
+        reverse(s.begin(), s.end());
+        int n = s.size();
+        // idx 用于记录当前字符的位置
+        int idx = 0;
+        // 遍历整个字符串
+        for (int start = 0; start < n; ++start) {
+            // 如果当前字符不为空格，说明找到了单词的开头，就把当前字符移动到 idx 处
+            if (s[start] != ' ') {
+                // 如果 idx 不等于 0，说明不是第一个单词，需要在单词之间加一个空格
+                if (idx != 0) s[idx++] = ' ';
+                // 用 end 记录单词的结尾，初始化为 start
+                int end = start;
+                // 循环找到单词的结尾 s[idx++]=s[end++]的意思是将end指向的字符赋值给idx指向的字符，然后end和idx都加1，相当于将end指向的字符移动到idx指向的位置，这样就可以实现原地移动，移动的目的是为了去掉单词之间的空格，从头开始覆盖
+                while (end < n && s[end] != ' ') s[idx++] = s[end++];
+                // 反转从idx开始，长度为end-start的单词
+                reverse(s.begin() + idx - (end - start), s.begin() + idx);
+                // 更新 start 的位置
+                start = end;
+            }
+        }
+        // 删除多余的字符
+        s.erase(s.begin() + idx, s.end());
+        return s;
+    }
+};
+```
+- z字形变换
+```c++
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        if (numRows < 2)
+            return s;
+        vector<string> rows(numRows);
+        int i = 0, flag = -1;
+        for (char c : s) {
+            rows[i].push_back(c);
+            if (i == 0 || i == numRows -1)
+                flag = - flag;
+            i += flag;
+        }
+        string res;
+        for (const string &row : rows)
+            res += row;
+        return res;
+    }
+};
+```
+- 找出字符串中第一个匹配项的下标
+```c++
+// 暴力模拟
+class Solution {
+public:
+    int strStr(string s, string p) {
+        int n = s.size(), m = p.size();
+        for(int i = 0; i <= n - m; i++){
+            int j = i, k = 0; 
+            while(k < m and s[j] == p[k]){
+                j++;
+                k++;
+            }
+            if(k == m) return i;
+        }
+        return -1;
+    }
+};
+
+```
+KMP算法
+    - 参考讲解：https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/solutions/1/kan-bu-dong-ni-da-wo-kmp-suan-fa-chao-qi-z1y0/?envType=study-plan-v2&envId=top-interview-150
+    - 最长公共前后缀：
+        按照 前后缀的长度，从小到大比较，从各组相等的前后缀中，返回长度最大的一组 前后缀的长度
+        如果字符串中不存在任一组前后缀相等，那么该字符串最长公共前后缀的长度就是 0。（公共：指的就是前后缀相等。）
+    - next数组
+        next [j]={ 子串 p[0, ... ,j−1] 的最长公共前后缀长度;}  0≤j≤n
+        通俗来讲，next[j] 表示的就是一个字符串中，起始点为 0 ，长度为 j 的子串的最长公共前后缀的大小。
+```c++
+class Solution {
+public:
+    int strStr(string s, string p) {
+        vector<int> next(p.size() + 1, 0); // next 数组，用于存储部分匹配表
+        vector<int> res; // 记录 p 在 s 中出现的位置下标
+
+        // 计算 next 数组，j 从 2 开始
+        for (int i = 0, j = 2; j <= p.size(); j++) {
+            // 只要不匹配，i 就一直跳转到上一个最长公共前后缀处
+            while (i > 0 && p[j - 1] != p[i]) i = next[i];
+            // 如果匹配，最长公共前后缀长度增加
+            if (p[j - 1] == p[i]) i++;
+            // 更新 next 数组记录的最长公共前后缀长度
+            next[j] = i;
+        }
+
+        // 开始匹配，i 在原串 s，j 在模式串 p
+        for (int i = 0, j = 0; i < s.size(); i++) {
+            // 只要不匹配，j 就一直跳转到上一个最长公共前后缀处
+            while (j > 0 && s[i] != p[j]) j = next[j];
+            // 如果匹配，索引递增，继续看下一位
+            if (s[i] == p[j]) j++;
+            // 如果已经遍历到模式串的最后一位
+            if (j == p.size()) {
+                // 记录结果
+                res.push_back(i - j + 1);
+                // 此时应该跳转到 next[j] 位置
+                j = next[j];
+            }
+        }
+
+        // 返回第一个匹配的位置
+        if (!res.empty()) return res[0];
+        return -1;
+    }
+};
+```
+
+- 文本左右对齐
+```c++
+class Solution {
+    // blank 返回长度为 n 的由空格组成的字符串
+    string blank(int n) {
+        return string(n, ' ');
+    }
+
+    // join 返回用 sep 拼接 [left, right) 范围内的 words 组成的字符串
+    string join(vector<string> &words, int left, int right, string sep) {
+        string s = words[left];
+        for (int i = left + 1; i < right; ++i) {
+            s += sep + words[i];
+        }
+        return s;
+    }
+
+public:
+    vector<string> fullJustify(vector<string> &words, int maxWidth) {
+        vector<string> ans;
+        int right = 0, n = words.size();
+        while (true) {
+            int left = right; // 当前行的第一个单词在 words 的位置
+            int sumLen = 0; // 统计这一行单词长度之和
+            // 循环确定当前行可以放多少单词，注意单词之间应至少有一个空格
+            while (right < n && sumLen + words[right].length() + right - left <= maxWidth) {
+                // 只加上单词的长度，不加上空格的长度，因为最后一个单词后面是没有空格的
+                sumLen += words[right++].length();
+            }
+
+            // 当前行是最后一行：单词左对齐，且单词之间应只有一个空格，在行末填充剩余空格
+            if (right == n) {
+                string s = join(words, left, n, " ");
+                ans.emplace_back(s + blank(maxWidth - s.length()));
+                return ans;
+            }
+
+            int numWords = right - left;
+            int numSpaces = maxWidth - sumLen;
+
+            // 当前行只有一个单词：该单词左对齐，在行末填充剩余空格
+            if (numWords == 1) {
+                ans.emplace_back(words[left] + blank(numSpaces));
+                continue;
+            }
+
+            // 当前行不只一个单词
+            // 求出单词之间应平均分配的空格数和应该被多加1个空格的单词数
+            int avgSpaces = numSpaces / (numWords - 1);
+            int extraSpaces = numSpaces % (numWords - 1);
+            // 拼接额外加一个空格的单词
+            string s1 = join(words, left, left + extraSpaces + 1, blank(avgSpaces + 1));
+            // 拼接其余单词
+            string s2 = join(words, left + extraSpaces + 1, right, blank(avgSpaces));
+            // 额外加一个空格的单词 + 其余单词，中间用平均数量的空格分隔
+            ans.emplace_back(s1 + blank(avgSpaces) + s2);
+        }
+    }
+};
+```
+
+## 双指针
+- 验证回文串
+```c++
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
