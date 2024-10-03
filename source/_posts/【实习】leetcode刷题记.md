@@ -2442,6 +2442,219 @@ public:
 };
 ```
 为什么双指针往中间移动时，不会漏掉某些情况呢？我们要从 **缩减搜索空间** 的角度思考。无论 A[i] + A[j] 的结果是大了还是小了，我们都可以排除掉一行或者一列的搜索空间。经过 n 步以后，就能排除所有的搜索空间，检查完所有的可能性。
+
+- 盛最多水的容器
+居然第一次就过了
+```c++
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int left = 0;
+        int right = height.size()-1;
+        int maxa = 0;
+        while(left<right){
+            int area = (right-left)*min(height[left],height[right]);
+            maxa = max(maxa,area);
+            if (height[left]<height[right]) left++;
+            else right--;
+        }
+        return maxa;
+    }
+};
+```
+- 三数之和
+```c++
+// 本题的难点在于如何设计三个指针之间的关系（遍历最小的指针）以及如何去除重复解（三个指针都需要跳过重复数字）。
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        int n = nums.size();
+        vector<vector<int>> res;
+        if (n==3){
+            if (nums[0]+nums[1]+nums[2]==0) {
+                res.emplace_back(nums);
+                return res;
+            }
+            return res;
+        } 
+        // 先排序，注意还要去除重复解
+        sort(nums.begin(),nums.end());
+        // 遍历那个最小的数字
+        for (int i = 0;i<n-2;i++){
+            // 跳过重复数字
+            int x = nums[i];
+            if (i && x == nums[i - 1]) continue; // 跳过重复数字
+            if (x>0) break;
+            if (x + nums[i + 1] + nums[i + 2] > 0) break; 
+            if (x + nums[n - 2] + nums[n - 1] < 0) continue; 
+            
+            int j = i+1; int k = n-1;
+            while (j < k) {
+                int s = x + nums[j] + nums[k];
+                if (s > 0) {
+                    k--;
+                } else if (s < 0) {
+                    j++;
+                } else {
+                    res.push_back({x, nums[j], nums[k]});
+                    for (j++; j < k && nums[j] == nums[j - 1]; j++); // 跳过重复数字
+                    for (k--; k > j && nums[k] == nums[k + 1]; k--); // 跳过重复数字
+                }
+            }
+        }
+        return res;
+    }
+};
+```
+## 滑动窗口
+- 长度最小的子数组
+```c++
+class Solution {
+public:
+    int minSubArrayLen(int target, vector<int>& nums) {
+        // 最短符合要求的子串，将原数组分为三个部分
+        // 维护一个滑动窗口，子串就是窗口
+        // 左右界，长度就是r-l+1
+        int n = nums.size();
+        int l = 0;
+        int r = 0;
+        int sum = 0;
+        int minlen = n + 1; // 初始化为比数组长度大1的值，以便后续比较
+
+        while (r < n) {
+            sum += nums[r];
+            while (sum >= target) {
+                minlen = min(minlen, r - l + 1);
+                sum -= nums[l];
+                l++;
+            }
+            r++;
+        }
+
+        return minlen == n + 1 ? 0 : minlen;
+    }
+};
+```
+初始化为比数组长度大1的值是为了确保在没有找到符合条件的子数组时，可以返回 0。具体来说，如果我们初始化 minlen 为 n + 1，那么在遍历整个数组后，如果 minlen 仍然是 n + 1，说明没有找到任何符合条件的子数组，我们可以返回 0。这是一个常见的技巧，用于处理找不到符合条件的情况。
+
+- 无重复字符的最长子串
+- 串联所有单词的子串
+```c++
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        vector<int> result;
+        if (words.empty() || s.empty()) return result;
+
+        int num = words.size();
+        int len = words[0].size();
+        int total_len = num * len;
+
+        if (s.size() < total_len) return result;
+
+        unordered_map<string, int> word_count;
+        for (const auto& word : words) {
+            word_count[word]++;
+        }
+
+        for (int i = 0; i <= s.size() - total_len; i++) {
+            unordered_map<string, int> seen;
+            int j = 0;
+            for (; j < num; j++) {
+                string word = s.substr(i + j * len, len);
+                if (word_count.find(word) != word_count.end()) {
+                    seen[word]++;
+                    if (seen[word] > word_count[word]) break;
+                } else {
+                    break;
+                }
+            }
+            if (j == num) result.push_back(i);
+        }
+
+        return result;
+    }
+};
+```
+进一步优化，减少了一些不必要的计算。
+```C++
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        vector<int> result;
+        if (words.empty() || s.empty()) return result;
+
+        int num = words.size();
+        int len = words[0].size();
+        int total_len = num * len;
+        // 如果s的长度小于总长度，直接返回
+        if (s.size() < total_len) return result;
+        // 统计单词出现的次数
+        unordered_map<string, int> word_count;
+        for (const auto& word : words) {
+            word_count[word]++;
+        }
+
+        for (int i = 0; i < len; i++) {
+            // 统计窗口内单词出现的次数
+            unordered_map<string, int> seen;
+            // 左右指针，count表示窗口内单词的个数
+            int left = i, right = i, count = 0;
+            // 遍历，右指针右移
+            while (right + len <= s.size()) {
+                // 取出一个单词
+                string word = s.substr(right, len);
+                // 右指针右移len个位置
+                right += len;
+                // 如果单词在words中
+                if (word_count.find(word) != word_count.end()) {
+                    // 窗口内单词出现次数加1
+                    seen[word]++;
+                    // 窗口内单词个数加1
+                    count++;
+                    // 如果窗口内单词出现次数大于words中的次数，说明窗口内字串不符合要求，窗口左界收缩
+                    while (seen[word] > word_count[word]) {
+                        // 取出左指针位置开始的一个单词
+                        string left_word = s.substr(left, len);
+                        // 窗口内该单词个数减1，窗口内单词个数减1，左指针右移len个位置
+                        seen[left_word]--;
+                        left += len;
+                        count--;
+                    }
+                    // 如果窗口内单词个数等于words中单词个数，说明窗口内字串符合要求
+                    if (count == num) {
+                        result.push_back(left);
+                    }
+                } else {
+                    // 如果单词不在words中，说明窗口内字串不符合要求，窗口左界收缩
+                    seen.clear();
+                    count = 0;
+                    // 左指针直接移动到右指针位置
+                    left = right;
+                }
+            }
+        }
+        return result;
+    }
+};
+```
+>为什么i只需要遍历到len-1呢？
+示例
+假设 len 为 3，字符串 s 为 "barfoothefoobarman"，单词列表 words 为 ["foo", "bar"]。
+组 1 (i = 0): 从位置 0 开始，检查子串 "bar", "foo", "the", "foo", "bar", "man"。
+组 2 (i = 1): 从位置 1 开始，检查子串 "arf", "oot", "hef", "oob", "arm", "an"。
+组 3 (i = 2): 从位置 2 开始，检查子串 "rfo", "oth", "efo", "oba", "rma", "n"。
+- 最小覆盖子串
+
+## 矩阵
+
+## 哈希表
+
+## 区间
+
+## 栈
+
+## 链表
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
