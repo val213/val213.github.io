@@ -801,3 +801,20 @@ Netlink socket是内核和用户进程之间的一种通信方式，同时它也
 跟Unix domain sockets（apue-第17.3章）一样，Netlink socket也只能用于同一主机上的进程通讯，不能像 INET sockets（网络套接字）一样可以用于不同主机间的进程通讯。因此，Netlink socket的效率比 INET sockets高。
 Netlink socket和Unix domain sockets挺相似的，它们区别在于：
 while the Unix domain sockets use the file system namespace, Netlink processes are usually addressed by process identifiers
+
+捋一下，目前已经实现的：
+- 用户态和内核态 netlink socket 的读写（u8）
+- uevent核心的几个函数（部分还是修改的skb，待迁移到修改buffer）
+- uevent文件写入改动触发uevent事件（待测试）
+- /sys下设备目录的uevent文件，必备的基础信息可能还缺少
+还未实现的：
+- 监听
+- udev？
+
+
+
+20241003
+- nlk的转换，参考cfg那一次commit
+- masks？的长度
+- registered？在什么时候注册
+- gruops？咋内容这么奇怪

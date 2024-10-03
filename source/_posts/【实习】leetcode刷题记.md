@@ -2351,6 +2351,97 @@ public:
 ## 双指针
 - 验证回文串
 ```c++
+// 不熟悉的API 
+// - isalnum() 函数用来判断一个字符是否是字母或数字，如果是则返回非零值，否则返回零。
+// - tolower()/toupper 函数用来把一个字母字符转换为小写字母。
+// - rbegin() 函数返回指向容器最后一个元素的逆向迭代器。rend() 函数返回指向容器第一个元素前面的位置的逆向迭代器。
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        string sgood;
+        for (char ch: s) {
+            if (isalnum(ch)) {
+                sgood += tolower(ch);
+            }
+        }
+        string sgood_rev(sgood.rbegin(), sgood.rend());
+        return sgood == sgood_rev;
+    }
+};
+```
+```c++
+// 原地双指针（处理后双指针的解法略）
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        int n = s.size();
+        int left = 0, right = n - 1;
+        while (left < right) {
+            while (left < right && !isalnum(s[left])) {
+                ++left;
+            }
+            while (left < right && !isalnum(s[right])) {
+                --right;
+            }
+            if (left < right) {
+                if (tolower(s[left]) != tolower(s[right])) {
+                    return false;
+                }
+                ++left;
+                --right;
+            }
+        }
+        return true;
+    }
+};
+```
+- 判断子序列
+```c++
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        int n = s.length(), m = t.length();
+        int i = 0, j = 0;
+        while (i < n && j < m) {
+            if (s[i] == t[j]) {
+                i++;
+            }
+            j++;
+        }
+        return i == n;
+    }
+};
+```
+进阶挑战：大量的s进行匹配。这种类似对同一个长字符串做很多次匹配的 ，可以像 KMP 算法一样，先用一些时间将长字符串中的数据 提取出来，磨刀不误砍柴功。有了提取好的数据，就可以快速的进行匹配。
+- 两数之和 II - 输入有序数组
+```c++
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        // 保证答案存在
+        int i = 1;
+        int n =numbers.size();
+        int j = n-1;
+        vector<int> res;
+        while(numbers[i]+numbers[j]!=target){
+            if (numbers[i]+numbers[j]<target){
+                // 偏小
+                if (i+1<j && i+1<n-1) i++;
+                else if (j<n && j>1) j++;
+            }
+            else{
+                // 偏大
+                if (j-1>1 && j-1>i) j--;
+                else if (i>=1 && i<n-1) i++;
+            }
+        }
+        res.emplace_back(i);
+        res.emplace_back(j);
+        return res;
+    }
+};
+```
+为什么双指针往中间移动时，不会漏掉某些情况呢？我们要从 **缩减搜索空间** 的角度思考。无论 A[i] + A[j] 的结果是大了还是小了，我们都可以排除掉一行或者一列的搜索空间。经过 n 步以后，就能排除所有的搜索空间，检查完所有的可能性。
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
