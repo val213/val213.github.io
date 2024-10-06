@@ -818,3 +818,9 @@ while the Unix domain sockets use the file system namespace, Netlink processes a
 - masks？的长度
 - registered？在什么时候注册
 - gruops？咋内容这么奇怪
+
+20241005
+- 整理一下回调函数这一块的内容
+- 接下来需要做的：清理日志
+- 清理好废弃的设计
+- 着手准备文档

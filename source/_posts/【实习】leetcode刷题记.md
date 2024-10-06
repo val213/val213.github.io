@@ -59,8 +59,76 @@ map 和 unordered_map 都是 C++ 标准库中的关联容器，它们都提供�
 - 自动扩容：unordered_map 会自动扩容，当元素个数超过容量的 75% 时，会自动扩容为原来的两倍。
 - 时间复杂度：unordered_map 支持常数时间复杂度的插入、删除和查找操作。
 
-## unordered_set
+### 各种操作的时间复杂度
+```C++
+#include <unordered_map>
+#include <iostream>
 
+int main() {
+    // 定义
+    std::unordered_map<int, int> um;
+
+    // 插入元素-insert
+    um.insert({1, 2});
+    um[3] = 4;
+
+    // 查找元素-find
+    auto it = um.find(1);
+    if (it != um.end()) {
+        std::cout << "Found 1" << std::endl;
+    }
+
+    // 删除元素-erase
+    um.erase(1);
+
+    // 遍历元素
+    for (auto& p : um) {
+        std::cout << p.first << " " << p.second << std::endl;
+    }
+
+    return 0;
+}
+```
+
+## unordered_set
+set 和 unordered_set 都是 C++ 标准库中的关联容器，它们都提供了集合的功能，可以用来存储不重复的元素。set 是基于红黑树实现的，支持自动排序，而 unordered_set 是基于哈希表实现的，不支持自动排序。
+
+### 特点：
+- 无序性：unordered_set 中的元素是无序的，不会按照键的大小进行排序。
+- 哈希表：unordered_set 是基于哈希表实现的，可以快速查找元素。
+- 自动扩容：unordered_set 会自动扩容，当元素个数超过容量的 75% 时，会自动扩容为原来的两倍。
+- 时间复杂度：unordered_set 支持常数时间复杂度的插入、删除和查找操作。
+
+### 各种操作的时间复杂度
+```C++
+#include <unordered_set>
+#include <iostream>
+
+int main() {
+    // 定义
+    std::unordered_set<int> us;
+
+    // 插入元素-insert
+    us.insert(1);
+    us.insert(2);
+
+    // 查找元素-find
+    auto it = us.find(1);
+    if (it != us.end()) {
+        std::cout << "Found 1" << std::endl;
+    }
+
+    // 删除元素-erase
+    us.erase(1);
+
+    // 遍历元素
+    for (auto& x : us) {
+        std::cout << x << " ";
+    }
+
+    return 0;
+}
+```
 ## queue
 
 ## stack
@@ -505,7 +573,7 @@ public:
 - `unordered_set::insert()`：在哈希集合中插入元素，如果元素已存在，返回 0；否则，返回 1。
 - `unordered_set::count()`：返回哈希集合中元素的个数。
 - `unordered_set::find()`：在哈希集合中查找元素，如果找到，返回指向该元素的迭代器；否则，返回指向集合末尾的迭代器。
-对比哈希map的接口：
+
 
 ```C++
 class Solution {
@@ -598,8 +666,9 @@ public:
     - 边界法，不断缩小边界，直到边界相遇，结束循环。
 3. 旋转图像
     - 要在原地旋转图像，你可以按照以下步骤进行：
-    1. **转置矩阵**：首先，将矩阵转置。转置意味着行变成列，列变成行。这可以通过交换`matrix[i][j]`和`matrix[j][i]`来实现，其中`i < j`。
-    2. **翻转每一行**：然后，翻转矩阵中的每一行。翻转一行意味着行中的第一个元素和最后一个元素交换，第二个元素和倒数第二个元素交换，以此类推。这可以通过交换`matrix[i][j]`和`matrix[i][n-j-1]`来实现，其中`n`是行的长度。
+    1. **水平翻转**：翻转矩阵中的每一行。翻转一行意味着行中的第一个元素和最后一个元素交换，第二个元素和倒数第二个元素交换，以此类推。这可以通过交换`matrix[i][j]`和`matrix[i][n-j-1]`来实现，其中`n`是行的长度。
+    2. **转置矩阵**：将矩阵沿着主对角线对称。转置意味着行变成列，列变成行。这可以通过交换`matrix[i][j]`和`matrix[j][i]`来实现，其中`i < j`。
+    
 4. 二维矩阵搜索Ⅱ
     - 暴力法，仿照螺旋矩阵缩减边界的方法，用四个边界变量，时间复杂度是 `O(min(m, n) * (m + n))`，too long；
     - 针对题目240. 搜索二维矩阵 II，有一个更高效的解法，利用矩阵的性质：每行的元素从左到右升序排列，每列的元素从上到下升序排列。这个性质允许我们从矩阵的右上角（或左下角）开始搜索，从而有效地减少搜索空间。
@@ -2645,9 +2714,276 @@ public:
 组 2 (i = 1): 从位置 1 开始，检查子串 "arf", "oot", "hef", "oob", "arm", "an"。
 组 3 (i = 2): 从位置 2 开始，检查子串 "rfo", "oth", "efo", "oba", "rma", "n"。
 - 最小覆盖子串
-
+```c++
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        if (s.empty() || t.empty() || s.size() < t.size()) return "";
+        
+        unordered_map<char, int> need, window;
+        int left = 0, right = 0;
+        int valid = 0;
+        int minLen = INT_MAX, minLeft = 0, minRight = 0;
+        
+        for (char c : t) {
+            need[c]++;
+        }
+        
+        while (right < s.size()) {
+            char c = s[right];
+            window[c]++;
+            // 记录窗口内的有效字符数量
+            if (need.count(c) && window[c] == need[c]) {
+                valid++;
+            }
+            
+            while (valid == need.size()) {
+                // 更新
+                if (right - left + 1 < minLen) {
+                    minLen = right - left + 1;
+                    minLeft = left;
+                    minRight = right;
+                }
+                // 移动左边界
+                char temp = s[left];
+                window[temp]--;
+                if (need.count(temp) && window[temp] < need[temp]) {
+                    valid--;
+                }
+                left++;
+            }
+            right++;
+        }
+        
+        return minLen == INT_MAX ? "" : s.substr(minLeft, minRight - minLeft + 1);
+    }
+};
+```
 ## 矩阵
+- 有效的数独
+```c++
+// 纯暴力N2垃圾解法
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        // 处理空白格
+        // 每个3*3，每一行、每一列
+        // 每一行
+        for (const auto &lineboard: board){
+            unordered_set<char> line;
+            for (const auto &digit:lineboard){
+                if (line.find(digit)!=line.end()&&digit!='.') return false;
+                line.insert(digit);
+            }
+        }
+        // 每一列
+        for (int i =0;i<9;i++) {
+            unordered_set<char> column;
+            for (int j =0;j<9;j++){
+                if (column.find(board[j][i])!=column.end()&& board[j][i]!='.') return false;
+                column.insert(board[j][i]);
+            }
+        }
+        // 每个九宫格
+        for (int k =0;k<9;k++) {
+            unordered_set<char> matrix;
+            for (int i = 0;i<3;i++){
+                for (int j = 0;j<3;j++){
+                    if (matrix.find(board[(k/3)*3+i][3*(k%3)+j])!=matrix.end() && board[(k/3)*3+i][3*(k%3)+j]!='.') return false;
+                    matrix.insert(board[(k/3)*3+i][3*(k%3)+j]);
+                }
+            }
 
+        }
+        return true;
+    }
+};
+```
+```c++
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        // 可以学习一下这种哈希表的具体定义，单纯使用数组
+        int rows[9][9];
+        int columns[9][9];
+        int subboxes[3][3][9];
+        
+        memset(rows,0,sizeof(rows));
+        memset(columns,0,sizeof(columns));
+        memset(subboxes,0,sizeof(subboxes));
+        // 三种情况一起在n2的时间复杂度内完成遍历，代码更简洁
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                char c = board[i][j];
+                if (c != '.') {
+                    int index = c - '0' - 1;
+                    rows[i][index]++;
+                    columns[j][index]++;
+                    subboxes[i / 3][j / 3][index]++;
+                    if (rows[i][index] > 1 || columns[j][index] > 1 || subboxes[i / 3][j / 3][index] > 1) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+};
+```
+- 螺旋矩阵
+```c++
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> res;
+        if (matrix.size()==0) return res;
+        // 边界法，不断缩小边界，直到边界相遇，结束循环
+        int top = 0;
+        int buttom = matrix.size()-1;
+        int left = 0;
+        int right = matrix[0].size()-1;
+        while (top<=buttom && left<=right){
+            // Traverse from left to right.
+            for (int i = left; i <= right; ++i) {
+                res.push_back(matrix[top][i]);
+            }
+            top++;
+            
+            // Traverse downwards.
+            for (int i = top; i <= buttom; ++i) {
+                res.push_back(matrix[i][right]);
+            }
+            right--;
+            
+            // Traverse from right to left.
+            if (top <= buttom) {
+                for (int i = right; i >= left; --i) {
+                    res.push_back(matrix[buttom][i]);
+                }
+                buttom--;
+            }
+            
+            // Traverse upwards.
+            if (left <= right) {
+                for (int i = buttom; i >= top; --i) {
+                    res.push_back(matrix[i][left]);
+                }
+                left++;
+            }
+        }
+        return res;
+    }
+};
+```
+- 旋转图像
+```c++
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        // 转置+水平翻转
+        // 水平翻转
+        int n = matrix.size();
+        for (int i = 0; i < n / 2; ++i) {
+            for (int j = 0; j < n; ++j) {
+                swap(matrix[i][j], matrix[n - i - 1][j]);
+            }
+        }
+        // 转置
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+        
+    }
+};
+```
+- 矩阵置零
+```c++
+// 使用两个标记变量，分别记录第一行和第一列是否需要置零
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        if (matrix.empty()) return;
+        // 用两个数字来记录第一行和第一列的情况，0-需要置零，1-不需要置零
+        int firstline = 1;
+        int firstcolumn = 1;
+        int n = matrix.size();
+        int m = matrix[0].size(); 
+        // 记录是否需要置零
+        for(int i = 0;i<n;i++){
+            for (int j = 0;j<m;j++){
+                if (matrix[i][j]==0){
+                    matrix[0][j]=0;
+                    matrix[i][0]=0;
+                    if (i==0) firstline=0;
+                    if (j==0) firstcolumn=0;
+                }
+            }
+        }
+        // 置零行
+        for(int i = 1;i<n;i++){
+            if (matrix[i][0]==0){
+                for (int j = 1;j<m;j++) matrix[i][j]=0;
+            }
+        }
+        // 置零列
+        for(int j = 1;j<m;j++){
+            if (matrix[0][j]==0){
+                for (int i = 1;i<n;i++) matrix[i][j]=0;
+            }
+        }
+
+        // 处理第一行和第一列
+        if (firstcolumn == 0){
+            for (int i = 0;i<n;i++) matrix[i][0]=0;
+        }
+
+        if (firstline == 0){
+            for (int j =0;j<m;j++) matrix[0][j]=0;
+        }
+    }
+};
+```
+- 生命游戏
+由于状态只有01，所以计算的时候可以通过 &1 来取出当前状态，标记 |=2 来标记下一状态，最后 >>1 即可。
+```c++
+class Solution {
+public:
+    void gameOfLife(vector<vector<int>>& board) {
+        // 使用x,y 的偏移量数组
+        int dx[] = {-1,  0,  1, -1, 1, -1, 0, 1};
+        int dy[] = {-1, -1, -1,  0, 0,  1, 1, 1};
+
+        for(int i = 0; i < board.size(); i++) {
+            for(int j = 0 ; j < board[0].size(); j++) {
+                int sum = 0;
+                for(int k = 0; k < 8; k++) {
+                    int nx = i + dx[k];
+                    int ny = j + dy[k];
+                    if(nx >= 0 && nx < board.size() && ny >= 0 && ny < board[0].size()) {
+                        sum += (board[nx][ny]&1); // 只累加最低位
+                    }
+                }
+                if(board[i][j] == 1) {
+                    if(sum == 2 || sum == 3) {
+                        board[i][j] |= 2;  // 使用第二个bit标记存活，默认是死亡
+                    }
+                } else {
+                    if(sum == 3) {
+                        board[i][j] |= 2; // 使用第二个bit标记存活
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < board.size(); i++) {
+            for(int j = 0; j < board[i].size(); j++) {
+                board[i][j] >>= 1; //右移一位，用第二bit覆盖第一个bit。
+            }
+        }
+    }
+};
+```
 ## 哈希表
 
 ## 区间
