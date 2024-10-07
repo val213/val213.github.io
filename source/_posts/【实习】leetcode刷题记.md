@@ -78,6 +78,10 @@ int main() {
         std::cout << "Found 1" << std::endl;
     }
 
+    // 查询元素是否存在-count
+    if (um.count(1)) {
+        std::cout << "Found 1" << std::endl;
+    }
     // 删除元素-erase
     um.erase(1);
 
@@ -115,6 +119,11 @@ int main() {
     // 查找元素-find
     auto it = us.find(1);
     if (it != us.end()) {
+        std::cout << "Found 1" << std::endl;
+    }
+    
+    // 查询元素是否存在-count
+    if (us.count(1)) {
         std::cout << "Found 1" << std::endl;
     }
 
@@ -2985,9 +2994,418 @@ public:
 };
 ```
 ## 哈希表
+- 赎金信
+```c++
+// 只需要一个哈希表，统计magazine中每个字符的数量，然后遍历ransomNote，如果某个字符的数量不够，返回false。
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        if (ransomNote.size() > magazine.size()) return false;
 
+        unordered_map<char, int> count;
+
+        // 统计 magazine 中字符的出现次数
+        for (const char &c : magazine) {
+            count[c]++;
+        }
+
+        // 检查 ransomNote 是否可以由 magazine 构成
+        for (const char &c : ransomNote) {
+            if (count[c] == 0) {
+                return false;  // 如果某个字符不足
+            }
+            count[c]--;  // 减少字符的计数
+        }
+
+        return true;
+    }
+};
+```
+
+```c++
+// vector<int> 方法性能更优：因为它在时间和空间复杂度上都更为高效，特别是在处理英文字母的这种有限字符集的情况下，直接使用固定大小的数组更为合适。
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        if (ransomNote.size() > magazine.size()) {
+            return false;
+        }
+        vector<int> cnt(26);
+        for (auto & c : magazine) {
+            cnt[c - 'a']++;
+        }
+        for (auto & c : ransomNote) {
+            cnt[c - 'a']--;
+            if (cnt[c - 'a'] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+```
+- 同构字符串
+```c++
+// 用两个哈希表维护映射/被映射
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        if (s.size() != t.size()) return false;
+
+        vector<int> hash_s(128, -1); // 用于存储 s -> t 的映射
+        vector<int> hash_t(128, -1); // 用于存储 t -> s 的映射
+
+        for (int i = 0; i < s.size(); i++) {
+            // 检查 s[i] 是否已经映射到 t[i]，同时 t[i] 是否已经映射到 s[i]
+            if (hash_s[s[i]] == -1 && hash_t[t[i]] == -1) {
+                // 建立双向映射，意义是，s[i]映射到t[i],t[i]被s[i]映射
+                hash_s[s[i]] = t[i];
+                hash_t[t[i]] = s[i];
+            } 
+            // 如果已经存在映射关系，但映射不一致，则返回 false
+            else if (hash_s[s[i]] != t[i] || hash_t[t[i]] != s[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
+```
+- 单词规律
+```c++
+
+- 有效的字母异位词
+```c++
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        if (s.size()!=t.size()) return false;
+        vector<int>count(26);
+        for (const auto &c:s){
+            count[c- 'a']++;
+        }
+        for (const auto &c:t){
+            if (count[c- 'a']==0) return false;
+            count[c- 'a']--;
+        }
+        return true;
+    }
+};
+```
+- 字母异位词分组
+```c++
+class Solution { 
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string, vector<string>> mp;
+        vector<vector<string>> res;
+        for(string &str: strs){
+            // 将字符串中的字符排序后放入对应的键值对中
+            string tmp = str;
+            sort(tmp.begin(), tmp.end()); // 对 tmp 进行排序
+            mp[tmp].push_back(str); // 使用排序后的 tmp 作为键
+        }
+        for (const auto &subres: mp){
+            res.push_back(subres.second); // 添加值到结果集中
+        }
+        return res;
+    }
+};
+```
+- 两数之和
+```c++
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int,int> hashtable;
+        // <值，索引>
+        for(int i=0;i<nums.size();i++){
+            auto it = hashtable.find(target-nums[i]);
+            if (it != hashtable.end()){
+                return {it->second,i};
+            }
+            // 没有找到，补充信息
+            hashtable[nums[i]]=i;
+        }
+        return {};
+    }
+};
+```
+- 快乐数
+```c++
+// 这个思路有点牛逼，快慢指针还能这样用
+// 关键在于不管什么情况最后都会进入一个循环，所以只要判断是否进入循环即可，进入循环后判断slow是否为1
+// 注意：此题不建议用集合记录每次的计算结果来判断是否进入循环，因为这个集合可能大到无法存储；另外，也不建议使用递归，同理，如果递归层次较深，会直接导致调用栈崩溃。不要因为这个题目给出的整数是 int 型而投机取巧
+class Solution {
+public:
+    // 执行具体操作的函数
+    int bitSquareSum(int n) {
+        int sum = 0;
+        while(n > 0)
+        {
+            int bit = n % 10;
+            sum += bit * bit;
+            n = n / 10;
+        }
+        return sum;
+    }
+
+    bool isHappy(int n) {
+        // 快慢指针判断循环
+        int slow = n, fast = n;
+        do{
+            slow = bitSquareSum(slow);
+            fast = bitSquareSum(fast);
+            fast = bitSquareSum(fast);
+        }while(slow!=fast);
+        return slow == 1;
+    }
+};
+```
+- 存在重复元素 II
+```c++
+// 想复杂了
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        if (k==0) return false; 
+        // <值，索引数组>
+        unordered_map<int,vector<int>>mp;
+        int n = nums.size();
+        int minlen = INT_MAX;
+        for (int i=0;i<n;i++){
+            mp[nums[i]].push_back(i);
+            if (mp[nums[i]].size()>=2) {
+                // 遍历索引数组，找到最小的差值
+                for (int j = 1;j<mp[nums[i]].size();j++) minlen = min(minlen,mp[nums[i]][j]-mp[nums[i]][j-1] );
+                if (minlen<=k) return true;
+            }
+        }
+        return false;
+    }
+};
+```
+```c++
+// 更优的解法，只需要哈希表，存储元素和它的索引
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        if (k == 0) return false; 
+        unordered_map<int, int> hash; // 存储元素和它的索引
+        for (int i = 0; i < nums.size(); i++) {
+            // 检查哈希表中是否存在该元素，并且索引差值小于等于k
+            if (hash.count(nums[i]) && abs(i - hash[nums[i]]) <= k) {
+                return true;
+            }
+            // 更新元素的索引到哈希表
+            hash[nums[i]] = i;
+        }
+        return false;
+    }
+};
+```
+- 最长连续序列
+第二次做，本来想用哈希把全部的数字范围都存进来，然后再遍历更新最长序列。但是内存超了。所以考虑用unordered_set存储所有的数字，然后遍历每个能作为序列开头的数字，不断向后查找，直到找不到为止。更新最长序列。
+```c++
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        unordered_set<int> num_set;
+        for (const int& num : nums) {
+            num_set.insert(num);
+        }
+
+        int longestStreak = 0;
+
+        for (const int& num : num_set) {
+            // 如果num-1存在，说明num不是序列的开头，直接跳过
+            if (!num_set.count(num - 1)) {
+                int currentNum = num;
+                int currentStreak = 1;
+
+                while (num_set.count(currentNum + 1)) {
+                    currentNum += 1;
+                    currentStreak += 1;
+                }
+
+                longestStreak = max(longestStreak, currentStreak);
+            }
+        }
+
+        return longestStreak;           
+    }
+};
+```
 ## 区间
+- 汇总区间
+```c++
+// 自己写的时候一些细节总是没考虑好，比如最后一个区间的处理，还有start和end的更新,以及string的拼接
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        vector<string> res;
+        if (nums.empty()) return res;
+        int n = nums.size();
+        int start = 0, end = 0;
+        for (int i = 0; i < n; i++) {
+            if (i == n - 1 || nums[i + 1] != nums[i] + 1) {
+                end = i;
+                if (start == end) {
+                    res.push_back(to_string(nums[start]));
+                } else {
+                    res.push_back(to_string(nums[start]) + "->" + to_string(nums[end]));
+                }
+                start = i + 1;
+            }
+        }
+        return res;
+    }
+};
+```
+- 合并区间
+```c++
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        // 先按照区间的起点和终点的大小排序，然后判断起点终点的索引大小来判断是否需要合并
+        sort(intervals.begin(),intervals.end());
+        int n = intervals.size();
+        vector<vector<int>> res;
+        for (int i=0;i<n;i++){
+            int start = intervals[i][0];
+            int end = intervals[i][1];
+            if (i==n-1) {
+                res.push_back({start,end});
+                break;
+            }
+            // 如果区间重叠
+            while (i!=n-1 && end>=intervals[i+1][0]){
+                if (end<intervals[i+1][1]) end = intervals[i+1][1];
+                i++;
+            }
+            res.push_back({start,end});
+        }
+        return res;
+    }
+};
+```
+- 插入区间
+```c++
+// 这道题好像想的有点乱，后面再复盘一下
+// 虽然可以用上面的合并区间的方法，但是效率太低了，因为这里只需要找到插入位置，然后判断是否需要合并即可
+// 找到了重叠区间之后，如何合并呢？应该在一次遍历中，边插入边判断，如果需要合并，就合并，否则直接插入。
 
+// 这种解法用3个while循环，第一个while循环找到插入位置，第二个while循环找到重叠区间，第三个while循环合并重叠区间。
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        int n = intervals.size();
+        bool inserted = false;
+        int start = newInterval[0];
+        int end = newInterval[1];
+
+        int i = 0;
+        // 找到插入位置
+        while (i < n && intervals[i][1] < start) {
+            // 把插入位置之前的区间直接插入结果集
+            res.push_back(intervals[i++]);
+        }
+        // 找到重叠区间。这里的判断条件是，新区间的起点小于等于当前区间的终点
+        while (i < n && intervals[i][0] <= end) {
+            // 更新新区间的起点和终点
+            start = min(start, intervals[i][0]);
+            end = max(end, intervals[i][1]);
+            i++;
+        }
+        // 把合并后的区间插入结果集
+        res.push_back({start, end});
+        // 把剩下的区间插入结果集
+        while (i < n) {
+            res.push_back(intervals[i++]);
+        }
+
+        return res;
+    }
+};
+```
+```c++
+// 用一个标志位来标记新区间是否已经插入，然后遍历区间，根据区间的起点和终点和新区间的起点和终点的关系，分情况讨论。
+// 标志位的存在主要是为了处理何时插入合并后的新区间，以及何时插入新区间之后的区间的问题。
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        // 是否插入新区间
+        bool inserted = false;
+        int n = intervals.size();
+        int start = newInterval[0];
+        int end = newInterval[1];
+        // 遍历区间
+        for (int i = 0; i < n; i++) {
+            // 如果区间的终点小于新区间的起点，说明新区间在当前区间的后面
+            if (intervals[i][1] < start) {
+                // 插入当前区间
+                res.push_back(intervals[i]);
+            } 
+            else if (intervals[i][0] > end) {
+                // 如果当前区间的起点大于新区间的终点，说明新区间在当前区间的前面
+                // 如果新区间还没有插入，就插入新区间
+                if (!inserted) {
+                    res.push_back({start, end});
+                    // 标记新区间已经插入
+                    inserted = true;
+                }
+                // 插入当前区间
+                res.push_back(intervals[i]);
+            } else {
+                // 如果新区间和当前区间有重叠，就合并区间，更新新区间的起点和终点
+                start = min(start, intervals[i][0]);
+                end = max(end, intervals[i][1]);
+            }
+        }
+        // 如果新区间还没有插入，就插入新区间
+        // 这种情况是新区间在所有区间的后面的时候
+        if (!inserted) {
+            res.push_back({start, end});
+        }
+        
+        return res;
+    }
+};
+```
+- 用最少数量的箭引爆气球
+```c++
+// 这种解法的思路是，不断移动箭的位置而使得原本能引爆的气球仍然能引爆，
+class Solution {
+public:
+    int findMinArrowShots(vector<vector<int>>& points) {
+        if (points.empty()) {
+            return 0;
+        }
+        // 按照区间的结束时间进行排序
+        sort(points.begin(), points.end(), [](const vector<int>& u, const vector<int>& v) {
+            return u[1] < v[1];
+        });
+        // 至少需要一支箭，位置是第一个气球的结束位置
+        int pos = points[0][1];
+        // 箭的数量
+        int ans = 1;
+        for (const vector<int>& balloon: points) {
+            // 如果气球的开始位置大于箭的位置，需要新的箭
+            if (balloon[0] > pos) {
+                // 更新箭的位置为当前气球的结束位置
+                pos = balloon[1];
+                ++ans;
+            }
+            // 已经按照结束时间排序了，不用再继续考虑下一个气球的结束坐标比当前气球的结束坐标小的情况，
+            // 但是如果排序是按照开始时间排序的话，就需要考虑这种情况，得加上一个else if来判断更新箭的位置收缩到更小的结束位置
+        }
+        return ans;
+    }
+};
+```
 ## 栈
 
 ## 链表
