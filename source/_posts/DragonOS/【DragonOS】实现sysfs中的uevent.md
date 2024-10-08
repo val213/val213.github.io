@@ -811,6 +811,9 @@ while the Unix domain sockets use the file system namespace, Netlink processes a
 - 监听
 - udev？
 
+还没看见有uevent的：
+- acpi
+- tty0
 
 
 20241003
@@ -824,3 +827,7 @@ while the Unix domain sockets use the file system namespace, Netlink processes a
 - 接下来需要做的：清理日志
 - 清理好废弃的设计
 - 着手准备文档
+
+20241007
+- 具体块设备/字符设备的结构体中是不是需要添加一个ops字段，用于让块设备和字符设备对象能够调用BlockDeviceOps/CharDeviceOps的方法
+- 

@@ -141,7 +141,36 @@ int main() {
 ## queue
 
 ## stack
+### 常用API
+```C++
+#include <stack>
+#include <iostream>
 
+int main() {
+    // 定义
+    std::stack<int> s;
+
+    // 插入元素-push
+    s.push(1);
+    s.push(2);
+    s.push(3);
+
+    // 获取栈顶元素-top
+    std::cout << s.top() << std::endl;  // 输出 3
+
+    // 删除栈顶元素-pop
+    s.pop();
+
+    // 遍历元素
+    while (!s.empty()) {
+        std::cout << s.top() << " ";
+        s.pop();
+    }
+
+    return 0;
+}
+```
+## deque
 ## priority_queue
 ### 特点：
 - 优先队列：priority_queue 是一个优先队列，支持在队列的任意位置插入元素，并且能够在 O(1) 时间内访问队列中的最大或最小元素。
@@ -3407,7 +3436,156 @@ public:
 };
 ```
 ## 栈
+- 有效的括号
+- 简化路径
+```c++
+class Solution {
+public:
+    string simplifyPath(string path) {
+        stack<string> sp;
+        string dir;
+        stringstream ss(path);
+        // 以/为分隔符，遍历路径。掌握 stringstream 和 getline 的用法
+        while (getline(ss, dir, '/')) {
+            // 如果是空或者是.，表示当前目录，直接跳过
+            if (dir == "" || dir == ".") continue;
+            // 如果是..，就弹出栈顶元素
+            if (dir == "..") {
+                if (!sp.empty()) sp.pop();
+            } else {
+                // 否则就入栈
+                sp.push(dir);
+            }
+        }
+        
+        string res;
+        while (!sp.empty()) {
+            // 逆序拼接路径
+            res = "/" + sp.top() + res;
+            sp.pop();
+        }
+        // 如果栈为空，表示根目录
+        return res.empty() ? "/" : res;
+    }
+};
+```
+- 最小栈
+```c++
+class MinStack {
+public:
+    MinStack() {
 
+    }
+    
+    void push(int val) {
+        // 栈顶入栈
+        if (st.empty()) st.push({val,val});
+        else st.push({val,min(val,st.top().second)});
+    }
+    
+    void pop() {
+        // 栈顶出栈
+        st.pop();
+    }
+    
+    int top() {
+        // 查看栈顶元素
+        return st.top().first;
+    }
+    
+    int getMin() {
+        // 常数时间内检索到最小元素
+        return st.top().second;
+    }
+private:
+    // 模拟栈中维护一个二元组，pair<x,此前栈中的最小值>
+    stack<pair<int,int>> st;
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+```
+- 逆波兰表达式求值
+```c++
+class Solution {
+public:
+    int evalRPN(vector<string>& tokens) {
+        stack<int> number;
+        unordered_map<string, function<int(int, int)>> operators = {
+            {"+", [](int a, int b) { return a + b; }},
+            {"-", [](int a, int b) { return a - b; }},
+            {"*", [](int a, int b) { return a * b; }},
+            {"/", [](int a, int b) { return a / b; }}
+        };
+
+        for (const string &token : tokens) {
+            if (token.size() > 1 || isdigit(token[0])) {
+                // 处理负数和正数
+                number.push(stoi(token));
+            } else {
+                // 遇到符号了，取出前两个数字进行运算
+                int num2 = number.top();
+                number.pop();
+                int num1 = number.top();
+                number.pop();
+                auto it = operators.find(token);
+                if (it != operators.end()) {
+                    number.push(it->second(num1, num2));
+                }
+            }
+        }
+        return number.top();
+    }
+};
+```
+- 基本计算器
+只有 '+' '-' '(' ')' 四种字符，所以只需要一个符号变量sign，一个符号栈ops。
+```c++
+class Solution {
+public:
+    int calculate(string s) {
+        // 用 sign 和 ops 栈来维护正负值
+        int sign = 1;
+        stack<int>ops;
+        ops.push(sign);
+        int n = s.size();
+        int res = 0;
+        for(int i = 0; i<n; i++){
+            if (s[i] == ' ') continue;
+            else if (s[i] == '+'){
+                sign = ops.top();
+            }
+            else if (s[i] == '-'){
+                sign = -ops.top();
+            }
+            else if (s[i] == '('){
+                ops.push(sign);
+            }
+            else if (s[i] == ')'){
+                ops.pop();
+            }
+            else{
+                long num = 0;
+                // 如果是数字
+                while(i<n && s[i]>='0' && s[i]<='9'){
+                    num = num * 10 + s[i] - '0';
+                    i++;
+                }
+                // 调整i的位置，避免多加一次
+                i--;
+                res += sign * num;
+            }
+        }
+        return res;
+    }
+};
+```
 ## 链表
 # 每日一题
 - 0927 每种字符至少取k个
