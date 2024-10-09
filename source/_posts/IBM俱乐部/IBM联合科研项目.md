@@ -1661,6 +1661,83 @@ SHOW DATABASES;
 USE ecs_api;
 SHOW TABLES;
 ```
+## 重新搭建环境部署上线
 
-### 性能优化
-用了https之后网页打开速度特别慢
+### 镜像制作
+#### LOP-API
+#### prometheus、mariaDB
+#### grafana
+#### 如何添加基于文件的 Swap 空间：
+在 Linux 系统中，添加基于文件的 Swap 空间是一种增加虚拟内存的方法。Swap 空间可以看作是硬盘上的一部分空间，被用作 RAM 使用。当系统的物理内存（RAM）不足时，操作系统会将一些不常用的数据从 RAM 移动到 Swap 空间中，以便为新的数据腾出空间。这有助于防止系统因内存不足而崩溃。
+1. **创建 Swap 文件**：
+   首先，你需要创建一个 Swap 文件。这可以通过 `fallocate` 或 `dd` 命令完成。例如，创建一个 1GB 的 Swap 文件：
+
+   ```bash
+   sudo fallocate -l 1G /swapfile
+   ```
+
+   或者使用 `dd`：
+
+   ```bash
+   sudo dd if=/dev/zero of=/swapfile bs=1024 count=1048576
+   ```
+
+2. **设置文件权限**：
+   为了安全起见，确保只有 root 用户可以访问 Swap 文件：
+
+   ```bash
+   sudo chmod 600 /swapfile
+   ```
+
+3. **格式化为 Swap 格式**：
+   将文件格式化为 Swap 格式：
+
+   ```bash
+   sudo mkswap /swapfile
+   ```
+
+4. **启用 Swap 文件**：
+   激活 Swap 文件：
+
+   ```bash
+   sudo swapon /swapfile
+   ```
+
+5. **验证 Swap 空间**：
+   使用以下命令验证 Swap 空间是否已启用：
+
+   ```bash
+   free -h
+   ```
+
+   或者
+
+   ```bash
+   swapon --show
+   ```
+
+6. **永久启用 Swap 文件**：
+   如果你想在系统重启后仍然使用这个 Swap 文件，需要将其添加到 `/etc/fstab` 文件中：
+
+   ```bash
+   echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+   ```
+
+7. **调整 Swap 行为**：
+   你可以通过 `/proc/sys/vm/swappiness` 文件来调整系统使用 Swap 的倾向性。值越高，系统越倾向于使用 Swap 空间。
+
+   ```bash
+   sudo sysctl vm.swappiness=10
+   ```
+
+   这会将 `swappiness` 值设置为 10，可以根据需要调整这个值。
+
+##### 注意事项：
+
+- **性能影响**：虽然 Swap 空间可以在内存不足时提供帮助，但它的速度比物理内存慢得多，频繁使用 Swap 可能会导致系统性能下降。
+- **磁盘空间**：确保你有足够的磁盘空间来创建 Swap 文件。
+- **磁盘类型**：如果可能，将 Swap 文件放在 SSD 上，而不是 HDD，因为 SSD 的读写速度更快。
+
+添加 Swap 空间是一种有效的短期解决方案，但最好还是增加物理内存以获得更好的性能。
+
+### grafana 备份恢复

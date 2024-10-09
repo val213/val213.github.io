@@ -830,4 +830,8 @@ while the Unix domain sockets use the file system namespace, Netlink processes a
 
 20241007
 - 具体块设备/字符设备的结构体中是不是需要添加一个ops字段，用于让块设备和字符设备对象能够调用BlockDeviceOps/CharDeviceOps的方法
-- 
+
+
+20241008
+- 不需要，请教了谢润霖之后知道了通过idtable来实现获取设备号
+- 块设备和字符设备是不是还没有在sysfs下创建目录？

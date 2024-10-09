@@ -3587,6 +3587,330 @@ public:
 };
 ```
 ## 链表
+- 环形链表
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        if (head == nullptr) return false; // 检查空链表
+        ListNode *slow = head;
+        ListNode *fast = head;
+        while (fast != nullptr && fast->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+            if (slow == fast) return true;
+        }
+        return false;
+    }
+};
+```
+- 两数相加
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode *head = nullptr;
+        ListNode *tail = nullptr;
+        int carry = 0;
+        while (l1||l2){
+            int n1 = l1?l1->val:0;
+            int n2 = l2?l2->val:0;
+            int n = n1+n2+carry;
+            if (!head){
+                head = tail = new ListNode (n%10);
+            }
+            else{
+                tail->next = new ListNode (n%10);
+                tail = tail->next;
+            }
+            carry = n/10;
+            if (l1) l1 = l1->next;
+            if (l2) l2 = l2->next;
+        }
+        if (carry>0) {
+            tail->next = new ListNode (carry);
+            tail = tail->next;
+        }
+        return head;
+    }
+};
+```
+- 合并两个有序链表
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        // 创建一个哨兵节点，简化边界条件处理
+        ListNode dummy(0);
+        ListNode* tail = &dummy;
+
+        // 合并两个链表
+        while (list1 != nullptr && list2 != nullptr) {
+            if (list1->val < list2->val) {
+                tail->next = list1;
+                list1 = list1->next;
+            } else {
+                tail->next = list2;
+                list2 = list2->next;
+            }
+            tail = tail->next;
+        }
+
+        // 连接剩余的节点
+        if (list1 != nullptr) {
+            tail->next = list1;
+        } else {
+            tail->next = list2;
+        }
+
+        // 返回合并后的链表的头节点
+        // 这里用 '.' ，因为 dummy是一个对象，而不是指针
+        return dummy.next;
+    }
+};
+```
+- 随机链表的复制
+第二次做，只能通过试错意识到方法一，要用一个哈希表构建 原链表节点 和 新链表对应节点 的键值对映射关系，再遍历构建新链表各节点的 next 和 random 引用指向即可。
+
+没有想到方法二，方法二是在原链表的每个节点后面插入一个新节点，然后再遍历一次链表，复制随机指针，最后再拆分链表。
+```c++
+// 方法一：哈希表
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == nullptr) {
+            return nullptr;
+        }
+        // 哈希表，存储原链表节点和新链表节点的映射关系
+        unordered_map<Node*, Node*> mp;
+        // 遍历原链表，构建新链表节点
+        Node* cur = head;
+        while (cur != nullptr) {
+            mp[cur] = new Node(cur->val);
+            cur = cur->next;
+        }
+        // 遍历原链表，构建新链表的 next 和 random 引用指向
+        cur = head;
+        while (cur != nullptr) {
+            mp[cur]->next = mp[cur->next];
+            mp[cur]->random = mp[cur->random];
+            cur = cur->next;
+        }
+        // 返回新链表的头节点
+        return mp[head];
+    }
+};
+```
+
+```C++
+// 方法二：拆分法
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == nullptr) {
+            return nullptr;
+        }
+        // 复制节点
+        Node* cur = head;
+        while (cur != nullptr) {
+            Node* node = new Node(cur->val);
+            node->next = cur->next;
+            cur->next = node;
+            cur = node->next;
+        }
+        // 复制随机指针
+        cur = head;
+        while (cur != nullptr) {
+            if (cur->random != nullptr) {
+                cur->next->random = cur->random->next;
+            }
+            cur = cur->next->next;
+        }
+        // 拆分链表
+        cur = head;
+        Node* newHead = head->next;
+        Node* newCur = newHead;
+        while (cur != nullptr) {
+            cur->next = cur->next->next;
+            cur = cur->next;
+            if (newCur->next != nullptr) {
+                newCur->next = newCur->next->next;
+                newCur = newCur->next;
+            }
+        }
+        return newHead;
+    }
+};
+```
+- 反转链表 II
+自己结合反转链表琢磨出来的错误答案，也不知道为什么就heap-use-after-free了。
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        if (left== right) return head;
+        // 所有要反转节点的前一个节点
+        ListNode *pre = nullptr;
+        // 所有要反转节点的后一个节点
+        ListNode *succ = nullptr;
+        // 翻转开始的节点
+        ListNode *curr = nullptr;
+        // 节点计数
+        int i = 1;
+        ListNode *newhead = head;
+        // 一次遍历找到上述三个节点
+        while(head){
+            if (i==left-1) pre = head;
+            if (i==left) curr = head;
+            if (i==right) succ = head;
+            head = head->next;
+            i++;
+        }
+        int n = right-left+1;
+        // 进行具体的切换
+        ListNode *prev = pre;
+        while(n--){
+            ListNode *next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+        pre->next = prev;
+        return newhead;
+    }
+};
+```
+更为简洁的可行答案
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        if (left == right) return head;
+
+        // 哑节点，简化边界情况处理
+        ListNode dummy(0);
+        dummy.next = head;
+        // pre 指向 left 的前一个节点
+        ListNode* pre = &dummy;
+
+        // 找到 left 节点的前一个节点
+        for (int i = 1; i < left; ++i) {
+            pre = pre->next;
+        }
+        // curr 指向 left 节点
+        ListNode* curr = pre->next;
+        // succ 初始化为 left 的下一个节点
+        ListNode* succ = curr->next;
+
+        // 反转链表的指定部分
+        for (int i = 0; i < right - left; ++i) {
+            curr->next = succ->next;
+            succ->next = pre->next;
+            pre->next = succ;
+            succ = curr->next;
+        }
+
+        return dummy.next;
+    }
+};
+```
+- K 个一组翻转链表
+参考上一道题，翻转链表 II 的思路，只不过这里要多一层循环，每次找到k个节点，然后进行翻转。
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if (head == nullptr || k == 1) return head;
+
+        ListNode dummy(0);
+        dummy.next = head;
+        ListNode* pre = &dummy;
+        ListNode* curr = head;
+        ListNode* succ = nullptr;
+
+        // 计算链表长度
+        int length = 0;
+        while (curr) {
+            length++;
+            curr = curr->next;
+        }
+
+        curr = head;
+        while (length >= k) {
+            succ = curr->next;
+            for (int i = 1; i < k; ++i) {
+                curr->next = succ->next;
+                succ->next = pre->next;
+                pre->next = succ;
+                succ = curr->next;
+            }
+            pre = curr;
+            curr = succ;
+            length -= k;
+        }
+
+        return dummy.next;
+    }
+};
+```
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
