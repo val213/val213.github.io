@@ -3911,6 +3911,258 @@ public:
     }
 };
 ```
+- 删除链表的倒数第 N 个结点
+```c++
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode dummy(0);
+        dummy.next = head;
+        // 先找到倒数第n个节点
+        ListNode *fast = head;
+        ListNode *slow = &dummy;
+        n--;
+        while (n--) {
+            fast = fast->next;
+        }
+        while (fast->next) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        // 此时slow是要被删除节点的前一个节点
+        ListNode *curr = slow->next;
+        slow->next = slow->next->next;
+        delete curr; // 释放内存
+        return dummy.next;
+    }
+};
+```
+- 删除排序链表中的重复元素 II
+```c++
+// 删除链表的类型，要记得释放内存，上次被面试官说了
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if (!head) return nullptr;
+
+        ListNode dummy(0);
+        dummy.next = head;
+        ListNode *prepre = &dummy;
+        ListNode *prev = head;
+        ListNode *curr = head->next;
+
+        while (prev) {
+            bool hasDuplicate = false;
+            while (curr && curr->val == prev->val) {
+                hasDuplicate = true;
+                ListNode* temp = curr;
+                curr = curr->next;
+                delete temp; // 释放内存
+            }
+            if (hasDuplicate) {
+                ListNode* temp = prev;
+                prepre->next = curr;
+                delete temp; // 释放内存
+            } else {
+                prepre = prev;
+            }
+            prev = curr;
+            if (curr) curr = curr->next;
+        }
+        return dummy.next;
+    }
+};
+```
+- 旋转链表
+```c++
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (!head || k == 0) return head;
+
+        // 计算链表长度
+        ListNode* curr = head;
+        int length = 1;
+        while (curr->next) {
+            curr = curr->next;
+            length++;
+        }
+
+        // 计算实际需要旋转的步数
+        k = k % length;
+        if (k == 0) return head;
+
+        // 将链表连接成环
+        curr->next = head;
+
+        // 找到新的尾节点和头节点
+        int stepsToNewHead = length - k;
+        ListNode* newTail = head;
+        for (int i = 1; i < stepsToNewHead; i++) {
+            newTail = newTail->next;
+        }
+        ListNode* newHead = newTail->next;
+
+        // 断开环
+        newTail->next = nullptr;
+
+        return newHead;
+    }
+};
+```
+```c++
+// 自己做出来成功的第一版，用时居然91.5%？感觉不应该呀。while套while，时间复杂度O(n^2)
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (!head) return nullptr;
+        ListNode dummy(0);
+        ListNode *prev = &dummy;
+        dummy.next = head;
+        ListNode *curr = head;
+        int size = 1;
+        while(curr->next){
+            prev = curr;
+            curr = curr->next;
+            size++;
+        }
+        k = k%size;
+        while(k--){
+            head = prev->next;
+            prev->next = nullptr;
+            curr->next = dummy.next;
+            dummy.next = head;
+            prev = &dummy;
+            while(curr->next){
+                prev = curr;
+                curr = curr->next;
+            }
+        }
+        return head;
+    }
+};
+```
+- 分隔链表
+```c++
+// 因为是链表而不是数组，构建子链不增加空间复杂度。勇敢地构造子链即可，无需考虑节点交换。
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        if (!head) return nullptr;
+        // 创建两个链表，一个存储小于 x 的节点，一个存储大于等于 x 的节点
+        ListNode dummySmall(0);
+        ListNode dummyBig(0);
+        ListNode* small = &dummySmall;
+        ListNode* big = &dummyBig;
+        // 遍历链表，根据节点值的大小分别插入到两个链表中
+        while (head) {
+            if (head->val < x) {
+                small->next = head;
+                small = small->next;
+            } else {
+                big->next = head;
+                big = big->next;
+            }
+            head = head->next;
+        }
+
+        big->next = nullptr; // 结束大于等于 x 的链表
+        small->next = dummyBig.next; // 连接小于 x 和大于等于 x 的链表
+
+        return dummySmall.next;
+    }
+};
+```
+- LRU 缓存
+> 在双向链表的实现中，使用一个伪头部（dummy head）和伪尾部（dummy tail）标记界限，这样在添加节点和删除节点的时候就不需要检查相邻的节点是否存在。
+```c++
+struct DLinkedNode{
+    int key,value;
+    DLinkedNode* prev;
+    DLinkedNode* next;
+    DLinkedNode(): key(0),value(0),prev(nullptr),next(nullptr){}
+    DLinkedNode(int _key, int _value): key(_key), value(_value),prev(nullptr),next(nullptr){}
+};
+
+
+class LRUCache {
+public:
+    LRUCache(int _capacity) {
+        // dummy
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head->next = tail;
+        tail->prev = head;
+    }
+    
+    int get(int key) {
+        if (!cache.count(key)) return -1;
+        DLinkedNode* node = cache[key];
+        moveToHead(node);
+        return node->value;
+    }
+    
+    void put(int key, int value) {
+        if (!cache.count(key)){
+            // 创建一个新的节点
+            DLinkedNode* node = new DLinkedNode(key, value);
+            cache[key]= node;
+            // 添加至链表的头部
+            addToHead(node);
+            ++size;
+            if (size>capacity){
+                // 删除结尾的节点
+                DLinkedNode* removed = removeTail();
+                cache.erase(removed->key);
+                // 防止内存泄露
+                delete removed;
+                --size;
+            }
+        }
+        else{
+            DLinkedNode *node = cache[key];
+            node->value=value;
+            moveToHead(node);
+        }
+    }
+
+    void addToHead(DLinkedNode* node) {
+        node->prev = head;
+        node->next = head->next;
+        head->next->prev = node;
+        head->next = node;
+    }
+    
+    void removeNode(DLinkedNode* node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+
+    void moveToHead(DLinkedNode* node) {
+        removeNode(node);
+        addToHead(node);
+    }
+
+    DLinkedNode* removeTail() {
+        DLinkedNode* node = tail->prev;
+        removeNode(node);
+        return node;
+    }
+private: 
+unordered_map<int, DLinkedNode*> cache;
+DLinkedNode* head;
+DLinkedNode* tail;
+int capacity;
+int size;
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+```
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
