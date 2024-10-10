@@ -20,7 +20,11 @@ categories: 个人记录
 **DragonOS 开源社区**的贡献者，参与内核子系统的开发和维护，目前主要负责内核中**用户态和内核态全双工通信机制**——**Netlink** 协议栈的开发和**设备驱动模型中设备事件通知**——**Uevent** 机制的实现。作为 reviewer 同时担任 SIG-Main 的主要负责人参与社区运营。其他工作：
 	- 移植 dog —— 一个开源 DNS CLI 查询工具到DragonOS，实现了在DragonOS上的DNS查询功能
 - ***LinuxOne可观测告警平台*** 
-IBM 和华南理工大学的校企合作科研项目，作为后台开发者，参与开发了一套 LinuxOne 平台的可观测告警系统。后端语言为Python，技术栈为 Prometheus + grafana + CherryPy + MariaDB。该项目采用多容器分离部署。主要负责 grafana 配置及其与后端交互的告警信息接口等的开发。
+IBM 和华南理工大学的校企合作科研项目，作为后台开发者，参与开发了一套 LinuxOne 平台的可观测告警系统。后端语言为Python，技术栈为 Prometheus + grafana + CherryPy + MariaDB。该项目采用多容器分离部署。主要负责项目可行方案的调研、环境的配置部署、可观测套件与后端交互的告警信息接口开发。
+	- 深入调研 zhmcclient、IBM zOS/s390x 架构和 zhmc_prometheus_exporter 的文档，确定对特定类型物理网卡 Nerwork adapter、虚拟网卡 NIC 在不同 cpc 和partition 上的细致监控方案
+	- 使用 promQL 查询语句符合需求的特定指标数据以及对指标数据进行一系列 data transform 操作，使之符合 Alter rules 的需求
+	- 设置 grafana webhook 配置 Alter rules，实现了后端服务对 grafana 指标告警信息的捕获，并实时推送、存入数据库。
+	- 容器化部署：在项目环境搭建包括项目数据模拟测试的时候，项目中的各个组件均为容器化部署。
 - ***ValCalendar*** ***基于QT框架的桌面多功能智能日历***
 在个人和团队两个层次实现了日程增删改查的同步，调用了百度地图的 JsAPI 以及和风天气的 WebAPI 实现了时空调度和实时出行建议的功能。最困难的是实现 QT 和百度地图的 JS 脚本之间的相互通信以及对应的功能实现。最终该项目作为**大一下的 C++ 实训作品**获得了 98 分。
 - ***Valchat*** **基于socket开发的双端即时通讯命令行**
@@ -41,7 +45,8 @@ IBM 和华南理工大学的校企合作科研项目，作为后台开发者，�
  - 2023.7 访学交流 **新加坡国立大学** 人工智能与机器学习项目
  ## 在校期间获得荣誉和成绩
  - CET-4/CET-6：**588/528**
- - 2022~2023年度校级奖学金 **二等奖**
+ - 2023~2024年度 企业捐赠奖学金 **温氏筠诚奖学金**
+ - 2022~2023年度 校级奖学金 **二等奖**
  - 2023年华南理工大学软件学院黑框框软件程序设计大赛 **一等奖**
  - 2024年华南理工大学软件学院光锥元杯PC端赛道 **团队三等奖**
  - 2024美国大学生数学建模竞赛 **Honorable Mention**
@@ -55,12 +60,15 @@ IBM 和华南理工大学的校企合作科研项目，作为后台开发者，�
 ---
 
 # 技能清单
-- **rust系统编程**：了解和熟悉使用 rust 语言进行系统编程，对于 rust 的内存安全、并发性能等特性有一定了解，关注 rust 的生态和工具链，熟悉 rust 的动态分发、宏、trait、泛型等特性。
-- **Javaweb 全栈开发**：云服务器部署上线 Javaweb 网站应用，对于 vue、Nuxt、springboot、mybatis、mysql 等常用 Javaweb 技术栈较为熟悉；有 typescript及其 RPC 框架开发经验，对dockers、k8s等容器化技术有一定了解。
+- **rust 系统编程**：了解和熟悉使用 rust 语言进行系统编程，对于 rust 的内存安全、并发性能等特性有一定了解，关注 rust 的生态和工具链，熟悉 rust 的动态分发、宏、trait、泛型等特性。
+- **Javaweb 全栈开发**：云服务器部署上线 Javaweb 网站应用，对于 vue、Nuxt、springboot、mybatis、mysql 等常用 Javaweb 技术栈较为熟悉；有 typescript 及其 RPC 框架开发经验。
 - **C++ PC客户端开发**：基于QT框架的桌面应用程序开发、基于socket的联网功能开发、多线程技术、API调用等。
 - **操作系统实践**：在Linux系统各个发行版（centos、ubuntu等）上都有过一段时间的使用和操作经历，较为熟悉Linux系统上使用gdb、tmux、strace等工具调试和开发程序。善于"折腾"。
 - **CI/CD**：熟悉 CI/CD workflow 的配置和使用，熟悉 github 的 PR 流程，熟悉 github actions 的配置和使用。
-- **生产力工具：版本控制/文档排版编写/博客框架等**：git, Markdown, LaTex, mermaid, hexo 等。个人博客网站：http://val213.github.io
+- **云原生技术**：熟悉 docker 等云原生技术，熟悉云原生应用的开发和部署。
+- **生产力工具：服务器CLI工具/版本控制工具/排版语言/博客框架等**：tmux、git, Markdown, LaTex, mermaid, hexo 等。个人博客网站：http://val213.github.io
+- **可观测组件**：熟悉业界常用可观测平台开源套件 Prometheus + grafana 的使用。
+- **数学建模**：熟练使用 Python 、Origin 以及部分其他学科领域的专业软件进行数学建模，熟悉常用的数学建模方法和技巧。
 ---
 
 

@@ -1662,12 +1662,14 @@ USE ecs_api;
 SHOW TABLES;
 ```
 ## 重新搭建环境部署上线
-
 ### 镜像制作
 #### LOP-API
+[√] 自己打包上传服务器
 #### prometheus、mariaDB
+[√] 略
 #### grafana
-#### 如何添加基于文件的 Swap 空间：
+[√] 开源的s390x架构grafana镜像构建 https://github.com/linux-on-ibm-z/dockerfile-examples/tree/master/Grafana
+##### 如何添加基于文件的 Swap 空间：
 在 Linux 系统中，添加基于文件的 Swap 空间是一种增加虚拟内存的方法。Swap 空间可以看作是硬盘上的一部分空间，被用作 RAM 使用。当系统的物理内存（RAM）不足时，操作系统会将一些不常用的数据从 RAM 移动到 Swap 空间中，以便为新的数据腾出空间。这有助于防止系统因内存不足而崩溃。
 1. **创建 Swap 文件**：
    首先，你需要创建一个 Swap 文件。这可以通过 `fallocate` 或 `dd` 命令完成。例如，创建一个 1GB 的 Swap 文件：
@@ -1741,3 +1743,97 @@ SHOW TABLES;
 添加 Swap 空间是一种有效的短期解决方案，但最好还是增加物理内存以获得更好的性能。
 
 ### grafana 备份恢复
+[×] grafana 备份丢失，无法恢复
+### 模拟数据配置
+#### 技术方案采用的前提：
+- [×] grafana 数据源插件 csv data source 和 infinity data - source 都不支持s390x架构！！
+- [×] 用数据库存模拟数据太麻烦
+#### 技术方案：
+[√] 用 python 脚本模拟了类似于这样的 zhmc_prometheus_exporter 的监测到的partition_processor_usage_ratio 数据：
+
+```
+# HELP partition_processor_usage_ratio Processor usage ratio for a partition
+# TYPE partition_processor_usage_ratio gauge
+partition_processor_usage_ratio{cpc="BZ12", hmc="HMC1", instance="172.16.36.127:9293", job="zhmc", partition="LPAR28", pod="mypod"} 0.77
+partition_processor_usage_ratio{cpc="BZ12", hmc="HMC1", instance="172.16.36.127:9293", job="zhmc", partition="LPAR29", pod="mypod"} 0.55
+partition_processor_usage_ratio{cpc="BZ12", hmc="HMC1", instance="172.16.36.127:9293", job="zhmc", partition="LPAR30", pod="mypod"} 0.64
+```
+在 LinuxOne 服务器上，~/python_server目录下，有三个文件：`metrics_server.py`, `requirements.txt`, `Dockerfile`，其中`metrics_server.py`是模拟数据的脚本，`requirements.txt`是依赖包列表，`Dockerfile`是打包镜像的脚本。
+```python
+# v0.1.0
+from flask import Flask, Response
+import random
+
+app = Flask(__name__)
+
+# 生成随机的指标值
+def generate_random_usage():
+    return round(random.uniform(0.3, 1.0), 2)  # 生成一个 0.3 到 1.0 之间的随机值 
+
+# 生成符合 Prometheus 格式的时间序列数据
+def generate_metrics():
+    # 使用拼接方式构建模拟指标数据，目前是随机的三个partition的CPU利用率，每次请求都会生成新的随机值
+    metrics = []
+    metrics.append("# HELP partition_processor_usage_ratio Processor usage ratio for a partition")
+    metrics.append("# TYPE partition_processor_usage_ratio gauge")
+    metrics.append(f'partition_processor_usage_ratio{{cpc="BZ12", hmc="HMC1", instance="172.16.36.127:9293", job="zhmc", partition="LPAR28", pod="mypod"}} {generate_random_usage()}')
+    metrics.append(f'partition_processor_usage_ratio{{cpc="BZ12", hmc="HMC1", instance="172.16.36.127:9293", job="zhmc", partition="LPAR29", pod="mypod"}} {generate_random_usage()}')
+    metrics.append(f'partition_processor_usage_ratio{{cpc="BZ12", hmc="HMC1", instance="172.16.36.127:9293", job="zhmc", partition="LPAR30", pod="mypod"}} {generate_random_usage()}')
+    
+    return "\n".join(metrics)  # 将列表连接为字符串
+
+@app.route('/metrics')
+def metrics():
+    metrics_data = generate_metrics()
+    return Response(metrics_data, mimetype="text/plain")
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
+```
+
+在 `~/python_server` 这个目录下，执行以下命令，可以打包镜像并运行容器（目前，**每次更换新的 metrics_server.py 脚本都需要执行一遍**）：
+```shell
+# 打包数据模拟服务镜像
+sudo docker build -t flask_metrics_server .
+# 运行数据模拟服务的容器
+sudo docker run -d --network monitoring -p 8080:8080 --name flask_metrics flask_metrics_server
+```
+[√] 把模拟数据的脚本打包一个镜像跑在 8080 端口上，作为 prometheus 的 target 之一，然后再添加 prometheus 为 grafana 的数据源。容器跑起来之后，以下命令可以调用服务查看模拟数据的具体情况：
+```shell
+curl -G 'http://localhost:8080/metrics'
+```
+
+#### 下一步工作
+1. [×] 完善数据模拟脚本
+    - 还有一个 `cpc_processor_usage_ratio` 的指标。
+    - 需要更有规律的数据，而不是随机的，以便于让算法训练
+2. [×] grafana dashboard 重建CPU监控面板，展示cpc（可选择不同cpc）的总的cpu利用率 和 partition（可选择不同 partition）的CPU利用率的时间序列图
+
+3. [×] 添加cpu的告警规则，设置告警通知 webhook(需要先把LOP-API的容器跑起来)
+
+4. [×] 前端把原本面板url改成最新重建的CPU监控面板的 url
+    - ps，之前做过的其他面板如果有图片保存可以放一点图片上去，或者后面直接放在视频上
+5. [×] 前端添加关于AI预测相关的页面
+6. [×] 前端服务打包部署在服务器上容器启动
+7. [×] AI的训练预测服务，可以参照数据模拟服务的方式部署上线
+
+### 遇到的问题：
+- 技术方案从数据源插件到 pushgateway 到自己写脚本模拟数据，再到打包成镜像部署。
+    - 如上，s390x 架构的生态支持真的很一般
+    - pushgateway 要求不带时间戳，并且也不允许一次推送多个相同的指标，这样就不适合模拟数据了，因为我们需要的是时间序列数据，而不是单个数据点。
+- 最开始生成的指标数据是一大串字符串，prometheus报错指标名称不符合规范，看起来是混进去了一个前导空格，后面改成 extnds 的方式拼接指标数据，就好了。 
+- 部署成功之后，在Prometheus上的target是up的，但是不管是 grafana 还是 prometheus 都找不到指标。确认了好几次之后看 prometheus 的日志，发现是因为手动添加的时间戳不对导致的。
+- 时间戳问题：一开始以为只有用 pushgateway 才不用添加时间戳，然后因为服务器是跨境的，时区是UTC，脚本中标注了，返回的也是不对的，都是CST，不知道为什么。后来搞了半天发现。虽然 prometheus 强制要求时间戳，但是其实也可以不用手动添加时间戳，因为 prometheus 会自己添加时间戳。
+- 最后终于成功了，找到指标了，但是grafana上面没有数据显示，这次我学聪明了，应该是浏览器和服务器的时区不一样导致的，grafana 的 webGUI 自动跟随了浏览器的时区。在grafana的设置里面设置了UTC时区，然后就好了。
+- 吐槽一下，linuxone 服务器几十秒不动就会自动断开连接，真的很烦，每次都要重新连。
+
+
+
+#### 汇报方面
+- 项目介绍：LOP-API 是一个用于监控 IBM Z 系统的 API，提供了一套用于监控 CPC、Adapter、Partition 等资源的指标数据，以及告警规则和通知服务。
+- 故事背景：客户是一家大型企业，拥有多台 IBM Z 系统，希望能够通过 Grafana 实时监控 CPC 和 Partition 的 CPU 利用率，并设置告警规则，以便在 CPU 利用率过高时及时通知。
+- 需求痛点：客户的 IBM Z 系统是企业的核心设备，CPU 利用率过高可能会导致系统性能下降，甚至影响业务运行。因此，客户希望能够及时监控 CPU 利用率，并在必要时采取措施。
+- 项目需求：客户希望能够通过 Grafana 实时监控 CPC 和 Partition 的 CPU 利用率，并设置告警规则，以便在 CPU 利用率过高时及时通知。
+- 解决方案：我们为客户提供了一个实时监控 CPC 和 Partition CPU 利用率的解决方案，通过 zhmc_prometheus_exporter 采集 CPC 和 Partition 的 CPU 利用率数据，并将其推送到 Prometheus 中。然后，我们在 Grafana 中创建了一个 CPU 监控面板，展示了 CPC 的总 CPU 利用率和 Partition 的 CPU 利用率的时间序列图。我们还设置了告警规则，当 CPU 利用率超过阈值时，会触发告警并发送通知。除此之外，我们还将机器学习算法应用于监控数据，以提供更准确的预测和分析服务，这样可以提前发现潜在的问题并采取措施。
+- 项目成果：我们成功地实现了客户的需求，为客户提供了一个实时监控 CPC 和 Partition CPU 利用率的解决方案，并设置了告警规则，以便在 CPU 利用率过高时及时通知客户。
+- 项目展望：未来，我们计划进一步优化监控面板，添加更多的监控指标和告警规则，以提供更全面的监控服务。

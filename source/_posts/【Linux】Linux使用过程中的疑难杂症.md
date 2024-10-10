@@ -11,6 +11,9 @@ categories: 技术分享
     - 解决方法：
         - 查阅资料[stackoverflow: At least one invalid signature was encountered
 ](https://stackoverflow.com/questions/62473932/at-least-one-invalid-signature-was-encountered)后进行尝试和排查，发现应该是磁盘空间不足了，进行虚拟机磁盘扩容
+2. [【实操】手把手教你完成Linux CentOS7磁盘扩容](https://blog.csdn.net/hualinger/article/details/121553556)
+    - [Insufficient free space: XXX extents needed, but only 0 available](https://askubuntu.com/questions/1111887/insufficient-free-space-xxx-extents-needed-but-only-0-available#:~:text=by%20run%20that%20command%20you%20try%20to%20re-use)
+    - [insufficient-free-space-x-extents-needed-but-only-y-available](https://serverfault.com/questions/733407/insufficient-free-space-x-extents-needed-but-only-y-available)
 # 网络相关
 1. ssh连接不上，有很多原因
     1. 扩容后虚拟机启动不起来了：原因是因为虚拟机的磁盘扩容后，虚拟机的分区表没有更新，所以虚拟机无法识别新的磁盘空间。
@@ -40,3 +43,6 @@ categories: 技术分享
 "https://docker.anyhub.us.kg",
 "https://docker.awsl9527.cn",
 ```
+# 权限相关
+1. (sudoers 配置了NOPASSWD，sudo依然提示输入密码)[https://blog.csdn.net/thesre/article/details/125358601]
+    - man sudoers 查看手册，可以看到如果有多个匹配，那么最后一个匹配将会被使用
