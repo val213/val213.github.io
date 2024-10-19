@@ -2,7 +2,7 @@
 title: IBM 联合科研项目周例会记录
 ---
 
-![alt text](a28d3f258446f90df6b2b9b054b0eef.jpg)
+![alt text](../a28d3f258446f90df6b2b9b054b0eef.jpg)
 
 # 技术栈要求
 - Linux

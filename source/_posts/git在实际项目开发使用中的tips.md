@@ -1,7 +1,7 @@
 ---
 title: git在实际项目开发使用中的tips
 ---
-
+### 基础操作
 - `git init`    //初始化本地仓库
 - `git add .`    //添加所有文件到暂存区
 - `git checkout -b feature-branch`    //创建并切换到分支feature-branch  
@@ -80,3 +80,21 @@ title: git在实际项目开发使用中的tips
 
     Replace `origin` with the name of your remote if it's different.
 - 设置上游仓库：git remote add upstream <upstream_repository_url>
+
+### 分支和主线的合并
+- 分支的新特性合并时可以用squash，这样可以将多次提交合并为一次提交，这样可以保持主线的清晰。
+- 但是将主线的更新合并到分支时，Merge或Rebase Merge合并主线代码，不能使用Squash Merge，避免后续合并主线时产生大量冲突。因为Squash Merge会将多次提交合并为一次提交，这样会丢失主线的提交历史，导致后续合并主线时产生大量冲突。
+- Rebase Merge会将分支的提交历史放在主线的提交历史之后，这样可以保持主线的提交历史，避免后续合并主线时产生大量冲突。
+
+### 克隆特定分支，而不是所有分支：
+
+1. 使用`--branch`（或`-b`）选项来指定你要克隆的分支。这个选项会告诉`git clone`只克隆特定的分支，而不是整个仓库的所有分支。
+2. 使用`--single-branch`选项来确保只克隆指定的分支。
+
+例如，假设你要克隆名为`feature-branch`的分支，你可以运行以下命令：
+
+```bash
+git clone --branch feature-branch --single-branch <repository-url>
+```
+
+这样只会拉取指定的分支，节省时间和空间。

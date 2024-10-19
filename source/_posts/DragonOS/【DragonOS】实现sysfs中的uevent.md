@@ -818,6 +818,32 @@ while the Unix domain sockets use the file system namespace, Netlink processes a
 
 20241003
 - nlk的转换，参考cfg那一次commit
+```rust
+    let nlk: Arc<NetlinkSock> = Arc::clone(&sk)
+        .arc_any()
+        .downcast()
+        .map_err(|_| SystemError::EINVAL)?;
+
+    let nlk = Arc::new(RwLock::new(
+        sk.lock()
+            .deref()
+            .as_any()
+            .downcast_ref::<NetlinkSock>()
+            .ok_or(SystemError::EINVAL)?
+            .clone(),
+    ));
+
+    let nlk = {
+        let sock_guard = sock.lock();
+        let netlink_sock = sock_guard
+            .deref()
+            .as_any()
+            .downcast_ref::<NetlinkSock>()
+            .ok_or(SystemError::EINVAL)?
+            .clone();
+        Arc::new(SpinLock::new(netlink_sock))
+    };
+```
 - masks？的长度
 - registered？在什么时候注册
 - gruops？咋内容这么奇怪
@@ -835,3 +861,27 @@ while the Unix domain sockets use the file system namespace, Netlink processes a
 20241008
 - 不需要，请教了谢润霖之后知道了通过idtable来实现获取设备号
 - 块设备和字符设备是不是还没有在sysfs下创建目录？
+
+
+20241013
+设备类型转换失败没有显示捕获，定位费了很多时间。
+
+```Rust
+let char_device = match device.cast::<dyn CharDevice>() {
+    Ok(dev) => dev,
+    Err(_) => {
+        log::error!("Failed to cast device to CharDevice");
+        return Err(SystemError::EINVAL);
+    }
+};
+```
+
+1016
+- 中断上下文中使用了mutex，NO！换成spinklock
+- rust Vec<> 类型用vec![]初始化数组被污染
+
+1017
+- 要怎么测试呢，内核启动的时候没有监听者，用户程序监听之后，内核如何产生uevent呢？
+- setsocketopt: NETLINK_ADD_MEMBERSHIP
+
+- 非常奇怪，portid为什么插入之后变了

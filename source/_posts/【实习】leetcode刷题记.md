@@ -4387,7 +4387,29 @@ public:
     }
 };
 ```
-
+- 1013 鸡蛋掉落 两个鸡蛋
+```c++
+class Solution {
+public:
+    int twoEggDrop(int n) {
+        return ceil((-1 + sqrt(1 + 8 * n)) / 2);
+    }
+};
+```
+- 1014 鸡蛋掉落
+```c++
+int superEggDrop(int k, int n) {
+    vector<vector<int>> dp(k + 1, vector<int>(n + 1, 0));
+    int m = 0;
+    while (dp[k][m] < n) {
+        ++m;
+        for (int i = 1; i <= k; ++i) {
+            dp[i][m] = dp[i][m - 1] + dp[i - 1][m - 1] + 1;
+        }
+    }
+    return m;
+}
+```
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
