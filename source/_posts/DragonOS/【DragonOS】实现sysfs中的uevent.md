@@ -884,4 +884,7 @@ let char_device = match device.cast::<dyn CharDevice>() {
 - 要怎么测试呢，内核启动的时候没有监听者，用户程序监听之后，内核如何产生uevent呢？
 - setsocketopt: NETLINK_ADD_MEMBERSHIP
 
-- 非常奇怪，portid为什么插入之后变了
+- 非常奇怪，portid为什么插入之后变了: 初始化为0了
+
+1020
+- uevent 应该由谁返回给用户空间？skb 还是 Netlinksock 的字段?
