@@ -121,5 +121,16 @@ casdoor修改了bee。
 
 
 
-## 微服务实践
-把API网关单独作为一个服务，让它跟casdoor集成就行了，其他的服务不需要知道casdoor的存在
+## 微服务实践中的 Casdoor
+### k8s + Casdoor
+- [Casdoor + Kubernetes](https://casdoor.org/docs/deploy/kubernetes)
+
+Casdoor 在 k8s 集群中的作用是什么？
+- 作为身份提供商，Casdoor 为 k8s 集群中的所有服务提供身份验证和授权。
+- 作为服务提供商，Casdoor 为用户提供一个统一的登录界面，用户可以通过 Casdoor 登录到 k8s 集群中的所有服务。
+
+如何让 k8s 集群中的服务连接到 Casdoor？
+- 服务可以通过 OIDC 或 SAML 连接到 Casdoor。
+- 服务可以通过 Casdoor SDK 连接到 Casdoor。
+例如 rust 服务可以使用 casdoor-rs 连接到 Casdoor， go 服务可以使用 casdoor-go 连接到 Casdoor。
+具体使用方法请参考 Casdoor SDK 文档。

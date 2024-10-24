@@ -58,7 +58,11 @@ todo
         + file: (file, required) - 文件
 + Response 200 (application/json)
     + Attributes (BaseResponse[string])
-
+### 下载书本 [GET /api/files/v1/download]
++ Parameters
+    + bookId: 123 (number, required) - 书本 ID
++ Response 200 (application/json)
+    + Attributes (BaseResponse[string])
 ## SSE 管理
 
 ### 关闭 SSE 长连接 [GET /api/sse/v1/close-sse-connect]

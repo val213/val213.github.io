@@ -88,53 +88,6 @@ For the "full" setup, you want to [4] make sure /dev is a tmpfs filesystem
 https://www.kernel.org/doc/html/next/userspace-api/netlink/intro.html
 https://www.man7.org/linux/man-pages/man7/netlink.7.html
 https://code.dragonos.org.cn/xref/linux-6.1.9/net/netlink/
-## 目录结构
-在Linux内核源代码中，drivers目录包含了为硬件设备提供支持的所有驱动程序。这个目录按照设备类型和功能进行了组织，以便于管理和维护。下面是一些常见的子目录及其包含的模块功能和目的概述：
-
-- acpi
-包含高级配置和电源接口（ACPI）的驱动程序，用于电源管理和设备配置。
-- **base**
-包含核心的设备、总线、和驱动模型的基础代码，这是Linux设备驱动架构的基础。
-- block
-包含块设备驱动程序，比如硬盘驱动和控制器。
-- bluetooth
-包含蓝牙设备的驱动程序。
-- bus
-提供对不同总线技术的支持，例如PCI、USB等。
-- cdrom
-包含CD-ROM驱动程序。
-- char
-包含字符设备的驱动程序，如串口和键盘驱动。
-- crypto
-提供加密算法的驱动程序，用于支持各种加密硬件。
-- gpu
-包含图形处理单元（GPU）驱动程序，支持不同的图形硬件。
-- hid
-包含人机接口设备（HID），如键盘、鼠标的驱动程序。
-- i2c
-提供I²C总线及其设备的驱动程序。
-- input
-管理输入设备的驱动程序，如键盘、鼠标、触摸屏。
-- media
-包含多媒体设备，如视频捕捉卡和电视卡的驱动程序。
-- mfd
-针对多功能设备（MFD）的驱动程序，这些设备包含多个功能集成在一个物理设备上。
-- net
-包含网络接口卡（NIC）和其他网络设备的驱动程序。
-- pci
-提供PCI总线及其设备的驱动程序。
-- platform
-包含为特定平台或硬件设计的驱动程序，通常是指嵌入式设备或特定硬件平台。
-- scsi
-包含SCSI设备的驱动程序，如硬盘和扫描仪。
-- sound
-包含声卡和其他音频接口的驱动程序。
-- usb
-提供USB控制器和设备的驱动程序。
-- video
-包含视频设备的驱动程序，如摄像头和视频采集卡。
-
-这个列表只是一个概述，Linux内核支持的设备和驱动程序非常广泛，各个目录下的内容会随着新硬件的支持和旧硬件的淘汰而变化。每个子目录下通常都有一个或多个驱动程序，这些驱动程序负责与特定的硬件设备通信，确保设备的功能能够被操作系统和应用程序使用。
 
 ## kobject.h
 ### kobject_action事件类型
@@ -631,10 +584,10 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
  ```
 
 - 用户空间使用netlink套接字和内核通信，和传统的套接字是一样首先使用socket系统调用要创建用户空间套接字，不同的是内核也要创建对应的内核套接字，两者通过 nl_table 链表进行绑定；创建内核套接字时，要定义接收用户空间 netlink 消息的 input 函数，如 NETLINK_ROUTE 簇的 input 函数就是 rtnetlink_rcv。 nl_table 是 netlink 机制的核心数据结构，围绕此结构的内核活动有：
-    -  用户空间应用程序使用 socket 系统调用创建套接字，然后在 bind 系统调用时，内核netlink_bind 函数将调用 netlink_insert(sk, portid) 将此用户态套接字和应用程序的进程 pid 插入 nl_table，这里参数 portid 就是进程 pid；
+    - 用户空间应用程序使用 socket 系统调用创建套接字，然后在 bind 系统调用时，内核netlink_bind 函数将调用 netlink_insert(sk, portid) 将此用户态套接字和应用程序的进程 pid 插入 nl_table，这里参数 portid 就是进程 pid；
     - 创建内核套接字时，调用 netlink_insert(sk, 0) 将此用户态套接字插入 nl_table（因为是内核套接字，这里 portid 是0）； 
     - 用户空间向内核发送 netlink 消息时，调用 netlink_lookup 函数，根据协议簇和 portid 在nl_table 快速查找对应的内核套接字对象；
-    - 当内核空间向用户空间发送 netlink 消息时，调用调用netlink_lookup 函数，根据协议簇和 portid 在 nl_table 快速查找对应的用户套接字对象.
+    - 当内核空间向用户空间发送 netlink 消息时，调用netlink_lookup 函数，根据协议簇和 portid 在 nl_table 快速查找对应的用户套接字对象.
 
 - 初始化数组nl_table 每个netlink协议簇对应nl_table数组的一个条目（struct netlink_table类型），一共32个。nl_table是netlink子系统的实现的一个关键表结构，其实是一个hash链结构，只要创建netlink套接字，不管是内核的还是用户空间的，都要调用netlink_insert将netlink套接字本身和它的信息一并插入到这个链表结构中（用户态套接字在bind系统调用的时候调用netlink_insert插入nl_table；内核套接字是在创建的时候调用netlink_insert插入nl_table），然后在发送时，只要调用netlink_lookup遍历这个表就可以快速定位要发送的目标套接字。
 - 在Linux6.1.9中，netlink_table 的 hash 是重新实现的 rhashtable，为了方便先使用 HashMap 实现，后续如果有需要再替换为 rhashtable。
@@ -883,8 +836,30 @@ let char_device = match device.cast::<dyn CharDevice>() {
 1017
 - 要怎么测试呢，内核启动的时候没有监听者，用户程序监听之后，内核如何产生uevent呢？
 - setsocketopt: NETLINK_ADD_MEMBERSHIP
-
 - 非常奇怪，portid为什么插入之后变了: 初始化为0了
 
 1020
 - uevent 应该由谁返回给用户空间？skb 还是 Netlinksock 的字段?
+1023
+- 内核空间的套接字接收到消息了，怎么传递给用户空间？
+- todo: 用户空间发往内核需要完善sendmsg函数，调用 unicast 单播函数
+- netlink_unicast 函数则用于向特定的用户空间进程发送单播消息，这在 uevent 机制中通常不是必需的，因为 uevent 通常需要被多个用户空间程序接收
+- udev作为一个用户空间的设备管理程序，由驱动程序向内核捕获Uevent。当udev收到内核的Uevent事件时，它首先会侦听内核事件，然后在匹配设备节点和正则表达式方面执行是否需要更改udev规则，从而在设备节点中添加或删除属性。同时，udev会随时保持与内核同步，以确保设备变化的信息是实时的。
+
+
+Netlink相对于其他的通信机制具有以下优点：
+
+1)使用Netlink通过自定义一种新的协议并加入协议族即可通过socket API使用Netlink协议2)完成数据交换，而ioctl和proc文件系统均需要通过程序加入相应的设备或文件。
+
+3)Netlink使用socket缓存队列，是一种异步通信机制，而ioctl是同步通信机制，如果传输的数据量较大，会影响系统性能。
+
+4)Netlink支持多播，属于一个Netlink组的模块和进程都能获得该多播消息。
+
+5)Netlink允许内核发起会话，而ioctl和系统调用只能由用户空间进程发起。
+
+
+1024
+3个问题
+1. bind的时候，portid的改变没有反应到 fd 对应的socket上。
+2. data没有复制到对应的地方
+3. 面向对象风格
