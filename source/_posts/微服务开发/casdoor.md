@@ -99,7 +99,7 @@ helm delete casdoor
 - SAML
 - CAS 1.0, 2.0, 3.0
 ### OAuth 2.0 (OIDC)
-OAuth 2是一个授权框架，它使得应用程序——如Facebook，GitHub和Casdoor——能够在HTTP服务上获得对用户账户的有限访问权限。 它的工作原理是将用户身份验证委托给托管用户帐户的服务，并授权第三方应用程序访问该用户帐户。 OAuth 2为网页和桌面应用程序，以及移动设备提供授权流程。
+OAuth 2 是一个授权框架，它使得应用程序——如 Facebook，GitHub 和 Casdoor ——能够在 HTTP 服务上获得对用户账户的有限访问权限。 它的工作原理是将用户身份验证委托给托管用户帐户的服务，并授权第三方应用程序访问该用户帐户。 OAuth 2为网页和桌面应用程序，以及移动设备提供授权流程。
 #### 标准 OIDC 客户端 OpenID Connect (OIDC)
 OpenID Connect (OIDC) 是一个在OAuth 2.0 框架顶端运行的开放身份验证协议。 针对消费者，OIDC允许个人通过单点登录(SSO)访问使用OpenID提供商(OPs)的依赖方站点，如电子邮件提供商或社交网络平台，以验证其身份。 它向应用程序或服务提供用户信息、认证背景，并允许访问用户个人资料。
 #### Casdoor SDKs

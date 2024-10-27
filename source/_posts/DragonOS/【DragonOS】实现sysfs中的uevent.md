@@ -863,3 +863,6 @@ Netlink相对于其他的通信机制具有以下优点：
 1. bind的时候，portid的改变没有反应到 fd 对应的socket上。
 2. data没有复制到对应的地方
 3. 面向对象风格
+
+1025
+- 重构NetlinkSock
