@@ -52,7 +52,7 @@ loop {
 
 实验
 1. 读取管道单独开一个线程，但是不加 thread::sleep(Duration::from_secs(1))，看看系统调用情况
-```
+```rust
 // 监听systemctl
     thread::spawn(move || {
         loop {
@@ -106,7 +106,7 @@ test_bpf是每五秒钟调用一次。每秒增加一次0,5,8的系统调用，�
 4. 去掉子线程中的loop
 ```rust
 thread::spawn(move || {
-        // 监听systemctl
+        // 监听 systemctl
         Systemctl::ctl_listen();
     });
 ```
