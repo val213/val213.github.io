@@ -9,27 +9,34 @@ tags:
 # 概况
 ## 已实现的功能
 - 用户态可以创建、绑定 Netlink 套接字，用来发送、接收 Uevent 消息
-- 支持sysfs下的uevent文件读写
-- uevent 消息在内核中的准备和发送
+- 支持 sysfs下的 uevent 文件读写
+- Netlink 消息组播
+- 用户态接收 uevent 消息
+- 用户态发送 uevent 消息
 ### 与 Linux 实现不同的
-- skb的实现
+- skb 的实现
 - NL_TABLE 的哈希链实现
 ## 目前没有实现的功能
+- 阻塞读取
+- 消息队列
+- 异步回调
 - net namespace
 - rcu
 ## 后续可能会支持的功能
-- netlink 协议族的路由协议
+- netlink 单播
+- netlink 协议族的 ROUTE    协议
 # Uevent 的基础设施：Netlink
 ## 创建 Netlink 套接字
 相关结构体和特征：
 - `struct netlink_kernel_cfg`
 - `struct netlink_sock`
 - `struct netlink_table`
-- `trait NetlinkSocket`
 ### 在内核中创建 Netlink 套接字
 - `netlink_kernel_create`
+- 
 ### 在用户空间中创建 Netlink 套接字
 - `socket` 系统调用
+- `bind` 系统调用
 ## Netlink 的消息格式
 Netlink 的消息格式分为两部分：消息头和消息负载。
 ### Netlink 消息头
@@ -70,3 +77,6 @@ add@/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.1
 相关函数：
 - `kobject_uevent`
 - `kobject_uevent_env`
+- 
+
+# 测试
