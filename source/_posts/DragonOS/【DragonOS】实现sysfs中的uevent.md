@@ -873,7 +873,7 @@ Netlink相对于其他的通信机制具有以下优点：
     - system
     - <0000000< 是什么东西
     - 如果读取的是一个字符串，怎么给udev处理？不能空格吗？
-- 多消息的处理，需要添加一个队列？等channel的实现
+- 多消息的处理，需要添加一个队列？
 - 组播消息不支持阻塞?
 
 ```rust
@@ -891,3 +891,5 @@ log::info!("init: buf.to_string: {:?}", String::from_utf8_lossy(&env.buf));
 [ INFO ] (src/driver/base/uevent/kobject_uevent.rs:159)	 init: buf: [0, 0, 0, 0, 60, 0, 48, 0, 48, 0, 48, 0, 48, 0, 48, 0, 48, 0, 48, 0, 48, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 [ INFO ] (src/driver/base/uevent/kobject_uevent.rs:160)	 init: buf.to_string: "\0\0\0\0<\00\00\00\00\00\00\00\00\0<\0\0\0\0\0\0\0\0\0"
 ```
+
+初始化问题

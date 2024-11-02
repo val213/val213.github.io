@@ -1,7 +1,7 @@
 FORMAT: 1A
-HOST: https://api.ebookplatform.com
+HOST: https://api.modernlibre.com
 
-# 电子图书馆 API
+# ModernLibre API
 
 ## Data Structures
 
@@ -50,37 +50,39 @@ HOST: https://api.ebookplatform.com
 + userId: 1 (number) - 用户 ID
 + readingListId: 1 (number) - 书单ID
 
+# 图书馆服务（libre Service）
+
 ## 图书馆书本管理
 
-### 书本列表展示 [POST /api/books/v1/page]
+### 书本列表展示 [POST /api/libre/v1/books/page]
 + Request (application/json)
     + Attributes (BookPageReq)
 + Response 200 (application/json)
     + Attributes (BaseResponse[List[Book]])
 
-### 获取书本详情 [GET /api/books/v1/{bookId}]
+### 获取书本详情 [GET /api/libre/v1/books/{bookId}]
 + Parameters
     + bookId: 123 (number, required) - 书本 ID
 + Response 200 (application/json)
-    + Attributes (BaseResponse[Book]])
+    + Attributes (BaseResponse[Book])
 
-### 最近添加的书本 [GET /api/books/v1/recent]
+### 最近添加的书本 [GET /api/libre/v1/books/recent]
 + Parameters
     + limit: 10 (number, optional) - 返回的书本数量
 + Response 200 (application/json)
     + Attributes (BaseResponse[List[Book]])
 
-### 最高评分的书本 [GET /api/books/v1/top-rated]
+### 最高评分的书本 [GET /api/libre/v1/books/top-rated]
 + Parameters
     + limit: 10 (number, optional) - 返回的书本数量
 + Response 200 (application/json)
     + Attributes (BaseResponse[List[Book]])
 
-### 获取所有分类 [GET /api/categories/v1]
+### 获取所有分类 [GET /api/libre/v1/categories]
 + Response 200 (application/json)
     + Attributes (BaseResponse[List[Category]])
 
-### 根据分类获取书本 [GET /api/categories/v1/{categoryId}/books]
+### 根据分类获取书本 [GET /api/libre/v1/categories/{categoryId}/books]
 + Parameters
     + categoryId: 1 (number, required) - 分类 ID
 + Response 200 (application/json)
@@ -88,23 +90,23 @@ HOST: https://api.ebookplatform.com
 
 ## 用户书单管理
 
-### 获取用户书单 [GET /api/user/reading-lists]
+### 获取用户书单 [GET /api/libre/v1/user/reading-lists]
 + Response 200 (application/json)
     + Attributes (BaseResponse[List[ReadingList]])
 
-### 获取书单详情 [GET /api/reading-lists/{readingListId}]
+### 获取书单详情 [GET /api/libre/v1/reading-lists/{readingListId}]
 + Parameters
     + readingListId: 1 (number, required) - 书单ID
 + Response 200 (application/json)
     + Attributes (BaseResponse[ReadingList]])
 
-### 创建书单 [POST /api/reading-lists]
+### 创建书单 [POST /api/libre/v1/reading-lists]
 + Request (application/json)
     + Attributes (ReadingList)
 + Response 201 (application/json)
     + Attributes (BaseResponse[ReadingList]])
 
-### 更新书单 [PUT /api/reading-lists/{readingListId}]
+### 更新书单 [PUT /api/libre/v1/reading-lists/{readingListId}]
 + Parameters
     + readingListId: 1 (number, required) - 书单ID
 + Request (application/json)
@@ -112,12 +114,12 @@ HOST: https://api.ebookplatform.com
 + Response 200 (application/json)
     + Attributes (BaseResponse[ReadingList]])
 
-### 删除书单 [DELETE /api/reading-lists/{readingListId}]
+### 删除书单 [DELETE /api/libre/v1/reading-lists/{readingListId}]
 + Parameters
     + readingListId: 1 (number, required) - 书单ID
-+ Response 204·
++ Response 204
 
-### 添加书本到书单 [POST /api/reading-lists/{readingListId}/books]
+### 添加书本到书单 [POST /api/libre/v1/reading-lists/{readingListId}/books]
 + Parameters
     + readingListId: 1 (number, required) - 书单ID
 + Request (application/json)
@@ -126,7 +128,7 @@ HOST: https://api.ebookplatform.com
 + Response 200 (application/json)
     + Attributes (BaseResponse[ReadingList]])
 
-### 从书单移除书本 [DELETE /api/reading-lists/{readingListId}/books/{bookId}]
+### 从书单移除书本 [DELETE /api/libre/v1/reading-lists/{readingListId}/books/{bookId}]
 + Parameters
     + readingListId: 1 (number, required) - 书单ID
     + bookId: 123 (number, required) - 书本 ID
@@ -134,36 +136,40 @@ HOST: https://api.ebookplatform.com
 
 ## 书单订阅管理
 
-### 订阅书单 [POST /api/subscriptions]
+### 订阅书单 [POST /api/libre/v1/subscriptions]
 + Request (application/json)
     + Attributes
         + readingListId: 1 (number, required) - 书单ID
 + Response 200 (application/json)
-    + Attributes (BaseResponse[Subscription]])
+    + Attributes (BaseResponse[Subscription])
 
-### 取消订阅书单 [DELETE /api/subscriptions/{readingListId}]
+### 取消订阅书单 [DELETE /api/libre/v1/subscriptions/{readingListId}]
 + Parameters
     + readingListId: 1 (number, required) - 书单ID
 + Response 204
 
+# 文件服务（File Service）
+
 ## 文件管理
 
-### 获取 OSS 上传临时凭证 [GET /api/files/v1/oss-temp-credential]
+### 获取 OSS 上传临时凭证 [GET /api/file/v1/oss-temp-credential]
 + Response 200 (application/json)
-    + Attributes (BaseResponse[OssTempCredentialVO]])
+    + Attributes (BaseResponse[OssTempCredentialVO])
 
-### 上传书本，支持格式：epub [POST /api/files/v1/upload]
+### 上传书本，支持格式：epub [POST /api/file/v1/upload]
 + Request (multipart/form-data)
     + Attributes
         + file: (file, required) - 文件
 + Response 200 (application/json)
-    + Attributes (BaseResponse[string]])
+    + Attributes (BaseResponse[string])
 
-### 下载书本 [GET /api/files/v1/download]
+### 下载书本 [GET /api/file/v1/download]
 + Parameters
     + bookId: 123 (number, required) - 书本 ID
 + Response 200 (application/json)
-    + Attributes (BaseResponse[string]])
+    + Attributes (BaseResponse[string])
+
+# SSE 服务（SSE Service）
 
 ## SSE 管理
 
@@ -171,19 +177,19 @@ HOST: https://api.ebookplatform.com
 + Parameters
     + clientId: abc123 (string, required) - 客户端 ID
 + Response 200 (application/json)
-    + Attributes (BaseResponse[boolean]])
+    + Attributes (BaseResponse[boolean])
 
 ### 建立 SSE 长连接 [GET /api/sse/v1/create-sse-connect]
 + Parameters
     + clientId: abc123 (string, required) - 客户端 ID
 + Response 200 (application/json)
-    + Attributes (SseEmitter]])
+    + Attributes (SseEmitter)
 
-## 测试
+# 测试
 
-### ping [GET /api/test/ping]
+### ping [GET /api/libre/v1/test/ping]
 + Response 200 (application/json)
-    + Attributes (string]])
+    + Attributes (string)
 
 ## 监控与可观测性服务
 *Prometheus + Grafana*

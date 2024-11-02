@@ -44,10 +44,12 @@ loop {
             }
         });
 ```
-分析读取管道单独开一个线程之后，test_ebpf 调用多的系统调用：
-- 281: epoll_pwait 
-- 61: wait4 多线程等待子进程结束
-- 228: clock_gettime 计时器任务计算时间调用
+test_ebpf 发现调用特别多的系统调用：
+- 281: epoll_pwait，等待事件发生
+- 61: wait4 多线程等待子进程结束（Manager::check_running_status()）
+- 228: clock_gettime，获取时间ben
+
+除了读命令管道那个会调用文件IO相关的0,5,8系统调用，还有检查各服务运行状态会调用很多 wait4 之外，281: epoll_pwait 和 clock_gettime 好像都不是 dragonreach 的原因？在主进程的loop中把这几个服务全注释了也有这两个系统调用的大量调用。
 
 
 实验
@@ -117,3 +119,7 @@ thread::spawn(move || {
 
 6. 去掉子线程中的loop，在函数中使用条件变量
 ![alt text](image-3.png)
+
+
+大量的61主要来自Manager::check_running_status();
+281，228
