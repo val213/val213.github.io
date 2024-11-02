@@ -7,7 +7,7 @@ mathjax: true
 ---
 ## 参数
 ### 训练步数相关参数
-- image 原图
+- ../image/image 原图
 
 - repeat 重复
 

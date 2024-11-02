@@ -69,8 +69,8 @@ Netlink 消息由消息头和消息体组成。消息头包含消息的元数据
 用户空间向内核发送 netlink 消息时，调用 netlink_lookup 函数，根据协议簇和 portid 在nl_table 快速查找对应的内核套接字对象；
 当内核空间向用户空间发送 netlink 消息时，调用调用 netlink_lookup 函数，根据协议簇和 portid 在 nl_table 快速查找对应的用户套接字对象.
 
-![alt text](image-361.png)
-![alt text](image-362.png)
+![alt text](../image/image-361.png)
+![alt text](../image/image-362.png)
 
 # 目前设计实现的具体方案
 ## trait 和 struct

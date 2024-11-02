@@ -7,7 +7,7 @@ categories: 技术分享
 ---
 # 磁盘相关
 1. 执行某个操作例如某脚本`./local_test.sh init` 的时候，遇到报错
-    ![alt text](image-329.png)
+    ![alt text](../image/image-329.png)
     - 解决方法：
         - 查阅资料[stackoverflow: At least one invalid signature was encountered
 ](https://stackoverflow.com/questions/62473932/at-least-one-invalid-signature-was-encountered)后进行尝试和排查，发现应该是磁盘空间不足了，进行虚拟机磁盘扩容
@@ -35,7 +35,7 @@ categories: 技术分享
 # GUI相关
 1. GUI突然消失，只能进入tty1，并且 `startx` 报错；运行 gdm3 相关的命令报错 `gdm3 is broken or not fully installed`
     - https://askubuntu.com/questions/1050672/gdm3-does-not-start-in-ubuntu-18-04
-    - 解决方法：![alt text](image-371.png)
+    - 解决方法：![alt text](../image/image-371.png)
 
 # Docker相关
 最新可用镜像源（2024.8.19）：

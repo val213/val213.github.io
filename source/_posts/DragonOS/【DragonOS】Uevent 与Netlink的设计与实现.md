@@ -23,7 +23,7 @@ tags:
 ## 后续会实现的功能
 - 实现 Netlink 的非阻塞操作
 - netlink 单播（netlink_unicast），由于 KOBJECT_UEVENT 协议不使用单播，所以此 PR 目前只提交支持多播的部分
-- netlink 协议族的 ROUTE 协议
+- netlink 协议族的 ROUTE 协议，用于大多数网络功能，如路由和邻居协议
 # Netlink
 Netlink 是 Linux 内核中的一种进程间通信（IPC）机制，用于内核与用户空间之间的通信。Netlink 通过 Netlink Socket 来实现，Netlink Socket 是一种特殊的 Socket，用于与内核进行通信。Netlink 的消息格式是一种特殊的消息格式，用于在内核与用户空间之间传递消息。
 

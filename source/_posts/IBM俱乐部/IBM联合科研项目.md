@@ -543,7 +543,7 @@ pytest --cov=tut12 --cov-report term-missing test_tut12.py
 - Linuxone基础知识入门
 ## 第二周
 前端组 后端组 ：
-任务1 学习docker的基本用法，熟悉container，image操作相关命令，使用一个简单的dockerfile build一个image并启动。
+任务1 学习docker的基本用法，熟悉container，../image/image操作相关命令，使用一个简单的dockerfile build一个../image/image并启动。
 任务2 搭建node_exporter+prometheus+grafana监控一个node并在grafana中展示，展示面板用这个就可以https://grafana.com/grafana/dashboards/1860-node-exporter-full/ （每组合作完成一套环境搭建，最好在linux环境下完成）
 任务3 进一步熟悉代码框架（后面对应指导老师会有专题讲座）
 任务4 linuxone基础知识入门 （后面叶老师会有专题讲座，并有学习资料给到大家）
@@ -639,7 +639,7 @@ MariaDB 安装完成后，运行 `mysql_secure_installation` 脚本来设置 roo
    ```
 
 完成以上步骤后，MariaDB 就安装并配置好了。你现在可以开始创建数据库和表，进行数据管理操作了。
-![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-35.png?raw=true)
+![alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/../image/image-35.png?raw=true)
 
 
 ### 配置dockers环境过程中遇到启动了容器但是访问不到端口的问题
@@ -966,33 +966,33 @@ password=YourPassword
 ## Linuxone基础知识讲座
 ### 基础介绍
 #### 什么是Linuxone
-![alt text](image-325.png)
+![alt text](../image/image-325.png)
 #### 发展历史
-![alt text](image-326.png)
+![alt text](../image/image-326.png)
 #### Rockhopper Ⅱ and Emperor Ⅱ
-![alt text](image-327.png)
+![alt text](../image/image-327.png)
 #### IBM z14 frame layout
-![alt text](image-312.png)
+![alt text](../image/image-312.png)
 - ibmZ**不提供磁盘** 
 ### DPM (Dynamic Partition Manager)
-![alt text](image-313.png)
+![alt text](../image/image-313.png)
 - 资源管理工具，降低了解门槛
-![alt text](image-314.png)
+![alt text](../image/image-314.png)
 #### process and memory
 - 划分逻辑资源LPAR
-![alt text](image-315.png)
+![alt text](../image/image-315.png)
 - 双柜可以分80个分区
-![alt text](image-316.png)
+![alt text](../image/image-316.png)
 ### CPU
-![alt text](image-317.png)
+![alt text](../image/image-317.png)
 - shared：一个CPU被多个分区共享
 - dedicated：一个CPU被一个分区独占
 - 频分比：一个CPU被多个分区共享时，每个分区的CPU时间比例
 ### Memory
-![alt text](image-318.png)
+![alt text](../image/image-318.png)
 - 计划任务
 ### Storage
-![alt text](image-319.png)
+![alt text](../image/image-319.png)
 - Linux one不提供磁盘，存储来自于外部存储
 - 通过光纤交换机看到存储
 - path：注意到路径的变化情况，说明了一些可能原因
@@ -1012,25 +1012,25 @@ password=YourPassword
     - 把网卡虚拟出多个网卡
     - 用来连接存储
 ### Network
-![alt text](image-320.png)
+![alt text](../image/image-320.png)
 - 10GB的卡叫OSD：Open System Adapter
 - 25GB的卡叫RoCE：
 同样可以划分逻辑资源，例如：
 - 05的卡被以下的partition共享：
-![alt text](image-321.png)
+![alt text](../image/image-321.png)
 - 17的卡被以下的partition独占：
-![alt text](image-322.png)
+![alt text](../image/image-322.png)
 ### Monitor
-![alt text](image-323.png)
-![alt text](image-324.png)
+![alt text](../image/image-323.png)
+![alt text](../image/image-324.png)
 
 
 ## 第三周考试周
 搭建本地API测试server
-![alt text](image-328.png)
+![alt text](../image/image-328.png)
 途中遇到了几个问题：
 1. `./local_test.sh init` 的时候，遇到报错
-    ![alt text](image-329.png)
+    ![alt text](../image/image-329.png)
     - 解决方法：
     查阅资料[stackoverflow: At least one invalid signature was encountered
 ](https://stackoverflow.com/questions/62473932/at-least-one-invalid-signature-was-encountered)后进行尝试和排查，发现应该是磁盘空间不足了，进行虚拟机磁盘扩容
@@ -1043,7 +1043,7 @@ password=YourPassword
 
 > [vscode连接不上问题和解决方法合集](https://blog.csdn.net/White_lies/article/details/124093530)
 后来又遇到过一次 `Got error from ssh: spawn C:\Windows\System32\WindowsPowerShell\v1.0\ssh.exe ENOENT`
-![alt text](image-360.png)
+![alt text](../image/image-360.png)
 ## 第四周
 任务分配： https://github.com/JasonCrash/LOP-API/issues/4
 
@@ -1059,7 +1059,7 @@ HMC：硬件管理控制台
 
 The following table shows the mapping between  `exporter metric groups` and `exported Prometheus metrics` in `the standard metric definition`. 请注意，集合和 zBX 相关的度量不在标准度量定义范围内（z15 版本已移除了对它们的支持）。有关 HMC 度量的更多信息，请参见 HMC API 手册中的“度量组”部分。有关 CPC 和分区（DPM 模式）以及逻辑分区（经典模式）的资源属性的更多信息，请参见 HMC API 手册中的相应数据模型。
 
-![alt text](image-357.png)
+![alt text](../image/image-357.png)
 
 Legend:
 - Type: The type of the metric group: M=metric service, R=resource property
@@ -1098,10 +1098,10 @@ For details, see Metric definition file.
 **在这个文件中，exporter_name 是用来标识每个度量指标（metric）的唯一名称，它代表了特定的监控数据点。这些名称通常用于 Prometheus 配置中，以便于 Prometheus 识别和收集相应的指标数据。**
 ### Demo setup with Grafana
 部署图
-![alt text](image-356.png)
+![alt text](../image/image-356.png)
 ### prometheus metrics类型
 
-![alt text](image-358.png)
+![alt text](../image/image-358.png)
 
 |Metric 类型|	说明	|常用指标|
 |---|---|---|
@@ -1130,7 +1130,7 @@ zhmc-prometheus-exporter的核心指标是什么？
 
 ### investigate how to get network usage through zhmc exporter
 
-![alt text](image-359.png)
+![alt text](../image/image-359.png)
 
 CPC（Central Processing Complex）可以看作是一台机器，其中划分了多个分区（partitions）。每个分区可能会连接一个或多个网络接口控制器（NIC），这些NIC可以理解为虚拟网卡。每个NIC又对应一个网络适配器（Adapter），其名称可能类似于OSD 010CA01B-05，而这个OSD 010CA01B-05实际上就是一块实际的物理网卡。
 
@@ -1351,14 +1351,14 @@ for port_uri, usage in adapter_usage.items():
 > 文档：The exporter code is agnostic to the actual set of metrics supported by the HMC. A new metric exposed by the HMC metric service or a new property added to one of the auto-updated resources can immediately be supported by just adding it to the Metric definition file.
 
 本来想看看测试机上exporter的文件怎么配置的, 用find命令找到了三个metrics.yaml:
-![alt text](image-363.png)
+![alt text](../image/image-363.png)
 不小心 attach 到 `zhmc_promethues_exporter` 容器,然后误操作用 `ctrl z` 和 `ctrl c` 命令把容器的进程给中断了, 没想到容器直接被删除了(docker ps -a也没有)..
 控制台操作日志如下:
-![alt text](image-364.png)
-![alt text](image-365.png)
-![alt text](image-366.png)
+![alt text](../image/image-364.png)
+![alt text](../image/image-365.png)
+![alt text](../image/image-366.png)
 马上参照官方文档: 用docker(实际上是podman)运行zhmc_prometheus_exporter,再找到本机上的hmccreds.yaml文件,把hmccreds.yaml文件挂载到容器中,并且把容器的端口映射到本机的端口,启动容器.
-![alt text](image-367.png)
+![alt text](../image/image-367.png)
 重新启动成功后, 端口映射成功, 可以通过浏览器访问到zhmc_prometheus_exporter的web页面, 并且可以看到metrics数据. 同时Prometheus和Grafana也可以通过配置文件访问到zhmc_prometheus_exporter的metrics数据. 大概上是复原了.
 
 后来和fulong老师交流了一下，给我多开了一个跑exporter容器来用于有需要修改metrics.yaml的时候进行测试。
@@ -1421,8 +1421,8 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
 - 类似于list的API有没有作为指标提供？似乎没有。
 - 如何提供作为指标？似乎不是量化的，跟原有的指标不一样，因为不是简单的数字
 - 是属于资源指标吗？跟量化指标不一样吗？
-![alt text](image-368.png)
-![alt text](image-369.png)
+![alt text](../image/image-368.png)
+![alt text](../image/image-369.png)
 和李老师交流了一下，重新确认了需求和思路：
 - 一方面，获取拓扑结构相关的东西这个公司以前都是有的，但是直接拿出来不合规；
 - 另一方面，拓扑结构和数据可能存在不一致的可能：
@@ -1446,11 +1446,11 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
 - 目标panel的query语句中使用变量：
     - `sum(zhmc_nic_packets_sent_count_total{adapter="$adapter_name"}) by (partition)`
 ## 第六周
-![alt text](image-381.png)
-![alt text](image-380.png)
-![alt text](image-377.png)
-![alt text](image-378.png)
-![alt text](image-379.png)
+![alt text](../image/image-381.png)
+![alt text](../image/image-380.png)
+![alt text](../image/image-377.png)
+![alt text](../image/image-378.png)
+![alt text](../image/image-379.png)
 ### 相似产品调研
 - Zabbix 
 - Nagios 预览版需要下载部署
@@ -1458,26 +1458,26 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
     - [interactive-demos 主页](https://www.solarwinds.com/interactive-demos)
     - [Hybrid Cloud Observability](https://hco.demo.solarwinds.com/Orion/SummaryView.aspx?viewkey=Summary+Home+Narrow)
     - [SolarWinds Observability](https://demo.na-01.cloud.solarwinds.com/?program=999&campaign=7012J000001J8VVQA0&parentCampaign=7012J000001J8VVQA0&duration=3600)
-        ![alt text](image-375.png)
-        ![alt text](image-376.png)
+        ![alt text](../image/image-375.png)
+        ![alt text](../image/image-376.png)
 - PRTG? 
 - Netdata
     - [Netdata console](https://app.netdata.cloud/spaces/netdata-demo/rooms/all-nodes/overview?_gl=1*hdpqyi*_gcl_au*NzM1NDE2NjQ0LjE3MjEwMjc4NjE.*_ga*Mzc5NjA0NTQ1LjE3MjEwMjc4NjE.*_ga_J69Z2JCTFB*MTcyMTAyNzg2MS4xLjEuMTcyMTAyNzg2MS42MC4wLjA.#metrics_correlation=false&after=-900&before=0&utc=Asia%2FShanghai&offset=%2B8&timezoneName=Beijing%2C%20Chongqing%2C%20Hong%20Kong%2C%20Urumqi&modal=&modalTab=&modalParams=&selectedIntegrationCategory=deploy.operating-systems&force_play=false&d8a4e0c5-7c79-4145-900e-83a9f06fcb6a--chartName-val=menu_system)
-    ![alt text](image-374.png)
-    ![alt text](image-372.png)
-    ![alt text](image-373.png)
+    ![alt text](../image/image-374.png)
+    ![alt text](../image/image-372.png)
+    ![alt text](../image/image-373.png)
 
 ### 展示
 比如你是一个用户，你现在打开页面看到什么，查看每一个网卡具体内容的时候具体有哪些内容，页面大体长什么样子，你可以简单用ppt画两个框，说明一下问题。
 ### 重新迭代
 - 重新设计 CPC/Adapter view，Adapter/Partition view
 - 调整 stat panel 进行排序
-![alt text](image-382.png)
-![alt text](image-383.png)
+![alt text](../image/image-382.png)
+![alt text](../image/image-383.png)
 - 优化饼状图
     - 记得选中 Legend
 - 三个 panel
-![alt text](image-385.png)
+![alt text](../image/image-385.png)
     - 时间序列
     - 指标数据 top5 的 Adapter 时间序列展示
         - 合理利用 grafana 的内置变量和 promQL 的函数，如 `topk`、`__range`、`__interval` 等
@@ -1485,32 +1485,32 @@ NIC 必须由适配器端口（在 OSA、ROCE 或 Hipersockets 适配器上）�
         topk(5, sum(rate(zhmc_adapter_usage_ratio{cpc="$cpc_name"}[$__range])) by (adapter))
         ```
         - [内置变量官方文档](https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables)
-        ![alt text](image-388.png)
+        ![alt text](../image/image-388.png)
     - 大表格细节展示
         - **Data Transform 可以针对每一个查询的结果进行处理！**
             - reduce：用来简化时间序列
-            ![alt text](image-387.png)
+            ![alt text](../image/image-387.png)
             - join by fileds：可以将两个查询的结果按照某个字段进行合并
             -  Filter data by values：可以根据某个字段的值进行过滤
             - organize fields：可以对table中的列进行排序、重命名
         - override fields：可以对table中具体某一列进行特殊处理，例如设置别名、单位、空值处理等
 #### 迭代历程：
-![alt text](image-386.png)
+![alt text](../image/image-386.png)
 ## 第七周
 ### nvestigate how to call own API through grafana alert #35
 grafana 一旦触发了 alert 之后，如何调用让 grafana 调用我们自己的接口？
 
 设置告警条件来触发alter：
-![alt text](image-389.png)
+![alt text](../image/image-389.png)
 Contact points：
-![alt text](image-391.png)
+![alt text](../image/image-391.png)
 测试：
-![alt text](image-392.png)
+![alt text](../image/image-392.png)
 
 ### Design API for alert #36
 设计一个我们自己的接口，这个接口的作用是收到grafana 的信息之后，把这个信息转换成我们自己的message，保存数据库
 
-![alt text](image-394.png)
+![alt text](../image/image-394.png)
 
 这里面涉及到的是后端我们自己的 message 的数据格式。
 
@@ -1528,7 +1528,7 @@ Contact points：
 
 - add alter_controller
 - modify message_service
-![alt text](image-417.png)
+![alt text](../image/image-417.png)
 ### 备份grafana
 ## 第十周
 grafana 的 webhook 还是 altermanager 的 webhook？
@@ -1623,7 +1623,7 @@ https://grafana.com/docs/grafana/latest/alerting/alerting-rules/templating-label
 ## 第十一、十二周（休假）
 ### 一键备份 grafana 配置
 [grafana-backup-tool](https://github.com/ysde/grafana-backup-tool)
-![alt text](image-418.png)
+![alt text](../image/image-418.png)
 ```
 docker run --user $(id -u):$(id -g) --rm --name grafana-backup-tool \
            -e GRAFANA_TOKEN= YOUR_TOKEN \

@@ -1,10 +1,9 @@
 ---
 title: casdoor 使用实践
 tags: 
-    - 微服务开发
+    - 微服务
     - casdoor
-categories: 
-    - 技术分享
+categories: 技术分享
 ---
 ## 核心概念
 - OAuth2.0

@@ -5,50 +5,50 @@ tags:
 categories: 技术分享
 cover: https://img1.imgtp.com/2023/08/08/n8BEWwBv.jpg
 ---
-## Digital Image Processing (Basics)
-### What is Digital Image Processing?
-The sequence of image processing to computer vision can be broken up into low-level, mid-level and high-level processes.
+## Digital ../image/image Processing (Basics)
+### What is Digital ../image/image Processing?
+The sequence of ../image/image processing to computer vision can be broken up into low-level, mid-level and high-level processes.
 
 | Level| Input  | Output  |Example|
 | :--------   | :-----:  |:-----:  |:-----:  |
-| low-level   | Image |Image |Noise removal,Image sharpening|
-| mid-level  |   Image   | Attributes|Object recognition,Segmentation|
+| low-level   | ../image/image |../image/image |Noise removal,../image/image sharpening|
+| mid-level  |   ../image/image   | Attributes|Object recognition,Segmentation|
 | high-level |    Attributes   |Understanding|Scene understanding, Autonomous navigation|
 
 ### Examples of DIP
-- Image Enhancement & Noise removal
+- ../image/image Enhancement & Noise removal
 - cameras/automated toll systems 
 - Law Enforcement
 - Printed Circuit Board (PCB) inspection 
 - Industrial Inspection
 - Geographic Information Systems 
-- edge detecion image(Take slice from MRI scan )
-- Hubble’s images useless Image processing techniques were used to fix this
+- edge detecion ../image/image(Take slice from MRI scan )
+- Hubble’s ../image/images useless ../image/image processing techniques were used to fix this
 - HCL:Try to make human computer interfaces more natural – Face recognition – Gesture recognition Does anyone remember the user interface from “Minority Report”? These tasks can be extremely difficult
 
-### Goal of Image Processing
-Image Processing quality assessment is largely subjective process
-Typical mechanism: come up with a mathematical model/algorithm/process that makes the image appear desirable to the human observer
+### Goal of ../image/image Processing
+../image/image Processing quality assessment is largely subjective process
+Typical mechanism: come up with a mathematical model/algorithm/process that makes the ../image/image appear desirable to the human observer
 
 
 
 
 ### Optical Illusions
 
-### Key Stages of Digital Image Processing
-1. Image Acquisition
-2. Image Enhancement
-3. Image Restoration
-4. Image Compression
+### Key Stages of Digital ../image/image Processing
+1. ../image/image Acquisition
+2. ../image/image Enhancement
+3. ../image/image Restoration
+4. ../image/image Compression
 5. Morphological Processing
-6. Image Segmentation
+6. ../image/image Segmentation
 7. Object Recognition
 8. Representation & Description
 
-#### Image Restoration
+#### ../image/image Restoration
 1 pixel needs 8bits for restoration
 
-#### Image Resolution
+#### ../image/image Resolution
 ##### Intensity Level Resolution
 ##### Resolution: How Much Is Enough?
 
@@ -59,11 +59,11 @@ y axis: values of the bins
 
 #### Histogram equalization
 
-#### Image Filtering
+#### ../image/image Filtering
 
-##### Fundamentals of Image Filtering
+##### Fundamentals of ../image/image Filtering
 
-#### Image Domain Transforms
+#### ../image/image Domain Transforms
 
 
 
@@ -82,10 +82,10 @@ Max/Min filter : replace the input value with the maximum/minimum in its neighbo
 #### Sharpening Filters
 ##### Unsharp Masking & Highboost Filtering 
 
-##### Image Sharpening using Laplacian
+##### ../image/image Sharpening using Laplacian
 
 #### Edge Detection
-##### Gradient of Image
+##### Gradient of ../image/image
 
 The simplest approximation of a first-order derivative that satisfy all the conditions are 
  gx=f(x+1,y)-f(x,y) 
@@ -94,12 +94,12 @@ The simplest approximation of a first-order derivative that satisfy all the cond
 
 
 ### Summary
-- Applications of Digital Image Processing
-- Key stages in Digital Image Processing
-- Digital Image Formation & Representation
-- Image transformations & operations
+- Applications of Digital ../image/image Processing
+- Key stages in Digital ../image/image Processing
+- Digital ../image/image Formation & Representation
+- ../image/image transformations & operations
 - Histogram processing
-- Image Filtering Basics
+- ../image/image Filtering Basics
 - Edge detections
 
 ## ML
@@ -192,12 +192,12 @@ Cons:
 
 ##### Local Binary Pattern (LBP)
 
-![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image.png)
+![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/../image/image.png)
 
 
 ##### Histogram of Oriented Gradient (HoG)
 - HoG features focus on structure or the shape of an - object
-- HoG is based on Gradient and direction of edges in image
+- HoG is based on Gradient and direction of edges in ../image/image
 - Gradient and directions are calculated for localized blocks
 - HOG would generate a Histogram for each of the localized blocks
 - The histograms are created using the gradients and orientations of the pixel values – ‘Histogram of Oriented Gradients’
@@ -213,9 +213,9 @@ Cons:
 
 
 ##### k-fold Cross Validation
-![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-1.png)
+![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/../image/image-1.png)
 ##### Leave-one-out Cross Validation
-![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/image-2.png)
+![Alt text](https://github.com/val213/val213.github.io/blob/hexo_source/source/_posts/../image/image-2.png)
 
 #### summary
 Classification means assigning class label to input pattern.

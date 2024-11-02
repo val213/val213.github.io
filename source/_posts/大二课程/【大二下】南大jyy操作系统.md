@@ -1,9 +1,7 @@
 ---
 title: 【大二下】南大jyy操作系统
 tag: 操作系统
-categories: 
-- 知识分享
-- 技术分享
+categories: 知识分享
 ---
 课程地址：
 - 2023：https://jyywiki.cn/OS/2023/index.html

@@ -565,8 +565,8 @@ fn set_parent(&self, parent: Option<Weak<dyn KObject>>);
     - generic netlink使用classic netlink的API。generic netlink是netlink的一种扩展，它支持1023个子协议号，弥补了netlink协议类型较少的缺陷。generic netlink基于netlink，但是在内核中，generic netlink的接口与netlink并不相同。generic netlink的API是通过netlink的API来实现的，因此generic netlink使用classic netlink的API。
     - 经典Netlink和通用Netlink之间的主要区别是子系统标识符的动态分配和自省的可用性。 在理论上，协议没有显著的区别，然而，在实践中，经典Netlink实验了通用Netlink中被放弃的概念(实际上，它们通常只在一个单一子系统的一小角落中使用)。本节旨在解释一些这样的概念， 其明确的目标是让通用Netlink用户在阅读uAPI头时有信心忽略它们。
 - 图解NETLINK_ROUTE和NETLINK_GENERIC调用过程
-![alt text](image-361.png)
-![alt text](image-362.png)
+![alt text](../image/image-361.png)
+![alt text](../image/image-362.png)
 - kset_uevent_ops结构体
  ```
  struct kset_uevent_ops {
@@ -629,7 +629,7 @@ static void sock_def_readable(struct sock *sk, int len)
 }
 ```
 - 回调函数是否需要通知链？
-- ![alt text](image-397.png)
+- ![alt text](../image/image-397.png)
 - 事件等待队列
 - netlink_rcv 回调
 - static const struct proto_ops netlink_ops 规定接口的操作的具体执行函数，-》实现socket trait
@@ -683,7 +683,7 @@ Endpoint这个东西到底怎么说
 
 
 
-![alt text](image-445.png)
+![alt text](../image/image-445.png)
 
 
 msghdr这个结构在socket变成中就会用到，并不算Netlink专有的，这里不在过多说明。只说明一下如何更好理解这个结构的功能。我们知道socket消息的发送和接收函数一般有这几对：recv／send、readv／writev、recvfrom／sendto。当然还有recvmsg／sendmsg，前面三对函数各有各的特点功能，而recvmsg／sendmsg就是要囊括前面三对的所有功能，当然还有自己特殊的用途。msghdr的前两个成员就是为了满足recvfrom／sendto的功能，中间两个成员msg_iov和msg_iovlen则是为了满足readv／writev的功能，而最后的msg_flags则是为了满足recv／send中flag的功能，剩下的msg_control和msg_controllen则是满足recvmsg／sendmsg特有的功能。
@@ -868,7 +868,7 @@ Netlink相对于其他的通信机制具有以下优点：
 - 重构NetlinkSock
 
 1029
-- ![alt text](image-4.png)
+- ![alt text](../image/image-4.png)
 - 输出的内容有点问题
     - system
     - <0000000< 是什么东西

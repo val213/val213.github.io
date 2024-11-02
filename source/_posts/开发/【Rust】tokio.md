@@ -14,7 +14,7 @@ async/await 是 Rust 语言提供的异步编程特性。通过 async/await 关�
 
 
 暂不关心底层，从高层看，`#[tokio::main]` 宏的作用是，启动一个 tokio 运行时，然后复制函数体给这个运行时执行。
-![alt text](image-468.png)
+![alt text](../image/image-468.png)
 
 tokio 提供了 `tokio::task` 模块，用于创建异步任务。异步任务是一个可以在 tokio 运行时中执行的异步函数。异步任务可以通过 `tokio::spawn` 函数创建。
 

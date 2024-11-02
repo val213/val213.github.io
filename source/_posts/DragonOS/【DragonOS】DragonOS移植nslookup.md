@@ -5,8 +5,6 @@ tags:
       - 移植
       - nslookup
       - dog
-      - rust
-      - udp
 ---
 # 啥是nslookup？
 ## Linux中的nslookup
@@ -122,7 +120,8 @@ network:
 
 具体在我本地，在新建的DragonOS/bin/sysroot/etc中的resolv.conf文件中写入（开发环境里可以直接新建文件测试，但是在生产环境则需要在脚本里设置好新建这个文件）
 ```shell
-nameserver=8.8.8.8
+nameserver 8.8.8.8
+nameserver 8.8.8.4
 ```
 成功编译后运行，发现了两个bug。而输入`dog example.com --tcp`后是正常工作的。
 

@@ -12,13 +12,13 @@ categories:
 #### 开发目的：
 - 支持多类型磁盘设备共存
 - 为 I/O 调度提供统一的接口
-![alt text](image-401.png)
+![alt text](../image/image-401.png)
 #### 核心数据结构：
 - 对单个块 I/O 设备的抽象-bio
 - 请求优化后，即将发往设备的请求-request
 - 全局请求队列-request_queue
 
-![alt text](image-402.png)
+![alt text](../image/image-402.png)
 #### 主要流程
 1. 进程通过系统调用发起I/0操作并阻塞
 2. 文件系统将进程谐求转换为bio，将其发送到全局请求队列中
@@ -29,10 +29,10 @@ categories:
 kernel/src/driver/block
 kernel/src/disk/ahci
 
-![alt text](image-403.png)
+![alt text](../image/image-403.png)
 ### kprobe 设计与实现 讨论
 #### speaker：陈林峰
-![alt text](image-404.png)
+![alt text](../image/image-404.png)
 #### 内核追踪机制
 Linux存在众多 tracing tools，比如 ftrace、perf，他们可用于内核的调试提高内核的可观测性。这些工具的背后是内核提供的一系列探测点或者事件(event)，这些工具可以在这些探测点注入自定义函数，在函数中实现获取想要的上下文信息并保存下来。
 1. kprobe:对内核进行调试追踪
@@ -42,21 +42,21 @@ Linux存在众多 tracing tools，比如 ftrace、perf，他们可用于内核�
 5. eBPF:在上面这些机制上提供更灵活的功能
 可以基于kprobe实现eBPF。
 #### Kprobe 内核接口
-![alt text](image-405.png)
+![alt text](../image/image-405.png)
 #### Kprobe 内核模块代码示例
-![alt text](image-406.png)
+![alt text](../image/image-406.png)
 #### Kprobe 实现原理
-![alt text](image-407.png)
+![alt text](../image/image-407.png)
 #### Kprobe 不同架构的差异
-![alt text](image-408.png)
+![alt text](../image/image-408.png)
 #### Kprobe 实现 register
-![alt text](image-409.png)
+![alt text](../image/image-409.png)
 #### Kprobe 实现 unregister
-![alt text](image-410.png)
+![alt text](../image/image-410.png)
 #### Kprobe 实现 riscv64
-![alt text](image-411.png)
+![alt text](../image/image-411.png)
 #### Kprobe 内核实现
-![alt text](image-412.png)
+![alt text](../image/image-412.png)
 1. 增加 Kprobe 管理的数据结构
 2. 增加从符号名称查找其地址的实现
 3. break 和 debug 的实现
@@ -76,15 +76,15 @@ cargo.toml debug = true
 既然 Linux Kprobe 是和他的符号表强绑定的，不如用另一种方式，
 不一定是传一个symbol
 demangle：解析符号表
-![alt text](image-413.png)
+![alt text](../image/image-413.png)
 这个函数被多个模块所使用怎么办呢？
 
 核心点是建立一个到最终函数的名字的映射，传进内核要传进一个完整符合规范的名字。由此确定了一个方案：封装一个库，省略拼接的细节，便于让用户直接指定一个函数的地址。
 
 ### 需求讨论（包含sig-observation还有和虚拟化的）
-![alt text](image-414.png)
+![alt text](../image/image-414.png)
 明确目标
-![alt text](image-415.png)
+![alt text](../image/image-415.png)
 性能。好像不是调度问题
 ### kvm
 跑起来只
@@ -105,7 +105,7 @@ syscall table
 ### 内核的编译流程？
 确实很慢
 只编译内核 make kernel
-![alt text](image-416.png)
+![alt text](../image/image-416.png)
 
 musl
 tokio 运行时跑得了
@@ -120,7 +120,7 @@ tokio 运行时跑得了
 ### 关于引入自动化内核测试的方案设想
 - **内部测试：syzkaller模糊测试**
 Syzkaller 是一个无监督的、覆盖率引导的内核模糊测试工具，它能够自动化地生成随机的系统调用序列，并将其作为测试用例输入到内核中，以此来发现内核中可能存在的漏洞。syzkaller 是谷歌开源的，业界使用的解决方案。
-![alt text](image-437.png)
+![alt text](../image/image-437.png)
 - **外部测试：基于固定用例与UI的测试**
 模拟开发者的行为，例如可以通过 VNC 拿到 QEMU 里面的数据，在启动阶段定时每隔一小段时间来截一次图，判断现在这个状态是卡住了，还是说崩了，还是说正确正常的进入到了系统里面。
 而当然这里其实有可能可以做更多的工作，比如说基于用例的去做，进到系统之后，可以跑一些现有的拿来做单元测试的用户空间的测试程序。好处是这是一个固定用测试用例的，对比起模糊测试，会更加精准，能清楚的知道各个模块的测试覆盖情况；并且时间上开销也比较小。
@@ -156,7 +156,7 @@ Syzkaller 的工作流程通常包括以下几个步骤：
 ### 联合文件系统 overlayfs
 分享人：操丰毅
 主题：联合文件系统 overlayfs 的作用和实现方式
-![alt text](image-458.png)
+![alt text](../image/image-458.png)
 主要分享了联合文件系统（overlayfs）的作用和实现方式。overlayfs可以将一个或多个文件系统结合在一起。主要有两个层次：上层为读写层，下层为只读层。在容器启动时，下层的只读层会提供最小的OS内核，而上层读写层的容器镜像则可以共享下层的资源。可以简单理解为内核态和用户态的关系；
 
 overlayfs 是 Union File System的一种实现，它可以将多个文件系统合并为一个虚拟的文件系统。overlayfs 有三个层次：上层、下层和合并层。上层是可读写的，下层是只读的，合并层是上层和下层的结合的结果。
@@ -164,7 +164,7 @@ overlayfs 是 Union File System的一种实现，它可以将多个文件系统�
 通过 COW(写时复制) 机制，在上层创建文件和文件夹，然后将其拷贝到下层进行修改，最后合并成一个虚拟的 merge 层。
 
 此外，还介绍了 WhiteOut 和透明文件夹（opaque directory）两个比较特殊的机制。
-![alt text](image-464.png)
+![alt text](../image/image-464.png)
 #### WhiteOut
 上层文件会把下层文件覆盖掉，这种覆盖关系是通过 WhiteOut 文件来实现的。
 WhiteOut 是一个特殊的文件，用于标记上层文件系统中被删除的文件。当上层文件系统中的文件被删除时，overlayfs 会在下层文件系统中创建一个 WhiteOut 文件，表示该文件已被删除。WhiteOut 文件的存在会覆盖下层文件系统中的同名文件，使其在上层文件系统中不可见。
@@ -178,7 +178,7 @@ WhiteOut 是一个特殊的文件，用于标记上层文件系统中被删除�
 分享人：陈林峰
 主题：eBPF in DragonOS——ebpf的运行流程，用户态支持和内核支持
 #### eBPF 的运行过程
-![alt text](image-465.png)
+![alt text](../image/image-465.png)
 从用户态和内核态的角度简述一下 eBPF 的运行过程：
 1. generate：用户态程序通过 BPF 系列的系统调用生成 eBPF 字节码。
 2. load：将 eBPF 字节码加载到内核中，在内核中verifier会对 eBPF 字节码进行验证，然后通过kprobe, uprobes, tracepoint, perf_event等机制将 eBPF 字节码挂载到内核的各个 hook 点上。

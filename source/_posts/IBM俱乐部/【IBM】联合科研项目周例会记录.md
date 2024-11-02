@@ -81,7 +81,7 @@ deliver：
 
 #### 用户需求和痛点：
 朱华：
-![alt text](image.png)
+![alt text](../image/image.png)
 
 靶子：airpart虚机的监控已经比较成熟，我们需要的是物理机的监控。
 
@@ -138,7 +138,7 @@ AI组：从两个方面逐步清晰我们的目标
 - 前后端后面需要talk关于api
 - axios
 - ant-design组件库
-- dockerfile打包成image发布
+- dockerfile打包成../image/image发布
 - mock数据
 
 ## 第四周考试停工
@@ -152,8 +152,8 @@ AI组：从两个方面逐步清晰我们的目标
     - 反馈：改善数据的展示，数据的展示要更加直观，把这些指标找到合理的组织方式
 - hyk：utils
 - dyr：告警规则
-    ![alt text](image-355.png)
-    ![alt text](image-354.png)
+    ![alt text](../image/image-355.png)
+    ![alt text](../image/image-354.png)
 
 - api协同
 - 目前还没有详细的需求，前端同学的工作重点是方法论，形而上

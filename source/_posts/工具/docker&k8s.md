@@ -5,7 +5,7 @@ categories: 技术分享
 ---
 ## docker
 ### 基本概念
-#### image镜像
+#### ../image/image镜像
 类似于虚拟机中的snapshot快照，里面包含我们要部署的应用程序以及它先关联的所有库。
 
 #### container容器
@@ -39,7 +39,7 @@ CMD echo $MYPATH
 ### docker desktop
 
 ### docker 命令
-- docker images：查看本地镜像
+- docker ../image/images：查看本地镜像
 - docker ps：查看正在运行的容器
 - docker ps -a：查看所有容器
 - docker run -d -p 80:5000 nginx：运行镜像，其中-d表示后台运行，-p表示端口映射，80是宿主机端口，5000是容器端口，nginx是镜像名。
@@ -71,13 +71,13 @@ CMD echo $MYPATH
 ```yml
 services:
   web:
-    image: nginx
+    ../image/image: nginx
     ports:
       - "80:5000"
     depends_on:
       - mysql
   mysql:
-    image: mysql
+    ../image/image: mysql
     environment:
       MYSQL_DATABASE: test
       MYSQL_ROOT_PASSWORD: pswd
@@ -158,7 +158,7 @@ $ kubectl delete -f deployment.yaml # 删除应用
 
 ## 架构组件
 borg: 谷歌内部的集群管理系统，k8s的前身。
-![alt text](image-467.png)
+![alt text](../image/image-467.png)
 - 主从节点：主节点负责调度，从节点负责运行容器。
 
 客户端：可以是kubectl命令行工具，也可以是云服务商的控制台。
