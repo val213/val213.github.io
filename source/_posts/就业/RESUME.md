@@ -1,8 +1,6 @@
 ---
 title: RESUME
-tags: 
-	- 找个班上啦
-categories: 个人记录
+categories: 找个班上啦
 ---
 # 个人信息
  - **杨璐玮/男/2003**

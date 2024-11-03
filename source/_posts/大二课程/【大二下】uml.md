@@ -1,6 +1,6 @@
 ---
 title: 软件需求分析与建模（uml）
-categories: 复习
+categories: 复习笔记
 tags: uml
 ---
 感谢很多同学！

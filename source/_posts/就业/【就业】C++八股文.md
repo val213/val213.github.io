@@ -2,7 +2,7 @@
 title: C++八股文
 tags: 
     - C++
-categories: 技术文章
+categories: 找个班上吧
 ---
 
 # C++八股文

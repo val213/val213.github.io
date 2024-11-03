@@ -1,6 +1,5 @@
 ---
 title: "【Rust】tokio"
-categories: Rust
 tags: tokio
 ---
 首先，我们需要了解什么是 I/O 密集型任务和 CPU 密集型任务。

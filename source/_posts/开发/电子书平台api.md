@@ -1,7 +1,5 @@
 ---
 title: Modernlibre API document
-categories: 
-    - 微服务
 tags:
     - Modernlibre
     - API
