@@ -268,3 +268,38 @@ Pod 可以定义两种类型的探针：`livenessProbe` 和 `readinessProbe`。�
 - tcpSocket：向容器的 IP 地址和端口发送 TCP 消息。
 - gRPC：向容器的 IP 地址和端口发送 gRPC 消息。
 
+#### 副本
+
+#### 控制器
+##### 适用 satetful
+- StatefulSet：有状态服务，比如数据库。
+  - Headless Service：无头服务，用于 StatefulSet。
+  -volumeClaimTemplates：持久化存储。
+##### 适用无状态
+- RC（Replication Controller）：副本控制器，确保指定数量的 Pod 始终在运行。可以动态更新 Pod 的数量。
+- RS（ReplicaSet）：副本集，是 RC 的升级版，支持集合选择器。可以通过指定 selector 来选择对哪些 Pod 生效。
+  - Label 和 Selector：Label 是键值对，Selector 是用于选择对象的标签。
+- Deployment：部署控制器，用于管理 Pod 和 ReplicaSet。滚动更新、回滚、扩容、缩容等操作。
+#### 守护进程
+- DaemonSet：守护进程集，确保每个节点上都运行一个 Pod 的副本。
+#### 任务/定时任务
+- Job：独立的任务，执行完毕后退出。
+- CronJob：定时任务，周期性地执行 Job。
+### 服务发现
+#### Service(横向)
+集群内部的服务发现，通过 Service 可以让 Pod 之间相互通信。Service 会为 Pod 提供一个虚拟 IP 和 DNS 名称，这样就可以通过 Service 的虚拟 IP 和 DNS 名称来访问 Pod。相当于是集群级别的端口映射。
+- ContainerPort：容器端口。
+#### Ingress（纵向）
+将k8s集群内部的服务暴露到外部的服务。
+- ingress-nginx：Ingress 控制器，负责将外部流量路由到集群内的服务。七层负载均衡。
+
+### 存储
+#### Volume
+#### CSI (Container Storage Interface)
+### 特殊类型存储
+#### ConfigMap
+#### secret
+#### Downward API
+### 其他
+#### Role
+#### RoleBinding
