@@ -17,9 +17,12 @@ categories: 找个班上啦
 - ***Rust 语言操作系统内核开发*** 
 **DragonOS 开源社区**的贡献者，参与内核子系统的开发和维护，作为 reviewer 同时担任 SIG-Main 的主要负责人参与社区运营。
 	- 目前主要负责内核中**用户态和内核态全双工通信机制**——**Netlink** 协议栈的开发和**设备驱动模型中设备事件通知**——**Uevent** 机制的实现。
+	- 优化 **DragonReach** 的主进程，使用多线程分离IO Bound task 和 CPU bound task，结合信号机制实现了**异步任务调度**，提高了主进程的并发性能，减少了大量对系统调用的请求。
+		- **DragonReach** 是 DragonOS 的系统和服务管理器，与 Linux Systemd 兼容。
 	- 移植 dog —— 一个开源 DNS 查询 CLI 工具到 DragonOS上，实现了在 DragonOS 上的 DNS 查询功能。
+	- 目前正在专注于**跨核负载均衡**的研究，尝试在调度子系统中，基于 CFS（完全公平调度器）和 PELT（负载追踪）实现跨核负载均衡。
 - ***IBM LinuxONE 可观测告警平台*** 
-**IBM × 华南理工大学的校企合作科研项目**，作为后台开发主要负责人，参与开发了一套 LinuxOne 平台的可观测告警系统 MVP。后端语言为Python，技术栈为 Prometheus + grafana + CherryPy + MariaDB。该项目采用多容器分离部署。主要负责项目可行方案的调研、环境的配置部署、可观测套件与后端交互的告警信息接口开发。
+**IBM × 华南理工大学的校企合作科研项目**，作为后台开发主要负责人，参与开发了一套 LinuxOne 平台的**可观测告警系统 MVP**。后端语言为Python，技术栈为 Prometheus + grafana + CherryPy + MariaDB。该项目采用多容器分离部署。主要负责项目可行方案的调研、环境的配置部署、可观测套件与后端交互的告警信息接口开发。
 	- 调研 zhmcclient、IBM zOS/s390x 架构和 zhmc_prometheus_exporter 的文档，确定对特定类型物理网卡 Nerwork adapter、虚拟网卡 NIC 在不同 cpc 和partition 上的监控方案
 	- 使用 PromQL utils 查询符合需求的特定指标数据以及对指标数据进行一系列 data transform 操作，使之符合 Alter rules 的需求
 	- 设置 grafana webhook 配置 Alter rules，实现了后端服务对 grafana 指标告警信息的捕获，并实时推送、存入数据库。
@@ -44,7 +47,7 @@ categories: 找个班上啦
  - 2023.7 访学交流 **新加坡国立大学** 人工智能与机器学习项目
  ## 在校期间获得荣誉和成绩
  - CET-4/CET-6：**588/528**
- - 2023~2024年度 企业捐赠奖学金 **温氏筠诚奖学金**
+ - 2023~2024年度 企业捐赠奖学金 **腾讯奖学金一等奖**
  - 2022~2023年度 校级奖学金 **二等奖**
  - 2022~2023年度 华南理工大学软件学院 **三好学生**
  - 2023~2024年度 华南理工大学软件学院 **三好学生**
@@ -63,7 +66,7 @@ categories: 找个班上啦
 
 # 技能清单
 - **rust 系统编程**：了解和熟悉使用 rust 语言进行系统编程，对于 rust 的内存安全、并发性能等特性有一定了解，关注 rust 的生态和工具链，熟悉 rust 的动态分发、宏、trait、泛型等特性。
-- **Javaweb 全栈开发**：云服务器部署上线 Javaweb 网站应用，对于 vue、Nuxt、springboot、mybatis、mysql 等常用 Javaweb 技术栈较为熟悉；有 typescript 及其 RPC 框架开发经验。
+- **JavaWeb 全栈开发**：云服务器部署上线 JavaWeb 网站应用，对于 vue、Nuxt、springboot、mybatis、mysql 等常用 Javaweb 技术栈较为熟悉；有 typescript 及其 RPC 框架 tsrpc 开发经验。
 - **C++ PC客户端开发**：基于QT框架的桌面应用程序开发，socket 网络编程、多线程、QT 的信号和槽机制等。
 - **操作系统实践**：在Linux系统各个发行版（centos、ubuntu等）上都有过一段时间的使用和操作经历，较为熟悉Linux系统上使用 gdb、tmux、strace 等工具调试和开发程序。善于"折腾"。
 - **CI/CD**：熟悉 CI/CD workflow 的配置和使用，熟悉 github 的 PR 流程，熟悉 github actions 的配置和使用。
