@@ -1017,8 +1017,8 @@ public:
 11. 二叉树展开为链表
     - 递归，先展开左右子树，然后将左子树插入到右子树的位置，然后将左子树置空，原来的右子树接到新的右子树的最右边。
 12. 从前序与中序遍历序列构造二叉树
-    - 从前序遍历的第一个节点找到根节点
-    - 在中序遍历中找到根节点的位置，得到左右子树的节点数量
+    - 从前序遍历的第一个节点找到**根节点**。
+    - 在中序遍历中**找到根节点的位置**，得到左右子树的节点数量
     - 递归构建左右子树
 13. 路径总和Ⅲ
     - 暴力 On2
@@ -4163,6 +4163,329 @@ int size;
  * obj->put(key,value);
  */
 ```
+## 树
+- 从前序与中序遍历序列构造二叉树
+```c++
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        if (preorder.empty() || inorder.empty()) return nullptr;
+        return build(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1);
+    }
+
+    TreeNode* build(vector<int>& preorder, int preStart, int preEnd, vector<int>& inorder, int inStart, int inEnd) {
+        if (preStart > preEnd || inStart > inEnd) return nullptr;
+
+        // 根节点的值
+        int rootVal = preorder[preStart];
+        // 根节点
+        TreeNode* root = new TreeNode(rootVal);
+
+        // 找到根节点在中序遍历中的位置，这里也可以用哈希表存储中序遍历的值和下标的映射关系，这样就不用每次都遍历查找了
+        int index = 0;
+        for (int i = inStart; i <= inEnd; i++) {
+            if (inorder[i] == rootVal) {
+                index = i;
+                break;
+            }
+        }
+
+        // 左子树的节点个数
+        int leftSize = index - inStart;
+
+        // 递归构建左右子树
+        root->left = build(preorder, preStart + 1, preStart + leftSize, inorder, inStart, index - 1);
+        root->right = build(preorder, preStart + leftSize + 1, preEnd, inorder, index + 1, inEnd);
+
+        return root;
+    }
+};
+```
+- 从中序与后序遍历序列构造二叉树
+跟上道题同样的思路，只不过后序遍历的根节点在最后一个位置。
+```c++
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        if (inorder.empty() || postorder.empty()) return nullptr;
+        return build(inorder, 0, inorder.size() - 1, postorder, 0, postorder.size() - 1);
+    }
+
+    TreeNode* build(vector<int>& inorder, int inStart, int inEnd, vector<int>& postorder, int postStart, int postEnd) {
+        if (inStart > inEnd || postStart > postEnd) return nullptr;
+
+        // 根节点的值
+        int rootVal = postorder[postEnd];
+        // 根节点
+        TreeNode* root = new TreeNode(rootVal);
+
+        // 找到根节点在中序遍历中的位置
+        int index = 0;
+        for (int i = inStart; i <= inEnd; i++) {
+            if (inorder[i] == rootVal) {
+                index = i;
+                break;
+            }
+        }
+
+        // 左子树的节点个数
+        int leftSize = index - inStart;
+
+        // 递归构建左右子树
+        root->left = build(inorder, inStart, index - 1, postorder, postStart, postStart + leftSize - 1);
+        root->right = build(inorder, index + 1, inEnd, postorder, postStart + leftSize, postEnd - 1);
+
+        return root;
+    }
+};
+```
+- 填充每个节点的下一个右侧节点指针 II
+```c++
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if (!root) return nullptr;
+        queue<Node*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int size = q.size();
+            // pre 初始化为 nullptr，因为每一层的第一个节点没有左边的节点
+            Node* pre = nullptr;
+            for (int i = 0; i < size; i++) {
+                // 取出队首节点
+                Node* node = q.front();
+                q.pop();
+                // 如果 pre 不为空，说明不是每一层的第一个节点，此时建将上一个节点 pre 的 next 指向当前节点
+                if (pre) {
+                    pre->next = node;
+                }
+                // 更新 pre 为当前节点
+                pre = node;
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+        }
+        return root;
+    }
+};
+```
+- 二叉树展开为链表
+- 路径总和
+- 求根节点到叶节点数字之和
+- 二叉树中的最大路径和
+- 二叉搜索树迭代器
+- 完全二叉树的节点个数
+- 二叉树的最近公共祖先
+- 二叉树的右视图
+```c++
+// 层序遍历的基础上，只取每一层的最后一个节点（通过循环来确认）
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> res;
+        if (!root) return res;
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode* node = q.front();
+                q.pop();
+                if (i == size - 1) {
+                    res.push_back(node->val);
+                }
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+        }
+        return res;
+    }
+};
+```
+```c++
+// 深度优先搜索，先访问右子树，再访问左子树，将每一深度第一次访问的节点放入结果列表中
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> res;
+        dfs(root, 0, res);
+        return res;
+    }
+
+    void dfs(TreeNode* root, int depth, vector<int>& res) {
+        if (!root) return;
+        if (depth == res.size()) {
+            res.push_back(root->val);
+        }
+        dfs(root->right, depth + 1, res);
+        dfs(root->left, depth + 1, res);
+    }
+};
+```
+- 二叉树的层平均值
+```c++
+class Solution {
+public:
+    vector<double> averageOfLevels(TreeNode* root) {
+        vector<double> res;
+        if (!root) return res;
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int size = q.size();
+            double sum = 0;
+            for (int i = 0; i < size; i++) {
+                TreeNode* node = q.front();
+                q.pop();
+                sum += node->val;
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+            res.push_back(sum / size);
+        }
+        return res;
+    }
+};
+```
+- 二叉树的层序遍历
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;
+        if (!root) {
+            return res;
+        }
+        queue<TreeNode*> Q;
+        Q.push(root);
+        while (!Q.empty()){
+            int sz = Q.size();
+            res.push_back(vector<int>());
+            while(sz>0){
+                TreeNode* node = Q.front();
+                res.back().push_back(node->val);
+                Q.pop();
+                if (node->left !=nullptr)  Q.push(node->left);
+                if (node->right!=nullptr) Q.push(node->right);
+                sz -=1;
+            }
+        }
+        return res;
+    }
+};
+```
+- 二叉树的锯齿形层序遍历
+```c++
+class Solution {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        vector<vector<int>> res;
+        if (!root) return res;
+        queue<TreeNode*> q;
+        q.push(root);
+        bool isOrderLeft = true;
+        while (!q.empty()) {
+            int size = q.size();
+            deque<int> levelList;
+            for (int i = 0; i < size; i++) {
+                TreeNode* node = q.front();
+                q.pop();
+                if (isOrderLeft) {
+                    levelList.push_back(node->val);
+                } else {
+                    levelList.push_front(node->val);
+                }
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+            res.push_back(vector<int>{levelList.begin(), levelList.end()});
+            isOrderLeft = !isOrderLeft;
+        }
+        return res;
+    }
+};
+```
+二叉搜索树
+- 二叉搜索树的最小绝对差
+```c++
+// 二叉搜索树有个性质为二叉搜索树中序遍历得到的值序列是递增有序的
+class Solution {
+public:
+    int getMinimumDifference(TreeNode* root) {
+        int res = INT_MAX;
+        int pre = -1;
+        inorder(root, pre, res);
+        return res;
+    }
+
+    void inorder(TreeNode* root, int& pre, int& res) {
+        if (!root) return;
+        inorder(root->left, pre, res);
+        if (pre != -1) {
+            res = min(res, root->val - pre);
+        }
+        pre = root->val;
+        inorder(root->right, pre, res);
+    }
+};
+```
+- 二叉搜索树中第 K 小的元素
+```c++
+// 使用迭代方法，这样可以在找到答案后停止，不需要遍历整棵树。迭代则是使用栈来模拟递归过程。
+class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        stack<TreeNode*> stk;
+        while (root || !stk.empty()) {
+            // 先遍历左子树
+            while (root) {
+                stk.push(root);
+                root = root->left;
+            }
+            // 出栈
+            root = stk.top();
+            stk.pop();
+            // 计数
+            if (--k == 0) {
+                return root->val;
+            }
+            // 遍历右子树
+            root = root->right;
+        }
+        return -1;
+    }
+};
+```
+```c++
+// 如果二叉搜索树经常被修改（插入/删除操作）并且你需要频繁地查找第 k 小的值，你将如何优化算法？
+```
+- 验证二叉搜索树
+```c++
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        return isValidBST(root, LONG_MIN, LONG_MAX);
+    }
+
+    bool isValidBST(TreeNode* root, long long lower, long long upper) {
+        if (!root) return true;
+        // 如果当前节点的值不在区间范围内，返回 false
+        if (root->val <= lower || root->val >= upper) return false;
+        return isValidBST(root->left, lower, root->val) && isValidBST(root->right, root->val, upper);
+    }
+};
+```
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
@@ -4412,7 +4735,7 @@ int superEggDrop(int k, int n) {
 ```
 - 1025 执行操作可获得的最大总奖励 I
 ```c++
-
+```
 # 企业题库
 - 字符串转换整数 (atoi)
     自动状态机。推导出自动状态机的状态转移表，然后用unordered_map存储状态转移表，然后遍历字符串，根据当前状态和字符，更新状态和结果。(分别对应输入为' '	+/-	number	other)
