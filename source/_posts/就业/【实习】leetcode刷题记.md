@@ -4270,12 +4270,195 @@ public:
 };
 ```
 - 二叉树展开为链表
+(in place) 递归
+```c++
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        if (!root) return;
+        flatten(root->left);
+        flatten(root->right);
+        // 后序遍历位置：为什么一定要后序遍历？为了避免丢失右子树。如果是前序遍历，会先把右子树覆盖掉
+        // 1. 左右子树已经被拉平成一条链表
+        TreeNode* left = root->left;
+        TreeNode* right = root->right;
+        // 2. 将左子树作为右子树
+        root->left = nullptr;
+        root->right = left;
+        // 3. 将原先的右子树接到当前右子树的末端
+        TreeNode* p = root;
+        while (p->right != nullptr) {
+            p = p->right;
+        }
+        p->right = right;
+    }
+};
+```
 - 路径总和
+```c++
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        if (!root) return false;
+        if (!root->left && !root->right) {
+            return targetSum == root->val;
+        }
+        return hasPathSum(root->left, targetSum - root->val) || hasPathSum(root->right, targetSum - root->val);
+    }
+};
+```
 - 求根节点到叶节点数字之和
+每条从根节点到叶节点的路径都代表一个数字。深度优先搜索，每到一个节点，就把当前数字乘以 10 加上当前节点的值，直到叶子节点，把这个数字加到结果中。
+```c++
+class Solution {
+public:
+    int sumNumbers(TreeNode* root) {
+        return dfs(root, 0);
+    }
+
+    int dfs(TreeNode* root, int prevSum) {
+        if (!root) return 0;
+        int sum = prevSum * 10 + root->val;
+        if (!root->left && !root->right) {
+            return sum;
+        } else {
+            return dfs(root->left, sum) + dfs(root->right, sum);
+        }
+    }
+};
+```
 - 二叉树中的最大路径和
+思路：递归计算每个节点的贡献值，即以该节点为根节点的子树中，能够贡献给其父节点的最大路径和。最大路径和为左子树的贡献值 + 右子树的贡献值 + 当前节点的值。
+```c++
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        maxSum = INT_MIN;
+        dfs(root);
+        return maxSum;
+    }
+
+    int dfs(TreeNode* root) {
+        if (!root) return 0;
+        // 计算左右子节点的贡献值，负数不贡献
+        int left = max(0, dfs(root->left));
+        int right = max(0, dfs(root->right));
+        // 更新最大路径和：如果以当前节点为中枢的话，是否能够得到更大的路径和？如果可以就更新
+        maxSum = max(maxSum, root->val + left + right);
+        // 返回当前节点的贡献值
+        return root->val + max(left, right);
+    }
+
+private:
+    int maxSum;
+};
+```
 - 二叉搜索树迭代器
+```C++
+// 递归中序遍历
+class BSTIterator {
+private:
+    void inorder(TreeNode* root, vector<int>& res) {
+        if (!root) {
+            return;
+        }
+        inorder(root->left, res);
+        res.push_back(root->val);
+        inorder(root->right, res);
+    }
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        inorder(root, res);
+        return res;
+    }
+    
+    vector<int> arr;
+    int idx;
+public:
+    BSTIterator(TreeNode* root): idx(0), arr(inorderTraversal(root)) {}
+    
+    int next() {
+        return arr[idx++];
+    }
+    
+    bool hasNext() {
+        return (idx < arr.size());
+    }
+};
+```
+```c++
+// 迭代中序遍历，无需预先遍历整棵树，只需要在 next 方法中进行中序遍历即可
+class BSTIterator
+{
+public:
+    BSTIterator(TreeNode *root)
+    {
+        // 初始化时将所有左子树节点加入栈
+        while (root != nullptr)
+        {
+            stk.push(root);
+            root = root->left;
+        }
+    }
+
+    int next()
+    {
+        // 取出栈顶元素
+        TreeNode *node = stk.top();
+        stk.pop();
+        int res = node->val;
+        // 如果当前节点有右子树，将右子树的所有左子树节点加入栈
+        node = node->right;
+        while (node != nullptr)
+        {
+            stk.push(node);
+            node = node->left;
+        }
+        return res;
+    }
+
+    bool hasNext()
+    {
+        return !stk.empty();
+    }
+
+private:
+    stack<TreeNode *> stk;
+};
+
+/**
+ * Your BSTIterator object will be instantiated and called as such:
+ * BSTIterator* obj = new BSTIterator(root);
+ * int param_1 = obj->next();
+ * bool param_2 = obj->hasNext();
+ */
+```
 - 完全二叉树的节点个数
+```c++
+class Solution {
+public:
+    int countNodes(TreeNode* root) {
+        if (!root) return 0;
+        int left = countNodes(root->left);
+        int right = countNodes(root->right);
+        return left + right + 1;
+    }
+};
+```
 - 二叉树的最近公共祖先
+```c++
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (!root || root == p || root == q) return root;
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+        if (!left) return right;
+        if (!right) return left;
+        return root;
+    }
+};
+```
 - 二叉树的右视图
 ```c++
 // 层序遍历的基础上，只取每一层的最后一个节点（通过循环来确认）
@@ -4486,6 +4669,395 @@ public:
     }
 };
 ```
+## 图
+- 岛屿数量
+```c++
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        int count = 0;
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
+                if (grid[i][j] == '1') {
+                    dfs(grid, i, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    // 深度优先搜索，将当前位置的陆地以及与其相连的陆地都标记为已访问
+    void dfs(vector<vector<char>>& grid, int r, int c) {
+        if (r < 0 || c < 0 || r >= grid.size() || c >= grid[0].size() || grid[r][c] == '0') {
+            return;
+        }
+        grid[r][c] = '0';
+        dfs(grid, r - 1, c);
+        dfs(grid, r + 1, c);
+        dfs(grid, r, c - 1);
+        dfs(grid, r, c + 1);
+    }
+};
+```
+- 被围绕的区域
+此题的关键是从边界开始搜索，将与边界相连的 O 都标记为 A，然后遍历整个矩阵，将 O 变为 X，将 A 变回 O。
+```c++
+// 递归dfs
+class Solution {
+public:
+    void solve(vector<vector<char>>& board) {
+        if (board.empty()) return;
+        int m = board.size();
+        int n = board[0].size();
+        // 从边界开始搜索，将与边界相连的 O 都标记为 A
+        for (int i = 0; i < m; i++) {
+            dfs(board, i, 0);
+            dfs(board, i, n - 1);
+        }
+        for (int j = 0; j < n; j++) {
+            dfs(board, 0, j);
+            dfs(board, m - 1, j);
+        }
+        // 遍历矩阵，将 O 变为 X，将 A 变回 O
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == 'O') {
+                    board[i][j] = 'X';
+                } else if (board[i][j] == 'A') {
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+
+    void dfs(vector<vector<char>>& board, int r, int c) {
+        if (r < 0 || c < 0 || r >= board.size() || c >= board[0].size() || board[r][c] != 'O') {
+            return;
+        }
+        board[r][c] = 'A';
+        dfs(board, r - 1, c);
+        dfs(board, r + 1, c);
+        dfs(board, r, c - 1);
+        dfs(board, r, c + 1);
+    }
+};
+```
+- 克隆图
+```c++
+class Solution {
+public:
+    Node* cloneGraph(Node* node) {
+        if (!node) return nullptr;
+        // 如果访问过了，直接返回
+        if (visited.find(node) != visited.end()) {
+            return visited[node];
+        }
+        // 克隆节点，为了深拷贝，不要直接克隆原节点的邻居
+        Node* cloneNode = new Node(node->val);
+        // 标记为已访问
+        visited[node] = cloneNode;
+        // 遍历邻居节点，进行深度优先搜索
+        for (auto& neighbor : node->neighbors) {
+            cloneNode->neighbors.emplace_back(cloneGraph(neighbor));
+        }
+        return cloneNode;
+    }
+
+private:
+    unordered_map<Node*, Node*> visited;
+};
+```
+- 除法求值
+    - 【带权并查集】
+    - 并查集支持查询，合并两个操作，只回答两个节点是不是在一个联通分量中，但并不回答路径问题。
+    - 如果一个问题具有传递性质，可以考虑使用并查集。
+    - 最常见的一种设计思想是，把同一个连通分量中的节点组织成一个树形结构（代表元法），树根的值就是该连通分量的值。
+    - 并查集使用路径压缩和按秩合并来解决树的高度增加带来的查询性能消耗问题。
+```c++
+class Solution {
+public:
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries) {
+        // 并查集初始化
+        for (int i = 0; i < equations.size(); i++) {
+            string A = equations[i][0];
+            string B = equations[i][1];
+            // k 代表 A/B 的值
+            double k = values[i];
+            // 将 A/B 和 B/A 加入并查集
+            unionSet(A, B, k);
+        }
+        // 查询结果
+        vector<double> res;
+        for (auto& query : queries) {
+            string X = query[0];
+            string Y = query[1];
+            // 如果没有出现过的字符串，无法得到结果
+            if (!parent.count(X) || !parent.count(Y)) {
+                res.push_back(-1.0);
+                continue;
+            }
+            // 查找根节点
+            string rootX = findParent(X);
+            string rootY = findParent(Y);
+            if (rootX != rootY) {
+                // 如果不在一个集合，返回 -1.0
+                res.push_back(-1.0);
+            } else {
+                // 如果在一个集合，返回权值比值
+                res.push_back(weight[X] / weight[Y]);
+            }
+        }
+        return res;
+    }
+    // 合并两个集合
+    void unionSet(string A, string B, double k) {
+        add(A);
+        add(B);
+        string rootA = findParent(A);
+        string rootB = findParent(B);
+        // 如果不在一个集合，合并
+        if (rootA != rootB) {
+            // 将 rootA 的父节点指向 rootB，同时更新权值，
+            parent[rootA] = rootB;
+            weight[rootA] = k * (weight[B] / weight[A]);
+        }
+    }
+    // 查找根节点
+    string findParent(string X) {
+        // 如果不是根节点，递归找父节点
+        if (X != parent[X]) {
+            string origin = parent[X];
+            // 路径压缩，更新父节点
+            parent[X] = findParent(parent[X]);
+            // 更新权值
+            weight[X] *= weight[origin];
+        }
+        // 返回根节点
+        return parent[X];
+    }
+    // 添加新节点
+    void add(string X) {
+        // 如果没有该节点，添加节点
+        if (!parent.count(X)) {
+            parent[X] = X;
+            weight[X] = 1.0;
+        }
+    }
+
+private:
+    // parent 存储节点的父节点 
+    unordered_map<string, string> parent;
+    // weight 存储节点到父节点的权值
+    unordered_map<string, double> weight;
+};
+```
+- 课程表
+```c++
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        // 邻接表
+        vector<vector<int>> edges(numCourses);
+        // 拓扑排序需要维护一个入度数组
+        vector<int> indeg(numCourses);
+        // 构建邻接表和入度数组
+        for (const auto& info : prerequisites) {
+            // info[1] -> info[0]
+            edges[info[1]].push_back(info[0]);
+            // info[0] 入度+1
+            ++indeg[info[0]];
+        }
+        // 将所有入度为 0 的节点加入队列
+        queue<int> q;
+        for (int i = 0; i < numCourses; ++i) {
+            if (indeg[i] == 0) {
+                q.push(i);
+            }
+        }
+        // 记录访问过的节点数
+        int visited = 0;
+        while (!q.empty()) {
+            ++visited;
+            // 取出队首节点
+            int u = q.front();
+            q.pop();
+            // 遍历以该节点为起点的边
+            for (int v: edges[u]) {
+                --indeg[v];
+                // 如果入度为 0，加入队列
+                if (indeg[v] == 0) {
+                    q.push(v);
+                }
+            }
+        }
+        // 如果访问过的节点数等于课程数，说明可以完成课程学习
+        return visited == numCourses;
+    }
+};
+```
+- 课程表 II
+```c++
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> edges(numCourses);
+        vector<int> indeg(numCourses);
+        for (const auto& info : prerequisites) {
+            edges[info[1]].push_back(info[0]);
+            ++indeg[info[0]];
+        }
+        queue<int> q;
+        for (int i = 0; i < numCourses; ++i) {
+            if (indeg[i] == 0) {
+                q.push(i);
+            }
+        }
+        vector<int> res;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            res.push_back(u);
+            for (int v: edges[u]) {
+                --indeg[v];
+                if (indeg[v] == 0) {
+                    q.push(v);
+                }
+            }
+        }
+        if (res.size() != numCourses) {
+            return {};
+        }
+        return res;
+    }
+};
+```
+- 蛇梯棋
+```c++
+class Solution {
+public:
+    int snakesAndLadders(vector<vector<int>>& board) {
+        int n = board.size();
+        vector<int> nums(n * n + 1);
+        // 将二维数组转为一维数组
+        for (int i = n - 1, idx = 1; i >= 0; i--) {
+            if ((n - i) % 2 == 1) {
+                for (int j = 0; j < n; j++) {
+                    nums[idx++] = board[i][j];
+                }
+            } else {
+                for (int j = n - 1; j >= 0; j--) {
+                    nums[idx++] = board[i][j];
+                }
+            }
+        }
+        // bfs
+        queue<int> q;
+        q.push(1);
+        vector<int> dist(n * n + 1, INT_MAX);
+        dist[1] = 0;
+        while (!q.empty()) {
+            int p = q.front();
+            q.pop();
+            for (int i = 1; i <= 6; i++) {
+                int np = p + i;
+                if (np > n * n) {
+                    break;
+                }
+                if (nums[np] != -1) {
+                    np = nums[np];
+                }
+                if (dist[np] == INT_MAX) {
+                    dist[np] = dist[p] + 1;
+                    q.push(np);
+                }
+            }
+        }
+        return dist[n * n] == INT_MAX ? -1 : dist[n * n];
+    }
+};
+```
+- 最小基因变化
+```c++
+class Solution {
+public:
+    int minMutation(string start, string end, vector<string>& bank) {
+        unordered_set<string> dict(bank.begin(), bank.end());
+        if (!dict.count(end)) {
+            return -1;
+        }
+        unordered_set<string> visited;
+        visited.insert(start);
+        queue<string> q;
+        q.push(start);
+        int step = 0;
+        while (!q.empty()) {
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+                string cur = q.front();
+                q.pop();
+                if (cur == end) {
+                    return step;
+                }
+                for (int j = 0; j < cur.size(); j++) {
+                    string tmp = cur;
+                    for (char ch : string("ACGT")) {
+                        tmp[j] = ch;
+                        if (!visited.count(tmp) && dict.count(tmp)) {
+                            visited.insert(tmp);
+                            q.push(tmp);
+                        }
+                    }
+                }
+            }
+            ++step;
+        }
+        return -1;
+    }
+};
+```
+- 单词接龙
+```c++
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        unordered_set<string> wordSet(wordList.begin(), wordList.end());
+        if (!wordSet.count(endWord)) {
+            return 0;
+        }
+        unordered_set<string> visited;
+        queue<string> q;
+        q.push(beginWord);
+        visited.insert(beginWord);
+        int step = 1;
+        while (!q.empty()) {
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+                string cur = q.front();
+                q.pop();
+                for (int j = 0; j < cur.size(); j++) {
+                    string tmp = cur;
+                    for (char ch = 'a'; ch <= 'z'; ch++) {
+                        tmp[j] = ch;
+                        if (tmp == cur) {
+                            continue;
+                        }
+                        if (tmp == endWord) {
+                            return step + 1;
+                        }
+                        if (wordSet.count(tmp) && !visited.count(tmp)) {
+                            visited.insert(tmp);
+                            q.push(tmp);
+                        }
+                    }
+                }
+            }
+            ++step;
+        }
+        return 0;
+    }
+};
+```
+
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
