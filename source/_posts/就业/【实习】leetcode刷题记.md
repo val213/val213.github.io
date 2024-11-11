@@ -5148,6 +5148,436 @@ public:
     }
 };
 ```
+## trie树
+- 实现 Trie (前缀树)
+```c++
+class Trie {
+public:
+    Trie() {
+        isEnd = false;
+        memset(children, 0, sizeof(children));
+    }
+
+    void insert(string word) {
+        Trie* node = this;
+        for (char ch : word) {
+            if (node->children[ch - 'a'] == nullptr) {
+                node->children[ch - 'a'] = new Trie();
+            }
+            node = node->children[ch - 'a'];
+        }
+        node->isEnd = true;
+    }
+    
+    bool search(string word) {
+        Trie* node = this;
+        for (char ch : word) {
+            node = node->children[ch - 'a'];
+            if (node == nullptr) {
+                return false;
+            }
+        }
+        return node->isEnd;
+    }
+    
+    bool startsWith(string prefix) {
+        Trie* node = this;
+        for (char ch : prefix) {
+            node = node->children[ch - 'a'];
+            if (node == nullptr) {
+                return false;
+            }
+        }
+        return true;
+    }
+private:
+    bool isEnd;
+    Trie* children[26];
+};
+```
+- 添加与搜索单词 - 数据结构设计
+```c++
+class WordDictionary {
+    struct TrieNode {
+        bool isEnd;
+        TrieNode* children[26];
+        TrieNode() {
+            isEnd = false;
+            memset(children, 0, sizeof(children));
+        }
+    };
+
+public:
+    WordDictionary() {
+        root = new TrieNode();
+    }、
+    void addWord(string word) {
+        TrieNode* node = root;
+        for (char ch : word) {
+            if (node->children[ch - 'a'] == nullptr) {
+                node->children[ch - 'a'] = new TrieNode();
+            }
+            node = node->children[ch - 'a'];
+        }
+        node->isEnd = true;
+    }
+    bool search(string word) {
+        return dfs(word, 0, root);
+    }
+private:
+    TrieNode* root;
+    bool dfs(const string& word, int index, TrieNode* node) {
+        if (index == word.size()) {
+            return node->isEnd;
+        }
+        char ch = word[index];
+        if (ch == '.') {
+            for (int i = 0; i < 26; ++i) {
+                if (node->children[i] && dfs(word, index + 1, node->children[i])) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return node->children[ch - 'a'] && dfs(word, index + 1, node->children[ch - 'a']);
+        }
+    }
+};
+```
+## 回溯
+- 电话号码的字母组合
+```c++
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty()) {
+            return {};
+        }
+        vector<string> res;
+        string path;
+        dfs(digits, 0, path, res);
+        return res;
+    }
+
+    void dfs(const string& digits, int u, string& path, vector<string>& res) {
+        // 递归终止条件：已经遍历完所有数字
+        if (u == digits.size()) {
+            // 保存结果
+            res.push_back(path);
+            return;
+        }
+        string letters = phone[digits[u] - '0'];
+        for (char ch : letters) {
+            // 做选择
+            path.push_back(ch);
+            // 进入下一层决策树
+            dfs(digits, u + 1, path, res);
+            // 回溯
+            path.pop_back();
+        }
+    }
+
+private:
+    vector<string> phone = {
+        "", "!@#", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"
+    };
+};
+```
+- 组合
+```c++
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> res;
+        vector<int> path;
+        dfs(n, k, 1, path, res);
+        return res;
+    }
+
+    void dfs(int n, int k, int u, vector<int>& path, vector<vector<int>>& res) {
+        // 递归终止条件：path 的长度等于 k
+        if (path.size() == k) {
+            res.push_back(path);
+            return;
+        }
+        // 遍历可能的搜索起点
+        for (int i = u; i <= n; i++) {
+            // 做选择
+            path.push_back(i);
+            // 递归
+            dfs(n, k, i + 1, path, res);
+            // 撤销选择
+            path.pop_back();
+        }
+    }
+};
+```
+- 全排列
+```c++
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> res;
+        vector<int> path;
+        // 标记数组，标记每个数字是否被使用过
+        vector<bool> st(nums.size(), false);
+        dfs(nums, 0, st, path, res);
+        return res;
+    }
+
+    void dfs(vector<int>& nums, int u, vector<bool>& st, vector<int>& path, vector<vector<int>>& res) {
+        if (u == nums.size()) {
+            res.push_back(path);
+            return;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            // 如果没有被使用过
+            if (!st[i]) {
+                // 做选择，标记为已使用
+                st[i] = true;
+                // 将 nums[i] 放入 path
+                path.push_back(nums[i]);
+                dfs(nums, u + 1, st, path, res);
+                // 撤销选择
+                path.pop_back();
+                // 标记为未使用
+                st[i] = false;
+            }
+        }
+    }
+};
+```
+- 组合总和
+```c++
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> res;
+        vector<int> path;
+        dfs(candidates, target, 0, path, res);
+        return res;
+    }
+
+    void dfs(vector<int>& candidates, int target, int u, vector<int>& path, vector<vector<int>>& res) {
+        if (target == 0) {
+            res.push_back(path);
+            return;
+        }
+        for (int i = u; i < candidates.size(); i++) {
+            // 如果当前元素大于 target，跳过
+            if (target >= candidates[i]) {
+                // 做选择
+                path.push_back(candidates[i]);
+                // 这里传入 i，不再是 u + 1，表示可以重复使用当前的元素
+                dfs(candidates, target - candidates[i], i, path, res);
+                path.pop_back();
+            }
+        }
+    }
+};
+```
+- N 皇后 II
+```c++
+class Solution {
+public:
+    int totalNQueens(int n) {
+        vector<string> board(n, string(n, '.'));
+        dfs(board, 0);
+        return res;
+    }
+
+    void dfs(vector<string>& board, int row) {
+        if (row == board.size()) {
+            ++res;
+            return;
+        }
+        int n = board[row].size();
+        for (int col = 0; col < n; col++) {
+            if (!isValid(board, row, col)) {
+                continue;
+            }
+            // 放置
+            board[row][col] = 'Q';
+            dfs(board, row + 1);
+            // 回撤
+            board[row][col] = '.';
+        }
+    }
+
+    bool isValid(vector<string>& board, int row, int col) {
+        int n = board.size();
+        // 检查列是否有皇后互相冲突
+        for (int i = 0; i < n; i++) {
+            if (board[i][col] == 'Q') {
+                return false;
+            }
+        }
+        // 检查右上方是否有皇后互相冲突
+        for (int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+            if (board[i][j] == 'Q') {
+                return false;
+            }
+        }
+        // 检查左上方是否有皇后互相冲突
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 'Q') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    int res = 0;
+};
+```
+- 括号生成
+们可以只在序列仍然保持有效时才添加 ‘(’ 或 ‘)’而不是像每次添加。
+我们可以通过跟踪到目前为止放置的左括号和右括号的数目来做到这一点。
+```c++
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        string path;
+        dfs(n, n, path, res);
+        return res;
+    }
+
+    void dfs(int left, int right, string& path, vector<string>& res) {
+        if (left == 0 && right == 0) {
+            res.push_back(path);
+            return;
+        }
+        // 剪枝：右括号数量大于左括号数量
+        if (left > right) {
+            return;
+        }
+        if (left > 0) {
+            path.push_back('(');
+            dfs(left - 1, right, path, res);
+            path.pop_back();
+        }
+        if (right > 0) {
+            path.push_back(')');
+            dfs(left, right - 1, path, res);
+            path.pop_back();
+        }
+    }
+};
+```
+- 单词搜索
+```c++
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        if (board.empty() || board[0].empty()) {
+            return false;
+        }
+        m = board.size();
+        n = board[0].size();
+        vector<vector<bool>> visited(m, vector<bool>(n, false));
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dfs(board, word, 0, i, j, visited)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool dfs(vector<vector<char>>& board, string& word, int u, int x, int y, vector<vector<bool>>& visited) {
+        if (board[x][y] != word[u]) {
+            return false;
+        }
+        if (u == word.size() - 1) {
+            return true;
+        }
+        visited[x][y] = true;
+        int dx[4] = {-1, 0, 1, 0};
+        int dy[4] = {0, 1, 0, -1};
+        for (int i = 0; i < 4; i++) {
+            int a = x + dx[i], b = y + dy[i];
+            if (a >= 0 && a < m && b >= 0 && b < n && !visited[a][b]) {
+                if (dfs(board, word, u + 1, a, b, visited)) {
+                    return true;
+                }
+            }
+        }
+        visited[x][y] = false;
+        return false;
+    }
+
+private:
+    int m, n;
+};
+```
+## 位运算
+- 只出现一次的数字
+异或运算有以下三个性质。
+
+- 任何数和 0 做异或运算，结果仍然是原来的数，即 a⊕0=a。
+- 任何数和其自身做异或运算，结果是 0，即 a⊕a=0。
+- 异或运算满足交换律和结合律，即 a⊕b⊕a=b⊕a⊕a=b⊕(a⊕a)=b⊕0=b。
+```c++
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int res = 0;
+        for (int num : nums) {
+            res ^= num;
+        }
+        return res;
+    }
+};
+```
+- 只出现一次的数字 II
+```c++
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ans = 0;
+        for (int i = 0; i < 32; i++) {
+            int total = 0;
+            for (int num : nums) {
+                total += ((num >> i) & 1);
+            }
+            if (total % 3 != 0) {
+                // 将第 i 位为 1 的数字加入结果
+                ans |= (1 << i);
+            }
+        }
+        return ans;
+    }
+};
+```
+- 只出现一次的数字 III
+```c++
+class Solution {
+public:
+    vector<int> singleNumber(vector<int>& nums) {
+        int ret = 0;
+        for (int num : nums) {
+            ret ^= num;
+        }
+        int div = 1;
+        while ((div & ret) == 0) {
+            div <<= 1;
+        }
+        int a = 0, b = 0;
+        for (int num : nums) {
+            if (div & num) {
+                a ^= num;
+            } else {
+                b ^= num;
+            }
+        }
+        return vector<int>{a, b};
+    }
+};
+```
+
 # 每日一题
 - 0927 每种字符至少取k个
 （字符串，哈希表，滑动窗口）
