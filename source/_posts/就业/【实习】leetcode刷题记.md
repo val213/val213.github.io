@@ -1725,7 +1725,7 @@ public:
 };
 ```
 - 买卖股票的最佳时机
-用一个dp数组来根本不需要，只需要一个变量来记录最小值，然后不断更新最大利润即可。
+只需要一个变量来记录当前最小值，然后不断更新最大利润即可。
 ```c++
 class Solution {
 public:
@@ -5577,6 +5577,283 @@ public:
     }
 };
 ```
+- 位1的个数
+```c++
+// 直接循环检查给定整数 n 的二进制位的每一位是否为 1
+class Solution {
+public:
+    int hammingWeight(uint32_t n) {
+        int ret = 0;
+        for (int i = 0; i < 32; i++) {
+            if (n & (1 << i)) {
+                ret++;
+            }
+        }
+        return ret;
+    }
+};
+```
+```c++
+// 规律：n & (n−1)，其运算结果恰为把 n 的二进制位中的最低位的 1 变为 0 之后的结果
+class Solution {
+public:
+    int hammingWeight(uint32_t n) {
+        int res = 0;
+        while (n) {
+            n &= n - 1;
+            res++;
+        }
+        return res;
+    }
+};
+```
+- 二进制求和
+```c++
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        // 初始化结果和进位
+        string res;
+        int carry = 0;
+        // 倒着循环直到 a 和 b 都为空
+        for (int i = a.size() - 1, j = b.size() - 1; i >= 0 || j >= 0; i--, j--) {
+            int sum = carry;
+            sum += i >= 0 ? a[i] - '0' : 0;
+            sum += j >= 0 ? b[j] - '0' : 0;
+            // 更新结果
+            res.push_back(sum % 2 + '0');
+            // 更新进位
+            carry = sum / 2;
+        }
+        // 如果最后还有进位，加上
+        if (carry) {
+            res.push_back('1');
+        }
+        // 翻转结果
+        reverse(res.begin(), res.end());
+        return res;
+    }
+};
+```
+- 颠倒二进制位
+```c++
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        uint32_t res = 0;
+        for (int i = 0; i < 32; i++) {
+            // res将处理完的位不断左移，n将处理完的位不断右移
+            // 这样就可以将 n 的二进制位颠倒
+            res = (res << 1) + (n & 1);
+            n >>= 1;
+        }
+        return res;
+    }
+};
+```
+- 数字范围按位与
+```c++
+class Solution {
+public:
+    int rangeBitwiseAnd(int left, int right) {
+        int shift = 0;
+        // 这个过程的目的是找到 left 和 right 的公共前缀。因为在右移过程中，低位的差异会逐渐被消除，直到 left 和 right 相等。
+        while (left < right) {
+            left >>= 1;
+            right >>= 1;
+            shift++;
+        }
+        // 将 left 左移 shift 位，恢复到原来的位数。此时的 left 就是 [left, right] 范围内所有整数按位与的结果。
+        return left << shift;
+    }
+};
+```
+## 堆
+- 数组中的第 K 个最大元素
+```c++
+class Solution {
+public:
+    int findKthLargest(std::vector<int>& nums, int k) {
+        // 创建一个大小为 K 的最小堆
+        std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
+        
+        // 遍历数组
+        for (int num : nums) {
+            // 将元素插入堆中
+            minHeap.push(num);
+            // 如果堆的大小超过 K，则移除堆顶元素（肯定有 K 个元素比堆顶元素大，所以不是他）
+            if (minHeap.size() > k) {
+                minHeap.pop();
+            }
+        }
+        
+        // 堆顶元素即为第 K 个最大的元素
+        return minHeap.top();
+    }
+};
+```
+```c++
+// 也可以用大根堆：建立一个大根堆，做 k−1 次删除操作后堆顶元素就是我们要找的答案。
+// 手写大根堆
+class Solution {
+public:
+    void maxHeapify(vector<int>& a, int i, int heapSize) {
+        int l = i * 2 + 1, r = i * 2 + 2, largest = i;
+        if (l < heapSize && a[l] > a[largest]) {
+            largest = l;
+        } 
+        if (r < heapSize && a[r] > a[largest]) {
+            largest = r;
+        }
+        if (largest != i) {
+            swap(a[i], a[largest]);
+            maxHeapify(a, largest, heapSize);
+        }
+    }
+
+    void buildMaxHeap(vector<int>& a, int heapSize) {
+        for (int i = heapSize / 2 - 1; i >= 0; --i) {
+            maxHeapify(a, i, heapSize);
+        } 
+    }
+
+    int findKthLargest(vector<int>& nums, int k) {
+        int heapSize = nums.size();
+        buildMaxHeap(nums, heapSize);
+        for (int i = nums.size() - 1; i >= nums.size() - k + 1; --i) {
+            swap(nums[0], nums[i]);
+            --heapSize;
+            maxHeapify(nums, 0, heapSize);
+        }
+        return nums[0];
+    }
+};
+```
+- 数据流的中位数
+```c++
+// 建立一个 小顶堆 A 和 大顶堆 B ，各保存列表的一半元素
+class MedianFinder {
+public:
+    /** initialize your data structure here. */
+    MedianFinder() {
+
+    }
+    
+    void addNum(int num) {
+        if (maxHeap.size() == minHeap.size()) {
+            maxHeap.push(num);
+            minHeap.push(maxHeap.top());
+            maxHeap.pop();
+        } else {
+            minHeap.push(num);
+            maxHeap.push(minHeap.top());
+            minHeap.pop();
+        }
+    }
+    
+    double findMedian() {
+        // 如果大顶堆和小顶堆的大小不一样，说明元素总数是奇数，返回小顶堆的堆顶元素
+        // 否则返回两个堆顶元素的平均值
+        return maxHeap.size() == minHeap.size() ? (maxHeap.top() + minHeap.top()) / 2.0 : minHeap.top();
+    }
+
+private:
+    // 小顶堆，保存较大的一半元素，堆顶是较大的一半元素中最小的 
+    std::priority_queue<int, std::vector<int>, std::less<int>> maxHeap;
+    std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
+};
+```
+## 分治
+- 将有序数组转换为二叉搜索树
+```c++
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return dfs(nums,0,nums.size()-1);
+    }
+
+    TreeNode* dfs(vector<int>& nums, int left, int right){
+        // 
+        if (left>right) return nullptr;
+        // 选择中间元素作为根节点
+        int mid = left + (right-left)/2;
+        TreeNode* root = new TreeNode(nums[mid]);
+
+        // 递归构建左右子树
+        root->left = dfs(nums,left,mid-1);
+        root->right = dfs(nums, mid+1, right);
+
+        return root;
+    }
+};
+```
+- 排序链表
+```c++
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if (head == nullptr) {
+            return nullptr;
+        }
+        // 注意这里的 tail 是 nullptr
+        return sortList(head, nullptr);
+    }
+
+    ListNode* sortList(ListNode* head, ListNode* tail) {
+        // 如果链表的长度为 1，直接返回该节点
+        if (head->next == tail) {
+            head->next = nullptr;
+            return head;
+        }
+        // 快慢指针找到中间节点
+        ListNode* slow = head, *fast = head;
+        while (fast != tail) {
+            slow = slow->next;
+            fast = fast->next;
+            if (fast != tail) {
+                fast = fast->next;
+            }
+        }
+        ListNode* mid = slow;
+        // 递归排序左右两部分，然后合并
+        return merge(sortList(head, mid), sortList(mid, tail));
+    }
+
+    ListNode* merge(ListNode* head1, ListNode* head2) {
+        // 创建一个哑节点作为辅助
+        ListNode* dummyHead = new ListNode(0);
+        // 用于遍历的指针，初始指向哑节点。
+        ListNode* temp = dummyHead, *temp1 = head1, *temp2 = head2;
+        // 合并两个有序链表
+        while (temp1 != nullptr && temp2 != nullptr) {
+            // 如果 temp1 的值小于 temp2 的值，就将 temp1 接在 temp 的后面，同时将 temp1 指针往后移一位。
+            if (temp1->val <= temp2->val) {
+                temp->next = temp1;
+                temp1 = temp1->next;
+            } else {
+                // 如果 temp2 的值小于 temp1 的值，就将 temp2 接在 temp 的后面，同时将 temp2 指针往后移一位。
+                temp->next = temp2;
+                temp2 = temp2->next;
+            }
+            // 将 temp 指针往后移一位。
+            temp = temp->next;
+        }
+        // 如果 temp1 还有剩余，就将 temp1 接在 temp 的后面。
+        if (temp1 != nullptr) {
+            temp->next = temp1;
+        } else if (temp2 != nullptr) {
+            // 如果 temp2 还有剩余，就将 temp2 接在 temp 的后面。
+            temp->next = temp2;
+        }
+        // 返回哑节点的下一个节点，即合并后的链表的头节点。
+        return dummyHead->next;
+    }
+};
+```
+## 设计
+- LRU 缓存机制
+```c++
+```
 
 # 每日一题
 - 0927 每种字符至少取k个
@@ -5877,59 +6154,64 @@ class Solution extends SolBase {
     再具体对于 5!，也就是 5 * 4 * 3 * 2 * 1 = 120，我们发现结果会有一个 0，原因就是 2 和 5 相乘构成了一个 10。而**对于 10 的话，其实也只有 2 * 5 可以构成**。有 2 的因子每两个出现一次，含有 5 的因子每 5 个出现一次，所有 2 出现的个数远远多于 5，换言之**找到一个 5，一定能找到一个 2 与之配对。所以我们只需要找有多少个 5**。直接的，我们**只需要判断每个累乘的数有多少个 5 的因子**即可。
     - 进一步分析：但还没有结束，继续分析。`... * (1 * 5) * ... * (1 * 5 * 5) * ... * (2 * 5 * 5) * ... * (3 * 5 * 5) * ... * n` 每隔 25 个数字，出现的是两个 5，所以除了每隔 5 个数算作一个 5，每隔 25 个数，还需要多算一个 5。
     - 优化：写程序的话，如果直接按照上边的式子计算，分母可能会造成溢出。所以算 n / 25 的时候，我们先把 n 更新，n = n / 5，然后再计算 n / 5 即可。后边的同理。
-    ```C++
-    int trailingZeroes(int n) {
-        int count = 0;
-        for (int i = 5; i <= n; i *= 5) {
-            count += n / i;
-        }
-        return count;
+```C++
+int trailingZeroes(int n) {
+    int count = 0;
+    for (int i = 5; i <= n; i *= 5) {
+        count += n / i;
     }
-    ```
+    return count;
+}
+```
 - Q2：lc1669. 合并两个链表 medium
-    给你两个链表 list1 和 list2 ，他们包含的元素分别为n个和m个。请你将list1中下标从 a 到 b 的全部节点都删除，并将list2 接在被删除节点的位置。
-    - 直接模拟：找到a的前一个节点，b的后一个节点，然后删除a到b的节点，然后将list2接在a的前一个节点和b的后一个节点之间。但是要注意内存泄漏，要释放删除的节点。
-    ```C++
-    ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
-        ListNode* dummy = new ListNode(0);
-        dummy->next = list1;
-        ListNode* pre = dummy;
-        
-        // 找到第 a 个节点的前一个节点
-        for (int i = 0; i < a; i++) {
-            pre = pre->next;
-        }
-        
-        // 找到第 b 个节点
-        ListNode* cur = pre;
-        for (int i = 0; i <= b - a; i++) {
-            cur = cur->next;
-        }
-        
-        // 处理被删除的节点
-        ListNode* temp = pre->next;
-        while (temp != cur->next) {
-            ListNode* next = temp->next;
-            delete temp;
-            temp = next;
-        }
-        // Update the next pointer of pre to cur->next
-        pre->next = cur->next;
-        
-        // 连接 list2
-        pre->next = list2;
-        while (list2->next) {
-            list2 = list2->next;
-        }
-        list2->next = cur->next;
-        
-        ListNode* result = dummy->next;
-        delete dummy; // 释放 dummy 节点
-        return result;
+给你两个链表 list1 和 list2 ，他们包含的元素分别为n个和m个。请你将list1中下标从 a 到 b 的全部节点都删除，并将list2 接在被删除节点的位置。
+直接模拟：找到a的前一个节点，b的后一个节点，然后删除a到b的节点，然后将list2接在a的前一个节点和b的后一个节点之间。但是要注意内存泄漏，要释放删除的节点。
+```C++
+ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
+    ListNode* dummy = new ListNode(0);
+    dummy->next = list1;
+    ListNode* pre = dummy;
+    
+    // 找到第 a 个节点的前一个节点
+    for (int i = 0; i < a; i++) {
+        pre = pre->next;
     }
-    ```
+    
+    // 找到第 b 个节点
+    ListNode* cur = pre;
+    for (int i = 0; i <= b - a; i++) {
+        cur = cur->next;
+    }
+    // delete 被删除的节点
+    while (pre->next != cur) {
+        ListNode* temp = pre->next;
+        pre->next = temp->next;
+        delete temp;
+    }
+    // Update the next pointer of pre to cur->next
+    pre->next = cur->next;
+    
+    // 连接 list2
+    pre->next = list2;
+    while (list2->next) {
+        list2 = list2->next;
+    }
+    list2->next = cur->next;
+    
+    ListNode* result = dummy->next;
+    delete dummy; // 释放 dummy 节点
+    return result;
+}
+```
 - Q3：lc1146. 快照数组 medium
-想半天不知道要用什么数据结构形成这个快照数组的结构，最后还是看了题解，有一个答案是：vector<vector<pair<int,int>>> data;意义是data[i]表示第i个快照，data[i][j]表示第i个快照的第j个元素，pair的first是元素的值，second是元素的快照的值。这样就可以实现快照数组的功能。pair的意义是，如果一个元素没有被修改过，那么就不需要存储这个元素，只需要存储这个元素的快照的值即可。
+题意解读
+调用 snap() 时，复制一份当前数组，作为「历史版本」。返回这是第几个历史版本（从 0 开始）。
+
+调用 get(index,snapId) 时，返回第 snapId 个历史版本的下标为 index 的元素值。
+
+
+想半天不知道要用什么数据结构形成这个快照数组的结构，最后还是看了题解，有一个答案是：vector<vector<pair<int,int>>> data; 
+意义是 data[i] 表示第 i 个快照，data[i][j] 表示第 i 个快照的第 j 个元素，pair 的 first 是元素的值，second 是元素的快照的值。这样就可以实现快照数组的功能。**pair 的意义是，如果一个元素没有被修改过，那么就不需要存储这个元素，只需要存储这个元素的快照的值即可**。
 ```C++
 #include <vector>
 #include <map>
@@ -5962,5 +6244,424 @@ public:
 private:
     std::vector<std::map<int, int>> data;
     int snap_id;
+};
+```
+```C++
+class SnapshotArray {
+    int cur_snap_id = 0;
+    /// 每个 index 的历史修改记录，history[index] 是一个按快照编号升序排序的数组，表示 index 的历史修改记录，index 是数组下标 
+    /// history[index][i] = (snap_id, value) 表示第 snap_id 次快照时，index 的值被修改为 value
+    unordered_map<int, vector<pair<int, int>>> history;
+public:
+    SnapshotArray(int) {}
+
+    void set(int index, int val) {
+        // 新增 index 的修改记录
+        history[index].emplace_back(cur_snap_id, val);
+    }
+
+    int snap() {
+        // 返回快照编号
+        return cur_snap_id++;
+    }
+
+    int get(int index, int snap_id) {
+        auto& h = history[index];
+        // 二分查找
+        // 找快照编号 <= snap_id 的最后一次修改记录
+        // 等价于找快照编号 < snap_id + 1 的最后一次修改记录，因为该快照编号不一定存在，但是一定存在小于它的最大的快照编号，此时对应的修改记录就是我们要找的最新的修改记录
+        int j = ranges::lower_bound(h, make_pair(snap_id + 1, 0)) - h.begin() - 1;
+        // 如果找到了，返回修改记录的值，否则返回 0，说明该 index 从未被修改过（所有元素初始化为0）
+        return j >= 0 ? h[j].second : 0;
+    }
+};
+```
+总结以上两种做法：
+- 查找效率：std::map 提供了更高效的查找、插入和删除操作（O(log N)），而 std::vector<std::pair<>> 需要线性查找（O(N)）。
+- 自动排序：std::map 会自动根据键排序，而 std::vector<std::pair<>> 不会自动排序，需要手动排序。
+- 内存使用：std::vector<std::pair<>> 可能在某些情况下使用更少的内存，因为它没有 map 的树结构开销。
+在需要频繁查找、插入和删除操作的场景下，std::map 通常是更好的选择。而在需要顺序存储和遍历的场景下，std::vector<std::pair<>> 可能更合适。
+
+## tencent 常考题
+- **LRU 缓存**
+```c++
+struct DListNode {
+    DListNode* prev;
+    DListNode* next;
+    int key;
+    int val;
+    DListNode() : prev(nullptr), next(nullptr), key(0), val(0) {}
+    DListNode(int key, int val) : prev(nullptr), next(nullptr), key(key), val(val) {}
+};
+
+class LRUCache {
+    int capacity;
+    int size;
+    unordered_map<int, DListNode*> cache;
+    DListNode* head;
+    DListNode* tail;
+
+public:
+    LRUCache(int capacity) : capacity(capacity), size(0) {
+        head = new DListNode();
+        tail = new DListNode();
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    int get(int key) {
+        if (!cache.count(key)) return -1;
+        DListNode* node = cache[key];
+        movetohead(node);
+        return node->val;
+    }
+
+    void put(int key, int value) {
+        if (cache.count(key)) {
+            DListNode* node = cache[key];
+            node->val = value;
+            movetohead(node);
+        } else {
+            DListNode* node = new DListNode(key, value);
+            cache[key] = node;
+            addtohead(node);
+            size++;
+            if (size > capacity) {
+                DListNode* removed = removefromtail();
+                cache.erase(removed->key);
+                delete removed;
+                size--;
+            }
+        }
+    }
+
+    void movetohead(DListNode* node) {
+        remove(node);
+        addtohead(node);
+    }
+
+    DListNode* removefromtail() {
+        DListNode* node = tail->prev;
+        remove(node);
+        return node;
+    }
+
+    void addtohead(DListNode* node) {
+        node->next = head->next;
+        node->prev = head;
+        head->next->prev = node;
+        head->next = node;
+    }
+
+    void remove(DListNode* node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+};
+```
+- **反转链表**
+```c++
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (head==nullptr) return nullptr;
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
+        ListNode* next = curr->next;
+        // 迭代
+        while(curr){
+            next = curr->next;
+            curr->next=prev;
+            prev = curr;
+            curr = next; 
+        }
+        return prev;
+    }
+};
+```
+- **手撕快排（排序数组）**
+
+- **合并两个有序链表**
+```C++
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        if (!list1) return list2;
+        if (!list2) return list1;
+        ListNode dummy(0);
+        ListNode* p1 = list1;
+        ListNode* p2 = list2;
+        ListNode* curr = &dummy;
+        while(p1 && p2){
+            if (p1->val<=p2->val) {
+                curr->next = p1;
+                curr = curr->next;
+                p1 = p1->next;
+            }
+            else{
+                curr->next = p2;
+                curr=curr->next;
+                p2 = p2->next;
+            }
+        }
+        if (!p1) curr->next = p2;
+        else curr->next = p1;
+        return dummy.next;
+    }
+};
+```
+- **最大子数组和**
+```c++
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int pre = 0, maxAns = nums[0];
+        for (const auto &x: nums) {
+            pre = max(pre + x, x);
+            maxAns = max(maxAns, pre);
+        }
+        return maxAns;
+    }
+};
+```
+- **无重复字符的最长子串**
+```c++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int sz = s.size();
+        if (sz == 0) return 0;
+        if (sz == 1) return 1;
+
+        unordered_map<char, int> window;
+        int left = 0;
+        int maxlen = 0;
+
+        for (int i = 0; i < sz; i++) {
+            window[s[i]]++;
+            while (window[s[i]] > 1) {
+                window[s[left]]--;
+                left++;
+            }
+            maxlen = max(maxlen, i - left + 1);
+        }
+
+        return maxlen;
+    }
+};
+```
+- **数组中的第K个最大元素**
+- 字符串相加
+- 二分查找
+- **K个一组翻转链表**
+```c++
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if (head == nullptr || k == 1) return head;
+
+        ListNode dummy(0);
+        dummy.next = head;
+        ListNode* pre = &dummy;
+        ListNode* curr = head;
+        ListNode* succ = nullptr;
+
+        // 计算链表长度
+        int length = 0;
+        while (curr) {
+            length++;
+            curr = curr->next;
+        }
+
+        curr = head;
+        // 拿到链表长度后按照k个一组处理
+        while (length >= k) {
+            succ = curr->next;
+            for (int i = 1; i < k; ++i) {
+                curr->next = succ->next;
+                succ->next = pre->next;
+                pre->next = succ;
+                succ = curr->next;
+            }
+            pre = curr;
+            curr = succ;
+            length -= k;
+        }
+
+        return dummy.next;
+    }
+};
+```
+- **最长上升子序列**
+```c++
+// On2 遍历的状态转移
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        int sz = nums.size();
+        if (sz == 0) return 0;
+        vector<int> dp(sz, 1);
+        int maxlen = 1;
+        for (int i = 1; i < sz; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = max(dp[i], dp[j] + 1);
+                }
+            }
+            maxlen = max(maxlen, dp[i]);
+        }
+        return maxlen;
+    }
+};
+```
+还有一种dp+二分的方法，用空间换时间，但是比较难理解。
+- **字符串转换整数（atoi）**
+```c++
+class Solution {
+public:
+    int myAtoi(string s) {
+        int sz = s.size();
+        if (sz == 0) return 0;
+        int i = 0;
+        while (i < sz && s[i] == ' ') i++;
+        if (i == sz) return 0;
+        int sign = 1;
+        if (s[i] == '+') {
+            i++;
+        } else if (s[i] == '-') {
+            sign = -1;
+            i++;
+        }
+        long long res = 0;
+        while (i < sz && isdigit(s[i])) {
+            res = res * 10 + s[i] - '0';
+            if (res > INT_MAX) break;
+            i++;
+        }
+        res *= sign;
+        if (res > INT_MAX) return INT_MAX;
+        if (res < INT_MIN) return INT_MIN;
+        return res;
+    }
+};
+```
+- 三数之和
+- **用RAND7()实现RAND10()**
+- 爬楼梯
+- 最长公共子序列
+- 有效的括号
+- 两数之和
+- 回文链表
+- 数组中重复的数据
+- **寻找旋转排序数组中的最小值**
+```c++
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int left = 0;
+        int right = nums.size() - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < nums[right]) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return nums[left];
+    }
+};
+```
+- **二叉搜索树的第k大节点**
+递归和迭代两种方法。跟**寻找二叉搜索树中的目标节点**一样的。后者是中序遍历的逆序。
+```c++
+class Solution {
+public:
+    int findTargetNode(TreeNode* root, int cnt) {
+        this->cnt = cnt;
+        dfs(root);
+        return res;
+    }
+private:
+    int res, cnt;
+    void dfs(TreeNode* root) {
+        if(root == nullptr) return;
+        dfs(root->right);
+        if(cnt == 0) return;
+        if(--cnt == 0) res = root->val;
+        dfs(root->left);
+    }
+};
+```
+- **路径总和**
+```c++
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        // 递归
+        return dfs(root,targetSum);
+    }
+    bool dfs(TreeNode* node, int targetSum){
+        if (!node) return false;
+        targetSum-=node->val;
+        if (targetSum == 0 &&(!node->left)&&(!node->right)) return true;
+        return dfs(node->left,targetSum)||dfs(node->right,targetSum);
+    }
+};
+```
+- **两数相加**
+- **买卖股票的最佳时机**
+```c++
+// 一次遍历
+minprice = min(minprice, prices[i]);
+maxProfit = max(maxProfit, prices[i]-minprice);
+```
+- **接雨水**
+```c++
+// 双指针
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int n = height.size();
+        if (n == 0) return 0;
+        int left = 0, right = n - 1;
+        int leftmax = 0, rightmax = 0;
+        int res = 0;
+        while (left < right) {
+            leftmax = max(leftmax, height[left]);
+            rightmax = max(rightmax, height[right]);
+            // 每次移动较小的那个指针
+            if (leftmax < rightmax) {
+                // 如果左边最大值小于右边最大值，那么左边的水位就是leftmax，减去当前高度，就是当前位置的水位
+                res += leftmax - height[left];
+                left++;
+            } else {
+                // 右边同理
+                res += rightmax - height[right];
+                right--;
+            }
+        }
+        return res;
+    }
+};
+```
+- **字符串相乘**
+- **回文链表**
+- **打家劫舍**
+```c++
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        // 偷与不偷，前者钱不变，后者加上该处的钱和前面最多的钱
+        int n = nums.size();
+        if (n==1) return nums[0];
+        vector<int>dp(n,0);
+        dp[0]=nums[0];
+        dp[1]=max(nums[0],nums[1]);
+        for(int i = 2; i<n; i++){
+            dp[i]=max(dp[i-1],dp[i-2]+nums[i]);
+        }
+        return dp[n-1];
+    }
 };
 ```
