@@ -5675,13 +5675,13 @@ class Solution {
 public:
     int findKthLargest(std::vector<int>& nums, int k) {
         // 创建一个大小为 K 的最小堆
-        std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
+        priority_queue<int, vector<int>, greater<int>> minHeap;
         
         // 遍历数组
         for (int num : nums) {
             // 将元素插入堆中
             minHeap.push(num);
-            // 如果堆的大小超过 K，则移除堆顶元素（肯定有 K 个元素比堆顶元素大，所以不是他）
+            // 插入后,如果堆的大小超过 K，则移除堆顶元素（肯定有 K 个元素比堆顶元素大，所以不是他）
             if (minHeap.size() > k) {
                 minHeap.pop();
             }
@@ -5698,13 +5698,16 @@ public:
 class Solution {
 public:
     void maxHeapify(vector<int>& a, int i, int heapSize) {
+        // 左右子节点的下标
         int l = i * 2 + 1, r = i * 2 + 2, largest = i;
+        // 找出三个节点中最大值的下标
         if (l < heapSize && a[l] > a[largest]) {
             largest = l;
         } 
         if (r < heapSize && a[r] > a[largest]) {
             largest = r;
         }
+        // 如果最大值不是根节点，交换根节点和最大值节点，递归调整最大值节点
         if (largest != i) {
             swap(a[i], a[largest]);
             maxHeapify(a, largest, heapSize);
@@ -5720,6 +5723,7 @@ public:
     int findKthLargest(vector<int>& nums, int k) {
         int heapSize = nums.size();
         buildMaxHeap(nums, heapSize);
+        // 做 k−1 次删除操作后堆顶元素就是我们要找的答案
         for (int i = nums.size() - 1; i >= nums.size() - k + 1; --i) {
             swap(nums[0], nums[i]);
             --heapSize;
@@ -6649,6 +6653,7 @@ public:
 - **回文链表**
 - **打家劫舍**
 ```c++
+
 class Solution {
 public:
     int rob(vector<int>& nums) {
@@ -6662,6 +6667,30 @@ public:
             dp[i]=max(dp[i-1],dp[i-2]+nums[i]);
         }
         return dp[n-1];
+    }
+};
+```
+- 打家劫舍 II
+```C++
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 1) return nums[0];
+        return max(robRange(nums, 0, n - 2), robRange(nums, 1, n - 1));
+    }
+
+    int robRange(vector<int>& nums, int start, int end) {
+        int n = nums.size();
+        // 偷与不偷，前者钱不变，后者加上该处的钱和前面最多的钱
+        int prev1 = 0, prev2 = 0;
+        int current = 0;
+        for (int i = start; i <=end; i++) {
+            current = max(prev1, nums[i] + prev2);
+            prev2 = prev1;
+            prev1 = current;
+        }
+        return current;
     }
 };
 ```
