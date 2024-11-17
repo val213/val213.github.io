@@ -126,6 +126,7 @@ Linux 内核 API 提供了一些方法，让用户可以修改位掩码或查看
 
 
 ### 跨核负载均衡的关键工作流程
+![alt text](image-6.png)
 在Linux的CFS（Completely Fair Scheduler）中，跨核负载均衡的实现依赖于一系列关键函数。这些函数共同作用，在多核系统中对不同CPU核心上的任务进行监控、判断和迁移，从而实现动态、实时的负载均衡。Linux的跨核负载均衡功能主要通过调度器周期性地检查各核心的负载情况，并根据需要在核心之间迁移任务来达成。
 
 以下是实现跨核负载均衡的几个关键函数：
@@ -198,13 +199,7 @@ scheduler_tick() -> trigger_load_balance() -> run_rebalance_domains()
 4. 定时任务的注册：sched_tick 和 NO_HZ 模式
 在多核系统中，每个 CPU 核心都有自己的调度 tick 定时器来触发 scheduler_tick()。
 
-正常模式：
-在默认的调度模式下，每个 CPU 核心会在每个时间片到期时触发 scheduler_tick()，由此启动负载均衡的检查和执行。
-
-NO_HZ 模式：
-在节能模式下（例如 NO_HZ 模式），系统的 tick 定时器不会频繁触发，而是尽量减少 CPU 的唤醒次数。但在必要时，负载均衡任务会通过特定的中断（如定时中断或任务唤醒事件）来触发 scheduler_tick() 并完成负载均衡。
-
-小结
+5. 小结
 跨核负载均衡的周期性触发机制由 scheduler_tick() 定时器驱动，通过 trigger_load_balance() -> run_rebalance_domains() -> rebalance_domains() 这一流程来完成周期性的负载均衡操作。这个过程通过调度 tick 定时器的触发而实现，确保每个 CPU 核心的负载能够在系统运行过程中保持均衡。
 
 
