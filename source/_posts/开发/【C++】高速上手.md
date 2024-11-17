@@ -370,3 +370,227 @@ class Magic {
 };
 ```
 ##### 强类型枚举
+todo!()
+### 语言运行期的强化
+#### Lambda 表达式
+todo!()
+#### 函数对象包装器
+todo!()
+#### 右值引用
+右值引用是 C++11 引入的与 Lambda 表达式齐名的重要特性之一。它的引入解决了 C++ 中大量的历史遗留问题， 消除了诸如 std::vector、std::string 之类的额外开销， 也才使得函数对象容器 std::function 成为了可能。
+##### 左值和右值的纯右值、将亡值、右值
+- **左值 (lvalue, left value)**，顾名思义就是赋值符号左边的值。准确来说， 左值是表达式（不一定是赋值表达式）**后依然存在的持久对象**。
+
+- **右值 (rvalue, right value)**，右边的值，是指**表达式结束后就不再存在的临时对象**。
+
+而 C++11 中为了引入强大的右值引用，将右值的概念进行了进一步的划分，分为：纯右值、将亡值。
+
+- **纯右值 (prvalue, pure rvalue)**，纯粹的右值，要么是纯粹的字面量，例如 10, true； 要么是求值结果相当于字面量或匿名临时对象，例如 1+2。非引用返回的临时变量、运算表达式产生的临时变量、原始字面量、Lambda 表达式都属于纯右值。
+
+需要注意的是，**字面量除了字符串字面量以外，均为纯右值**。而**字符串字面量是一个左值，类型为 const char 数组**。例如：
+```cpp
+#include <type_traits>
+
+int main() {
+    // 正确，"01234" 类型为 const char [6]，因此是左值
+    const char (&left)[6] = "01234";
+
+    // 断言正确，确实是 const char [6] 类型，注意 decltype(expr) 在 expr 是左值
+    // 且非无括号包裹的 id 表达式与类成员表达式时，会返回左值引用
+    static_assert(std::is_same<decltype("01234"), const char(&)[6]>::value, "");
+
+    // 错误，"01234" 是左值，不可被右值引用
+    // const char (&&right)[6] = "01234";
+}
+```
+>- id 表达式：
+>这是指简单的标识符，例如变量名、函数名等。例如，x、foo 都是 id 表达式。
+>- 类成员表达式：
+>这是指通过对象或指针访问类成员的表达式。例如，obj.member 或 ptr->member 都是类成员表达式。
+
+但是注意，数组可以被隐式转换成相对应的指针类型，而转换表达式的结果（如果不是左值引用）则一定是个右值（右值引用为将亡值，否则为纯右值）。例如：
+```cpp
+const char *p = "01234"; // "01234" 被隐式转换为 const char * 类型，是右值。
+const char *&& rp = "01234"; // "01234" 被隐式转换为 const char * 类型，该转换的结果是纯右值。
+const char *& lp = "01234"; // 错误，"01234" 被隐式转换为 const char * 类型，是右值，不存在 const char * 的左值
+```
+
+- **将亡值 (xvalue, expiring value)**，是指**即将要被销毁的对象**，例如将要过期的临时对象。将亡值是 C++11 新增的概念，是一种特殊的右值引用，可以延长临时对象的生命周期，使其可以被赋值给左值引用。也就是即将被销毁、却能够被移动的值。例如：
+```cpp
+std::vector<int> foo() {
+    std::vector<int> temp = {1, 2, 3, 4};
+    return temp;
+}
+
+std::vector<int> v = foo();
+```
+在 C++11 之后，编译器为我们做了一些工作，此处的左值 temp 会被进行此隐式右值转换， 等价于 `static_cast<std::vector<int> &&>(temp)`，进而此处的 v 会将 foo 局部返回的值进行移动。 也就是后面我们将会提到的移动语义。
+
+##### 右值引用和左值引用
+要拿到一个将亡值，就需要用到右值引用：`T &&`，其中 T 是类型。 右值引用的声明让这个临时值的生命周期得以延长、只要变量还活着，那么将亡值将继续存活。
+
+C++11 提供了 std::move 这个方法将左值参数无条件的转换为右值， 有了它我们就能够方便的获得一个右值临时对象，例如：
+```cpp
+#include <iostream>
+#include <string>
+
+void reference(std::string& str) {
+    std::cout << "左值" << std::endl;
+}
+void reference(std::string&& str) {
+    std::cout << "右值" << std::endl;
+}
+
+int main()
+{
+    std::string lv1 = "string,"; // lv1 是一个左值
+    // std::string&& r1 = lv1; // 非法, 右值引用不能引用左值
+    std::string&& rv1 = std::move(lv1); // 合法, std::move 可以将左值转移为右值
+    std::cout << rv1 << std::endl; // string,
+
+    const std::string& lv2 = lv1 + lv1; // 合法, 常量左值引用能够延长临时变量的生命周期
+    // lv2 += "Test"; // 非法, 常量引用无法被修改
+    std::cout << lv2 << std::endl; // string,string,
+
+    std::string&& rv2 = lv1 + lv2; // 合法, 右值引用延长临时对象生命周期
+    rv2 += "Test"; // 合法, 非常量引用能够修改临时变量
+    std::cout << rv2 << std::endl; // string,string,string,Test
+
+    reference(rv2); // 输出左值
+
+    return 0;
+}
+```
+rv2 虽然引用了一个右值，但由于它是一个引用，所以 rv2 依然是一个左值。
+##### 移动语义
+**传统 C++ 通过拷贝构造函数和赋值操作符为类对象设计了拷贝/复制的概念**，但为了实现对资源的移动操作，调用者必须使用先复制、再析构的方式，否则就需要自己实现移动对象的接口。 试想，搬家的时候是把家里的东西直接搬到新家去，而不是将所有东西复制一份（重买）再放到新家、 再把原来的东西全部扔掉（销毁），这是非常反人类的一件事情。
+
+**传统的 C++ 没有区分『移动』和『拷贝』的概念，造成了大量的数据拷贝，浪费时间和空间**。 右值引用的出现恰好就解决了这两个概念的混淆问题，例如：
+```cpp
+#include <iostream>
+class A {
+public:
+    int *pointer;
+    A():pointer(new int(1)) {
+        std::cout << "构造" << pointer << std::endl;
+    }
+
+    // 无意义的对象拷贝构造
+    A(A& a):pointer(new int(*a.pointer)) {
+        std::cout << "拷贝" << pointer << std::endl;
+    }
+
+    // 将传入对象的 pointer 直接赋值给当前对象的 pointer。
+    // 将传入对象的 pointer 置为 nullptr，表示资源已被移动
+    A(A&& a):pointer(a.pointer) {
+        a.pointer = nullptr;
+        std::cout << "移动" << pointer << std::endl;
+    }
+    ~A(){
+        std::cout << "析构" << pointer << std::endl;
+        delete pointer;
+    }
+};
+// 防止编译器优化
+A return_rvalue(bool test) {
+    // 首先会在 return_rvalue 内部构造两个 A 对象，于是获得两个构造函数的输出
+    A a,b;
+    // 根据 test 的值，返回 a 或 b 的右值引用，这会调用移动构造函数
+    if(test) return a; // 等价于 static_cast<A&&>(a);
+    else return b;     // 等价于 static_cast<A&&>(b);
+}
+int main() {
+    // 调用 return_rvalue(false)，返回 b 的右值引用
+    // 使用移动构造函数将返回的右值引用赋值给 obj
+    // 等价于 A obj = static_cast<A&&>(b); （将亡值，被移动构造引用，从而延长生命周期）
+    // 并将这个右值中的指针赋值给 obj 中的指针，同时将原来的指针置为 nullptr，防止重复释放
+    A obj = return_rvalue(false); 
+    std::cout << "obj:" << std::endl;
+    std::cout << obj.pointer << std::endl;
+    std::cout << *obj.pointer << std::endl;
+    return 0;
+}
+```
+```shell
+构造0x5913a5b9ceb0
+构造0x5913a5b9d2e0
+移动0x5913a5b9d2e0
+析构0
+析构0x5913a5b9ceb0
+obj:
+0x5913a5b9d2e0
+1
+析构0x5913a5b9d2e0
+```
+1. **构造 `a` 和 `b`**：
+    - 输出两次构造信息。
+
+2. **移动构造 `obj`**：
+    - 输出移动信息。
+
+3. **析构 `a` 和 `b`**：
+    - `a` 和 `b` 在 `return_rvalue` 函数结束时被析构。
+    - `b` 的 `pointer` 已被移动，所以 `b` 的析构不会释放内存。
+
+4. **输出 `obj` 的信息**：
+    - 输出 `obj.pointer` 和 `*obj.pointer`。
+
+5. **析构 `obj`**：
+    - 输出析构信息，释放内存。
+
+stl 中的例子：
+```cpp
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <string>
+
+int main() {
+
+    std::string str = "Hello world.";
+    std::vector<std::string> v;
+
+    // 将使用 push_back(const T&), 即产生拷贝行为
+    v.push_back(str);
+    // 将输出 "str: Hello world."
+    std::cout << "str: " << str << std::endl;
+
+    // 将使用 push_back(const T&&), 不会出现拷贝行为
+    // 而整个字符串会被移动到 vector 中，所以有时候 std::move 会用来减少拷贝出现的开销
+    // 这步操作后, str 中的值会变为空
+    v.push_back(std::move(str));
+    // 将输出 "str: "，因为 str 的值已经被移动了
+    std::cout << "str: " << str << std::endl;
+
+    return 0;
+}
+```
+##### 完美转发
+前面我们提到了，一个声明的右值引用其实是一个左值。这就为我们进行参数转发（传递）造成了问题：
+todo!()
+
+##### g++ 和 clang++ 对 std::move 的优化
+**移动语义** 是 C++11 引入的一种优化技术，用于避免不必要的拷贝操作。它通过引入 **右值引用**（`T&&`）来实现。右值引用允许我们区分出那些即将被销毁的对象，从而可以安全地“移动”它们的资源，而不是进行昂贵的拷贝。
+
+**`std::move`** 是一个标准库函数，它将其参数转换为右值引用，从而启用移动语义。它本身并不移动任何东西，只是将左值转换为右值引用。
+
+不同编译器在处理移动语义和右值引用时可能会有不同的策略和优化行为。
+`g++` 通常会进行**返回值优化 (RVO)** 和**命名返回值优化 (NRVO)**，即使在没有显式使用 `std::move` 的情况下，也会尽量避免不必要的拷贝操作。因此，在很多情况下，`g++` 不会对不必要的 `std::move` 调用发出警告。
+
+`clang++` 更严格地检查代码，并且会发出警告或错误，特别是在使用 `-Werror` 标志时。`clang++` 会检测到不必要的 `std::move` 调用，并发出 `-Wpessimizing-move` 警告，因为**这种调用会阻止编译器进行返回值优化 (RVO)，从而导致性能下降**。
+例如：
+```cpp
+std::string Buffer::RetrieveAsString(int len){
+    assert(read_index_ + len <= write_index_);
+    // 这里的 `std::move` 是不必要的，因为 `PeekAsString(len)` 返回的是一个临时对象，编译器可以直接进行返回值优化 (RVO)，避免不必要的拷贝。
+    // std::string ret = std::move(PeekAsString(len)); 
+    std::string ret = PeekAsString(len);
+    Retrieve(len);
+    return ret;
+}
+```
+
+
+### 容器
+
+### 智能指针与内存管理
