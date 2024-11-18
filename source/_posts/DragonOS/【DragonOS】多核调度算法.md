@@ -322,4 +322,5 @@ PELT 的数据统计和 sched_domain 配合：
 - 从简单的均匀分配开始，在低层调度域（如共享缓存）测试迁移逻辑。
 - 扩展到高层调度域（如 NUMA 节点间）。
 
-
+### 参考
+http://www.wowotech.net/process_management/load_balance_function.html
