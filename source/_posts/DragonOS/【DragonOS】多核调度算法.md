@@ -327,5 +327,34 @@ PELT 的数据统计和 sched_domain 配合：
 ### 周期性负载均衡
 周期性负载均衡（periodic load balance或者tick load balance）是指在tick中，周期性的检测系统的负载均衡状况。周期性负载均衡是一个自底向上的均衡过程。即从该CPU对应的base sched domain开始，向上直到顶层sched domain，在各个level的domain上进行负载均衡。具体在某个特定的domain上进行负载均衡是比较简单，找到domain中负载最重的group和CPU，将其上的runnable任务拉到本CPU以便让该domain上各个group的负载处于均衡的状态。由于Linux上的负载均衡仅支持任务拉取，周期性负载均衡只能在busy cpu之间均衡，不能把任务push到其他空闲CPU上，要想让系统中的idle cpu“燥起来”就需要借助idle load balance。
 
+
+#### 找出最繁忙的调度组
+这个表格描述了在不同情况下，调度器如何进行负载均衡决策。表格的行和列分别表示 
+
+- **行**：表示 local group
+- **列**：表示 busiest group
+
+
+- 状态解释
+  - **Has spare**：有空闲资源。
+  - **Fully busy**：完全忙碌，没有空闲资源。
+  - **misfit**：不匹配的任务，可能需要强制迁移。
+  - **imbalanced**：不平衡，需要进行负载均衡。
+  - **overloaded**：过载，需要强制迁移任务。
+
+- 决策解释
+  - **Nr idle**：不需要进行负载均衡，因为有空闲资源。
+  - **balanced**：系统已经平衡，不需要进行负载均衡。
+  - **force**：强制进行负载均衡，迁移任务以达到平衡。
+  - **Avg load**：根据平均负载进行负载均衡。
+
+|                | Has spare | Fully busy | misfit | imbalanced | overloaded |
+|----------------|-----------|------------|--------|------------|------------|
+| **Has spare**  | Nr idle   | balanced   | N/A    | balanced   | balanced   |
+| **Fully busy** | Nr idle   | Nr idle    | N/A    | balanced   | balanced   |
+| **misfit**     | force     | N/A        | N/A    | force      | force      |
+| **imbalanced** | force     | force      | N/A    | force      | force      |
+| **overloaded** | force     | force      | N/A    | force      | Avg load   |
+
 ### 参考
 http://www.wowotech.net/process_management/load_balance_function.html
