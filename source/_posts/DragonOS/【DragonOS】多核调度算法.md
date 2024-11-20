@@ -178,6 +178,7 @@ detach_entity_load_avg() 则在任务迁出时将任务的负载数据从原调�
 这些函数在 PELT（负载追踪）的支持下，通过实时更新和统计各个CPU核心上的负载，使 CFS 调度器能够有效地实现多核系统中的跨核负载均衡。
 
 ### 跨核负载均衡的定时器任务
+![负载均衡流程](image-7.png)
 在Linux内核中，跨核负载均衡的定时器任务实际上是通过一个周期性触发的调度软中断（softirq）机制来实现的。具体来说，跨核负载均衡的触发是由调度器周期性 tick 定时器（也称为 sched_tick）驱动的，而 rebalance_domains() 函数通常是在这个定时器触发的上下文中被调用。
 
 1. scheduler_tick() 函数
@@ -235,6 +236,8 @@ void trigger_load_balance(struct rq *rq)
 &emsp;&emsp;请注意，由于软中断的可重入、可并发性，所以软中断处理程序需要自己保证线程安全。
 
 ### 调度域和调度组
+一个任务在小核cluster上的CPU之间的迁移所带来的性能开销一定是小于任务从小核cluster的CPU迁移到大核cluster的开销。因此，为了更好的执行负载均衡，我们需要构建和CPU拓扑相关的数据结构，也就是调度域和调度组的概念。
+
 - 调度域
 调度域是CPU拓扑中某一层级里面，与某个逻辑CPU关联（该CPU称为主权CPU）的所有逻辑CPU的集合。
 
@@ -321,6 +324,8 @@ PELT 的数据统计和 sched_domain 配合：
 
 - 从简单的均匀分配开始，在低层调度域（如共享缓存）测试迁移逻辑。
 - 扩展到高层调度域（如 NUMA 节点间）。
+### 周期性负载均衡
+周期性负载均衡（periodic load balance或者tick load balance）是指在tick中，周期性的检测系统的负载均衡状况。周期性负载均衡是一个自底向上的均衡过程。即从该CPU对应的base sched domain开始，向上直到顶层sched domain，在各个level的domain上进行负载均衡。具体在某个特定的domain上进行负载均衡是比较简单，找到domain中负载最重的group和CPU，将其上的runnable任务拉到本CPU以便让该domain上各个group的负载处于均衡的状态。由于Linux上的负载均衡仅支持任务拉取，周期性负载均衡只能在busy cpu之间均衡，不能把任务push到其他空闲CPU上，要想让系统中的idle cpu“燥起来”就需要借助idle load balance。
 
 ### 参考
 http://www.wowotech.net/process_management/load_balance_function.html

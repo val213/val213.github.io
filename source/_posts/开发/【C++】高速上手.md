@@ -1,3 +1,8 @@
+---
+title: C++ 11/14/17/20
+categories: 知识分享
+tags: C++
+---
 ## 高速上手 C++ 11/14/17/20
 ### 与 C 的兼容
 在不得不使用 C 时，应该注意使用 `extern "C"` 这种特性，**将 C 语言的代码与 C++代码进行分离编译，再统一链接**这种做法，例如：
@@ -373,9 +378,139 @@ class Magic {
 todo!()
 ### 语言运行期的强化
 #### Lambda 表达式
-todo!()
+Lambda 表达式的基本语法如下：
+```cpp
+[capture](parameters) -> return-type {body}
+[捕获列表](参数列表) mutable(可选) 异常属性 -> 返回类型 {
+// 函数体
+}
+```
+上面的语法规则除了 [捕获列表] 内的东西外，其他部分都很好理解，只是一般函数的函数名被略去， 返回值使用了一个 -> 的形式进行（参考：尾返回类型）。
+
+所谓捕获列表，其实可以理解为参数的一种类型，Lambda 表达式内部函数体在默认情况下是不能够使用函数体外部的变量的，这时候捕获列表可以起到传递外部数据的作用。根据传递的行为，捕获列表也分值捕获，引用捕获和隐式捕获，以及一种表达式捕获。
+
+##### 值捕获
+```cpp
+与参数传值类似，值捕获的前提是变量可以拷贝，不同之处则在于，被捕获的变量在 Lambda 表达式被创建时拷贝， 而非调用时才拷贝：
+
+void lambda_value_capture() {
+    int value = 1;
+    auto copy_value = [value] {
+        return value;
+    };
+    value = 100;
+    auto stored_value = copy_value();
+    std::cout << "stored_value = " << stored_value << std::endl;
+    // 这时, stored_value == 1, 而 value == 100.
+    // 因为 copy_value 在创建时就保存了一份 value 的拷贝
+}
+```
+##### 引用捕获
+```cpp
+引用捕获保存的是引用，值会发生变化。
+
+void lambda_reference_capture() {
+    int value = 1;
+    auto copy_value = [&value] {
+        return value;
+    };
+    value = 100;
+    auto stored_value = copy_value();
+    std::cout << "stored_value = " << stored_value << std::endl;
+    // 这时, stored_value == 100, value == 100.
+    // 因为 copy_value 保存的是引用
+}
+```
+##### 隐式捕获
+手动书写捕获列表有时候是非常复杂的，这种机械性的工作可以交给编译器来处理，这时候可以在捕获列表中写一个 & 或 = 向编译器声明采用引用捕获或者值捕获.
+
+总结一下，捕获提供了 Lambda 表达式对外部值进行使用的功能，捕获列表的最常用的四种形式可以是：
+
+[] 空捕获列表
+[name1, name2, ...] 捕获一系列变量
+- `[&]` ：以引用的方式捕获所有外部变量。
+- `[=]` ：以值的方式捕获所有外部变量。
+- `[=, &foo]` ：`foo` 以引用方式捕获，其他变量以值的方式捕获。
+- `[&, foo]` ：`foo` 以值的方式捕获，其他变量以引用方式捕获。
+##### 表达式捕获
+值捕获、引用捕获都是已经在外层作用域声明的变量，因此这些捕获方式捕获的均为左值，而不能捕获右值。
+
+C++14 允许捕获的成员用任意的表达式进行初始化，这就允许了右值的捕获， 被声明的捕获变量类型会根据表达式进行判断，判断方式与使用 auto 本质上是相同的：
+```cpp
+#include <iostream>
+#include <memory>  // std::make_unique
+#include <utility> // std::move
+
+void lambda_expression_capture() {
+    // important 是一个独占指针，不能够被 "=" 值捕获到
+    auto important = std::make_unique<int>(1);
+    auto add = [v1 = 1, v2 = std::move(important)](int x, int y) -> int {
+        return x+y+v1+(*v2);
+    };
+    std::cout << add(3,4) << std::endl;
+}
+```
+在上面的代码中，我们可以将 import 用 std::move 转移为右值，在表达式中初始化。
+> std::unique_ptr 是C++11引入的智能指针类型，位于<memory>头文件中。它用于管理动态分配的对象，并确保对象在不再需要时自动释放，以防止内存泄漏。
+>
+>**独占所有权**：std::unique_ptr独占所管理对象的所有权，不能被复制，只能通过移动语义转移所有权。
+>**自动释放**：当std::unique_ptr超出作用域或被显式重置时，所管理的对象会自动被释放。
+
+##### 泛型 Lambda
+从 C++14 开始，Lambda 函数的形式参数可以使用 auto 关键字来产生意义上的泛型：
+```cpp
+auto add = [](auto x, auto y) {
+    return x+y;
+};
+
+add(1, 2);
+add(1.1, 2.2);
+```
 #### 函数对象包装器
-todo!()
+##### std::function
+`std::function` 是一个通用的函数封装，它的实例可以对任何可以调用的目标实体进行存储、复制和调用操作，它也是**一种类型安全的包裹**。（相对来说，**函数指针的调用不是类型安全的**）， 换句话说，就是函数的容器。当我们有了函数的容器之后便能够更加方便的将函数、函数指针作为对象进行处理。 例如：
+```cpp
+#include <functional>
+#include <iostream>
+
+int foo(int para) {
+    return para;
+}
+
+int main() {
+    // func 包装了一个返回值为 int, 参数为 int 的函数 foo
+    // std::function 的格式为 std::function<返回值类型(参数类型)>
+    std::function<int(int)> func = foo;
+
+    int important = 10;
+    // func2 包装了一个返回值为 int, 参数为 int 的 Lambda 表达式, 并捕获了外部变量 important
+    std::function<int(int)> func2 = [&](int value) -> int {
+        return 1+value+important;
+    };
+    // 通过 std::function 调用被包装的函数和 Lambda 表达式
+    std::cout << func(10) << std::endl;
+    std::cout << func2(10) << std::endl;
+}
+```
+##### std::bind，std::placeholders
+- std::bind 是一个通用的函数适配器，它可以将有多个参数的函数适配成需要的参数个数。返回值是一个可调用对象，可以直接调用。
+    - 它解决的需求是我们有时候可能并不一定能够一次性获得调用某个函数的全部参数，通过这个函数， 我们可以将部分调用参数提前绑定到函数身上成为一个新的对象，然后在参数齐全后，完成调用。
+- std::placeholders 则是一个占位符，用于指定参数的位置。
+```cpp
+#include <functional>
+#include <iostream>
+
+int foo(int a, int b, int c) {
+    ;
+}
+int main() {
+    // 将参数1,2绑定到函数 foo 上，
+    // 但使用 std::placeholders::_1 来对第一个参数进行占位
+    auto bindFoo = std::bind(foo, std::placeholders::_1, 1,2);
+    // 这时调用 bindFoo 时，只需要提供第一个参数即可
+    bindFoo(1);
+}
+```
 #### 右值引用
 右值引用是 C++11 引入的与 Lambda 表达式齐名的重要特性之一。它的引入解决了 C++ 中大量的历史遗留问题， 消除了诸如 std::vector、std::string 之类的额外开销， 也才使得函数对象容器 std::function 成为了可能。
 ##### 左值和右值的纯右值、将亡值、右值
@@ -429,7 +564,7 @@ std::vector<int> v = foo();
 ##### 右值引用和左值引用
 要拿到一个将亡值，就需要用到右值引用：`T &&`，其中 T 是类型。 右值引用的声明让这个临时值的生命周期得以延长、只要变量还活着，那么将亡值将继续存活。
 
-C++11 提供了 std::move 这个方法将左值参数无条件的转换为右值， 有了它我们就能够方便的获得一个右值临时对象，例如：
+C++11 提供了 `std::move` 这个方法将左值参数无条件的转换为右值， 有了它我们就能够方便的获得一个右值临时对象，例如：
 ```cpp
 #include <iostream>
 #include <string>
@@ -594,3 +729,105 @@ std::string Buffer::RetrieveAsString(int len){
 ### 容器
 
 ### 智能指针与内存管理
+#### RAII 与引用计数
+对于一个对象而言，我们在构造函数的时候申请空间，而在析构函数（在离开作用域时调用）的时候释放空间， 也就是我们常说的 **RAII 资源获取即初始化**。
+
+凡事都有例外，我们总会有需要将对象在自由存储上分配的需求，在传统 C++ 里我们只好使用` new `和 ` delete `去 『记得』对资源进行释放。而 C++11 引入了智能指针的概念，使用了引用计数的想法，让程序员不再需要关心手动释放内存。 这些智能指针包括 ` std::shared_ptr/std::unique_ptr/std::weak_ptr `，使用它们需要包含头文件 `<memory>`。
+
+##### 辨析 GC
+注意：引用计数不是垃圾回收，引用计数能够尽快收回不再被使用的对象，同时在回收的过程中也不会造成长时间的等待， 更能够清晰明确的表明资源的生命周期。
+#### std::shared_ptr
+`std::shared_ptr` 是一种智能指针，它能够记录多少个 shared_ptr 共同指向一个对象，从而消除显式的调用 delete，当引用计数变为零的时候就会将对象自动删除。
+
+但还不够，因为使用 std::shared_ptr 仍然需要使用 new 来调用，这使得代码出现了某种程度上的不对称。
+
+`std::make_shared` 就能够用来**消除显式的使用 new**，所以 std::make_shared 会 **分配创建传入参数中的对象，并返回这个对象类型的 `std::shared_ptr` 指针**。例如：
+```cpp
+#include <iostream>
+#include <memory>
+void foo(std::shared_ptr<int> i) {
+    (*i)++;
+}
+int main() {
+    // auto pointer = new int(10); // illegal, no direct assignment
+    // Constructed a std::shared_ptr
+    auto pointer = std::make_shared<int>(10);
+    foo(pointer);
+    std::cout << *pointer << std::endl; // 11
+    // The shared_ptr will be destructed before leaving the scope
+    return 0;
+}
+```
+`std::shared_ptr` 可以通过 `get()` 方法来获取原始指针，通过 `reset()` 来减少一个引用计数， 并通过`use_count()`来查看一个对象的引用计数。例如：
+
+```cpp
+auto pointer = std::make_shared<int>(10);
+auto pointer2 = pointer; // 引用计数+1
+auto pointer3 = pointer; // 引用计数+1
+int *p = pointer.get();  // 这样不会增加引用计数
+std::cout << "pointer.use_count() = " << pointer.use_count() << std::endl;   // 3
+std::cout << "pointer2.use_count() = " << pointer2.use_count() << std::endl; // 3
+std::cout << "pointer3.use_count() = " << pointer3.use_count() << std::endl; // 3
+
+pointer2.reset();
+std::cout << "reset pointer2:" << std::endl;
+std::cout << "pointer.use_count() = " << pointer.use_count() << std::endl;   // 2
+std::cout << "pointer2.use_count() = "<< pointer2.use_count() <<std::endl;// pointer2 已 reset; 0
+std::cout << "pointer3.use_count() = " << pointer3.use_count() << std::endl; // 2
+pointer3.reset();
+std::cout << "reset pointer3:" << std::endl;
+std::cout << "pointer.use_count() = " << pointer.use_count() << std::endl;   // 1
+std::cout << "pointer2.use_count() = " << pointer2.use_count() << std::endl; // 0
+std::cout << "pointer3.use_count() = "<< pointer3.use_count() << std::endl; // pointer3 已 reset; 0
+```
+
+#### std::unique_ptr
+`std::unique_ptr `是一种独占的智能指针，它禁止其他智能指针与其共享同一个对象，从而保证代码的安全：
+```cpp
+std::unique_ptr<int> pointer = std::make_unique<int>(10); // make_unique 从 C++14 引入
+std::unique_ptr<int> pointer2 = pointer; // 非法
+```
+`mkae_unique` 是 C++14 引入的，用于创建一个 `std::unique_ptr` 对象，它是一个模板函数，可以接受任意参数， 并返回一个 `std::unique_ptr` 对象。
+
+既然是独占，换句话说就是不可复制。但是，我们可以利用 std::move 将其转移给其他的 unique_ptr，例如：
+```cpp
+#include <iostream>
+#include <memory>
+
+struct Foo {
+    Foo() { std::cout << "Foo::Foo" << std::endl; }
+    ~Foo() { std::cout << "Foo::~Foo" << std::endl; }
+    void foo() { std::cout << "Foo::foo" << std::endl; }
+};
+
+void f(const Foo &) {
+    std::cout << "f(const Foo&)" << std::endl;
+}
+
+int main() {
+    std::unique_ptr<Foo> p1(std::make_unique<Foo>());
+    // p1 不空, 输出
+    if (p1) p1->foo();
+    {
+        std::unique_ptr<Foo> p2(std::move(p1));
+        // p2 不空, 输出
+        f(*p2);
+        // p2 不空, 输出
+        if(p2) p2->foo();
+        // p1 为空, 无输出
+        if(p1) p1->foo();
+        p1 = std::move(p2);
+        // p2 为空, 无输出
+        if(p2) p2->foo();
+        std::cout << "p2 被销毁" << std::endl;
+    }
+    // p1 不空, 输出
+    if (p1) p1->foo();
+    // Foo 的实例会在离开作用域时被销毁
+}
+```
+#### std::weak_ptr
+使用弱引用指针 std::weak_ptr 可以解决 std::shared_ptr 的**循环引用**问题。循环引用是指两个或多个对象之间相互引用，从而导致它们的引用计数永远不会变为 0，**从而导致内存泄漏**。
+
+std::weak_ptr 是一种弱引用（相比较而言 std::shared_ptr 就是一种强引用）。弱引用不会引起引用计数增加，所以它不会影响对象的生命周期。当对象被释放后，std::weak_ptr 会自动变成一个空指针。
+### 并行与并发
