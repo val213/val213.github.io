@@ -46,14 +46,13 @@ lstopo - 查看系统拓扑结构
 
 ### NUMA（Non-Uniform Memory Access）
 - 非一致性内存访问
-- 一种多处理器系统架构
 - 每个处理器核心连接到一个或多个内存控制器
 - 每个内存控制器管理一部分内存
 - 处理器核心访问本地内存的延迟比访问远程内存的延迟低
 - NUMA 架构旨在减少内存访问延迟，提高系统性能
 
-### SMP（Symmetric Multiprocessing）
-- 对称多处理
+### SMP（Symmetric Multiprocessor）
+- 对称多处理器
 - 一种多处理器系统架构
 - 所有处理器核心共享同一内存
 - 每个处理器核心可以访问所有内存区域

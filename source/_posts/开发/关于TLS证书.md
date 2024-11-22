@@ -174,7 +174,7 @@ openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt 
 
 - -out server.crt：指定生成的自签名证书文件名为server.crt，并将其输出到当前目录。
 
-- -extensions v3_req：指定启用openssl.cnf配置文件中v3_req部分定义的扩展字段。这通常用于定义扩展的证书属性，比如Subject Alternative Name (SAN)。
+- -extensions v3_req：指定启用openssl.cnf配置文件中v3_req部分定义的扩展字段。这通常用于**定义扩展的证书属性**，比如Subject Alternative Name (SAN)。
 
 - -extfile openssl.cnf：指定要读取的扩展配置文件为openssl.cnf，它包含了v3_req扩展的具体配置。
 

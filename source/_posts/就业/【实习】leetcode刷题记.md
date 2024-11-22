@@ -6384,7 +6384,6 @@ public:
 };
 ```
 - **手撕快排（排序数组）**
-
 - **合并两个有序链表**
 ```C++
 class Solution {
@@ -6456,6 +6455,8 @@ public:
 ```
 - **数组中的第K个最大元素**
 - 字符串相加
+```c++
+
 - 二分查找
 - **K个一组翻转链表**
 ```c++
@@ -6553,9 +6554,10 @@ public:
 - **用RAND7()实现RAND10()**
 - 爬楼梯
 - 最长公共子序列
+
 - 有效的括号
 - 两数之和
-- 回文链表
+- **回文链表**
 - 数组中重复的数据
 - **寻找旋转排序数组中的最小值**
 ```c++
@@ -6650,10 +6652,9 @@ public:
 };
 ```
 - **字符串相乘**
-- **回文链表**
+
 - **打家劫舍**
 ```c++
-
 class Solution {
 public:
     int rob(vector<int>& nums) {
@@ -6671,6 +6672,7 @@ public:
 };
 ```
 - 打家劫舍 II
+和上一题的区别在于，这里是一个环形的房屋，第一个和最后一个房屋不能同时被偷。所以可以分成两种情况，一种是偷第一个房屋，一种是不偷第一个房屋。
 ```C++
 class Solution {
 public:
@@ -6691,6 +6693,60 @@ public:
             prev1 = current;
         }
         return current;
+    }
+};
+```
+
+
+## 面经
+- 零钱兑换
+```cpp
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        // dp[i]表示凑成金额i所需的最少硬币数
+        // 初始化 dp[0] = 0, dp[i] = amount + 1，因为硬币数不可能超过amount
+        int Max = amount + 1;
+        vector<int> dp(amount + 1, Max);
+        dp[0]=0;
+        // 遍历每个总金额
+        for (int i = 1;i<=amount;i++){
+            // 遍历每个硬币
+            for(int j = 0;j<coins.size();j++) {
+                // 如果当前硬币面值小于等于总金额
+                if (i-coins[j] >= 0)
+                // 则当前总金额的最少硬币数更新，如果当前总金额减去当前硬币面值的最少硬币数加上1小于当前的硬币数
+                dp[i]=min(dp[i-coins[j]]+1,dp[i]);
+            }
+        }
+        // 如果最后的硬币数大于amount，则返回-1，否则返回dp[amount]
+        return dp[amount]==Max? -1:dp[amount];
+    }
+};
+```
+- 环形缓冲区
+- 子树的最大平均值
+```c++
+class Solution {
+public:
+    double maximumAverageSubtree(TreeNode* root) {
+        double res = 0;
+        dfs(root,res);
+        return res;
+    }
+    pair<int,int> dfs(TreeNode* root, double& res){
+        // 返回值是一个pair，first是子树的节点数，second是子树的节点值之和
+        if (!root) return {0,0};
+        // 递归左右子树，得到的两个pair
+        auto left = dfs(root->left,res);
+        auto right = dfs(root->right,res);
+        // 当前子树的节点数和节点值之和
+        int sum = left.first+right.first+root->val;
+        int cnt = left.second+right.second+1;
+        // 更新res
+        res = max(res,(double)sum/cnt);
+        // 返回当前子树的节点数和节点值之和
+        return {sum,cnt};
     }
 };
 ```

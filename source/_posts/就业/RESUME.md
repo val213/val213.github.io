@@ -18,9 +18,9 @@ categories: 找个班上啦
 **DragonOS 开源社区**的贡献者，参与内核子系统的开发和维护，作为 reviewer 同时担任 SIG-Main 的主要负责人参与社区运营。
 	- 目前主要负责内核中**用户态和内核态全双工通信机制**——**Netlink** 协议栈的开发和**设备驱动模型中设备事件通知**——**Uevent** 机制的实现。
 	- 移植 dog —— 一个开源 DNS 查询 CLI 工具到 DragonOS 上，实现了在 DragonOS 上的 DNS 查询功能。
-	<!-- - 优化 **DragonReach** 的主进程，使用多线程分离 IO Bound task 和 CPU bound task，结合信号机制实现了**异步任务调度**，提高了主进程的并发性能，减少了大量对系统调用的请求。
+	- 优化 **DragonReach** 的主进程，使用多线程分离 IO Bound task 和 CPU bound task，结合信号机制实现了**异步任务调度**，提高了主进程的并发性能，减少了大量对系统调用的请求。
 		- **DragonReach** 是 DragonOS 的系统和服务管理器，与 Linux Systemd 兼容。
-	- 目前正在专注于**跨核负载均衡**的研究，尝试在调度子系统中，基于 CFS（完全公平调度器）和 PELT（负载追踪）实现跨核负载均衡。 -->
+	- 目前正在专注于**跨核负载均衡**的研究，尝试在调度子系统中，基于 CFS（完全公平调度器）和 PELT（负载追踪）实现跨核负载均衡，面向的是 serverless 场景。
 - ***IBM LinuxONE 可观测告警平台*** 
 **IBM × 华南理工大学的校企合作科研项目**，作为后台开发主要负责人，参与开发了一套 LinuxOne 平台的**可观测告警系统 MVP**。后端语言为Python，技术栈为 Prometheus + grafana + CherryPy + MariaDB。该项目采用多容器分离部署。主要负责项目可行方案的调研、环境的配置部署、可观测套件与后端交互的告警信息接口开发。
 	- 调研 zhmcclient、IBM zOS/s390x 架构和 zhmc_prometheus_exporter 的文档，确定对特定类型物理网卡 Nerwork adapter、虚拟网卡 NIC 在不同 cpc 和partition 上的监控方案
