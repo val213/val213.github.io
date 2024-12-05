@@ -133,7 +133,7 @@ loadbalancer是一种服务类型，它会在云服务商上创建一个负载�
 ingress是一种服务类型，它会在集群内部创建一个负载均衡器，然后将请求转发到各个node上。这种方法比loadbalancer更加灵活，因为我们可以在集群内部修改负载均衡器的配置，而不需要修改deployment.yaml文件。
 
 ### kubectl
-kubectl是k8s的命令行工具，可以用来管理集群。所有平台都可以使用kubectl，包括云服务商的控制台和minicube模拟的k8s集群。
+kubectl 是 k8s 的命令行工具，可以用来管理集群。所有平台都可以使用 kubectl，包括云服务商的控制台和 minicube 模拟的k8s集群。
 ```shell
 $ kubectl get nodes # 查看集群中的节点
 $ kubectl get pods # 查看集群中的pod
@@ -157,6 +157,7 @@ $ kubectl delete -f deployment.yaml # 删除应用
 - [kubernetes中文指南](https://www.bookstack.cn/read/kubernetes-handbook/README.md)
 
 ## 架构组件
+![k8s](image.png)
 borg: 谷歌内部的集群管理系统，k8s的前身。
 ![alt text](../image/image-467.png)
 - 主从节点：主节点负责调度，从节点负责运行容器。
@@ -174,10 +175,10 @@ borg: 谷歌内部的集群管理系统，k8s的前身。
   - Route Controller：负责路由。
   - Service Controller：负责服务。
 - Scheduler：负责调度，将 pod 分配到合理的 node 上。
-- etcd：保存了整个集群的状态。理解为一个 k8s 的 K-V 数据库。基于 Raft 算法实现分布式一致性。老版本基于内存，新版本基于持久化存储。
+- **etcd**：保存了整个集群的状态。理解为一个 k8s 的 K-V 数据库。基于 Raft 算法实现分布式一致性。老版本基于内存，新版本基于持久化存储。
 
 ### Node（节点组件）
-- Kubelet：负责与Master节点通信，接收Master节点的指令，管理容器。
+- Kubelet：负责与 Master 节点通信，接收 Master 节点的指令，管理容器。
 - Kube-proxy：负责维护网络规则，实现负载均衡。
 - Container runtime：负责运行容器。
 
@@ -289,6 +290,14 @@ Pod 可以定义两种类型的探针：`livenessProbe` 和 `readinessProbe`。�
 #### Service(横向)
 集群内部的服务发现，通过 Service 可以让 Pod 之间相互通信。Service 会为 Pod 提供一个虚拟 IP 和 DNS 名称，这样就可以通过 Service 的虚拟 IP 和 DNS 名称来访问 Pod。相当于是集群级别的端口映射。
 - ContainerPort：容器端口。
+##### service
+service 的类型有四种：
+- ExternalName：外部服务，将服务映射到外部地址。
+- NodePort：基于 ClusterIP，
+- LoadBalancer：基于 NodePort
+- ClusterIP：集群内部服务，通过 ClusterIP 来访问 Pod。
+
+既然可以通过上面的 ClusterIp 来实现集群内部的服务访问，那么如何注册服务呢？其实 K8s 并没有引入任何的注册中心，使用的就是 K8s 的 `kube-dns` 组件。然后 K8s 将 Service 的名称当做域名注册到 kube-dns 中，每一个Service在kube-dns中都有一条DNS记录，同时，如果有服务的ip更换，kube-dns自动会同步，对服务来说是不需要改动的。通过 Service 的名称就可以访问其提供的服务。那么问题又来了，如果一个服务的 pod 对应有多个，那么如何实现 LB？其实，最终通过 kube-proxy，实现负载均衡。也就是说 **kube-dns 通过 servicename 找到指定 clusterIP，kube-proxy完成通过 clusterIP 到 PodIP 的过程**。
 #### Ingress（纵向）
 将k8s集群内部的服务暴露到外部的服务。
 - ingress-nginx：Ingress 控制器，负责将外部流量路由到集群内的服务。七层负载均衡。
@@ -303,3 +312,9 @@ Pod 可以定义两种类型的探针：`livenessProbe` 和 `readinessProbe`。�
 ### 其他
 #### Role
 #### RoleBinding
+
+
+## tools
+### miniKube
+
+### kind
