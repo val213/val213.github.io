@@ -9,7 +9,7 @@ tags: language
 |--------------------------------|------------------------------------------------------------------------------|
 | **C++ Version**                    |                                                                              |
 | **Header Files**                   | **Self-contained Headers**, **The #define Guard**, **Include What You Use**, **Forward Declarations**, **Inline Functions**, **Names and Order of Includes** |
-| Scoping                        | **Namespaces**, Internal Linkage, Nonmember, Static Member, and Global Functions, Local Variables, Static and Global Variables, thread_local Variables |
+| Scoping                        | **Namespaces**, **Internal Linkage**, **Nonmember, Static Member, and Global Functions**, Local Variables, Static and Global Variables, thread_local Variables |
 | Classes                        | Doing Work in Constructors, Implicit Conversions, Copyable and Movable Types, Structs vs. Classes, Structs vs. Pairs and Tuples, Inheritance, Operator Overloading, Access Control, Declaration Order |
 | Functions                      | Inputs and Outputs, Write Short Functions, Function Overloading, Default Arguments, Trailing Return Type Syntax |
 | Google-Specific Magic          | Ownership and Smart Pointers, cpplint                                         |
@@ -298,3 +298,29 @@ inline void my_inline_function() {
     ```
 
 ### Internal Linkage 内部链接
+**所有声明都可以通过将其置于未命名命名空间中获得内部链接**。**通过声明函数和变量的名称（ static ），也可以将它们赋予内部链接**。这意味着您**声明的任何内容都无法从其他文件中访问**。如果另一个文件也声明了具有相同名称的实体，那么这两个实体**完全独立**。
+
+当 .cc 文件中的定义不需要在该文件外部被引用时，可以通过将它们放入未命名命名空间或使用 static 进行内部链接。不要在 .h 文件中使用这些构造。
+
+Decision:
+- 鼓励在 .cc 文件中使用内部链接，用于所有不需要在其他地方引用的代码。不要在 .h 文件中使用内部链接。
+- 像命名空间一样格式化未命名命名空间。在终止注释中，将命名空间名称留空：
+```cpp
+namespace {
+...
+}  // namespace
+```
+
+### Nonmember, Static Member, and Global Functions 非成员、静态成员和全局函数
+非成员函数应该放在命名空间中；很少使用完全的全局函数。不要仅仅为了分组静态成员而使用类。类的静态方法通常与类的实例或类的静态数据密切相关。
+
+Pros:
+- 在某些情况下，非成员函数和静态成员函数可能很有用。将非成员函数放在命名空间中可以避免污染全局命名空间。
+Cons:
+- 如果非成员函数和静态成员函数访问外部资源或具有重要依赖关系，则将其作为新类的成员可能更有意义。
+
+Decision:
+- 有时定义一个不绑定到类实例的函数是有用的。这样的函数可以是静态成员函数或非成员函数。非成员函数不应依赖于外部变量，并且几乎总是存在于命名空间中。不要创建仅用于分组静态成员的类；这与仅给名称一个公共前缀没有区别，而且这种分组通常是不必要的。
+- 如果定义了一个非成员函数，并且它只在其 .cc 文件中需要，请使用内部链接来限制其范围。
+
+### Local Variables
