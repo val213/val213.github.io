@@ -324,3 +324,94 @@ Decision:
 - 如果定义了一个非成员函数，并且它只在其 .cc 文件中需要，请使用内部链接来限制其范围。
 
 ### Local Variables
+将函数的变量放在尽可能狭窄的范围内，并在声明中初始化变量。
+
+C++ 允许在函数中的任何位置声明变量。我们鼓励将它们声明在尽可能局部的范围内，并尽可能靠近第一次使用。这使读者更容易找到声明，并查看变量的类型以及它的初始化方式。特别是，应使用初始化而不是声明和赋值，例如：
+```cpp
+int i = f();  // Good -- declaration has initialization.
+```
+```cpp
+int jobs = NumJobs();
+f(jobs);      // Good -- declaration immediately (or closely) followed by use.
+```
+Prefer initializing using brace initialization. /
+```cpp
+std::vector<int> v = {1, 2};  // Good -- v starts initialized.
+```
+在 if、while 和 for 语句中通常应声明需要的变量，以便这些变量被限制在这些作用域中。例如：
+```cpp
+while (const char* p = strchr(str, '/')) str = p + 1;
+```
+警告：如果变量是一个对象，那么每次进入作用域并创建时都会调用其构造函数，每次退出作用域时都会调用其析构函数。
+```cpp
+// Inefficient implementation:
+for (int i = 0; i < 1000000; ++i) {
+  Foo f;  // My ctor and dtor get called 1000000 times each.
+  f.DoSomething(i);
+}
+```
+在循环中使用的变量可能更有效地在循环外部声明：
+```cpp
+Foo f;  // My ctor and dtor get called once each.
+for (int i = 0; i < 1000000; ++i) {
+  f.DoSomething(i);
+}
+```
+### Static and Global Variables 静态和全局变量
+具有静态 storage duration 的对象是禁止使用的，除非它们是 trivially destructible 的。非正式地，这意味着即使考虑到成员和基类的析构函数，析构函数也不执行任何操作。也就是说，该类型没有用户定义的或虚拟的析构函数，并且所有基类和非静态成员都是平凡可销毁的。静态函数局部变量可以使用动态初始化。静态类成员变量或命名空间范围内的变量使用动态初始化是不鼓励的，但在有限的情况下是允许的；详情见下文。
+
+一个经验法则：如果考虑到它的声明，一个全局变量满足这些要求，那么它的声明在隔离的情况下可以是 `constexpr`。
+
+> 在C++中，"非平凡"（non-trivial）通常用于描述构造函数、析构函数、复制构造函数和赋值操作符等函数的复杂性。具体来说，非平凡的函数是指那些执行了超出简单内存操作的额外工作。
+>- **非平凡的构造函数**：如果构造函数执行了比如分配内存、调用其他函数或执行逻辑操作，那么它就是非平凡的。
+>- **平凡的构造函数**：如果构造函数只执行简单的内存初始化（例如，设置成员变量为默认值），那么它就是平凡的。
+>- **非平凡的析构函数**：如果析构函数执行了比如释放动态分配的内存、关闭文件或释放资源，那么它就是非平凡的。
+>- **平凡的析构函数**：如果析构函数不执行任何操作，或者只执行简单的内存释放，那么它就是平凡的。
+>- **非平凡的复制构造函数和赋值操作符**：如果这些函数执行比如深拷贝、分配内存或调用其他函数，那么它们就是非平凡的。
+>- **平凡的复制构造函数和赋值操作符**：如果这些函数只执行简单的内存复制，那么它们就是平凡的。
+
+Define:
+每个对象都有一个 storage duration，与它的生命周期相关。具有 static storage duration 的对象从初始化点一直存活到程序结束。此类对象在命名空间范围内作为变量出现（全局变量），作为**类的静态数据成员**，或者作为**使用 static 关键字声明的函数局部变量**。
+
+**函数局部静态变量**在控制流**首次通过其声明时初始化**；
+其他具有 static storage duration 的对象**在程序启动时初始化**。所有具有static storage duration 的对象在程序退出时被销毁（在未终止的线程之前发生）。
+
+初始化可能是动态的，这意味着在初始化过程中会发生一些非平凡的事情。（例如，考虑一个构造函数，它分配内存，或者一个被初始化为当前进程ID的变量。）另一种初始化是静态初始化。尽管这两种初始化方式并不完全对立，但静态初始化总是发生在具有静态存储持续时间的对象上（将对象初始化为给定的常量或所有字节都被设置为零的表示），而动态初始化则在必要时在静态初始化之后发生。
+
+Pros:
+- 全局和静态变量对于大量应用程序非常有用：命名常量、某个翻译单元内部的辅助数据结构、命令行标志、日志记录、注册机制、后台基础设施等。
+
+Cons:
+- 全局静态变量如果使用动态初始化或有复杂的析构函数，会带来复杂性，容易导致难以发现的错误。动态初始化不会在翻译单元之间按顺序进行，同样，析构也不按顺序进行（除非是按初始化顺序的逆序进行）。当一个初始化操作引用另一个具有静态存储期的变量时，有可能导致在该对象的生存期开始之前或结束之后对其进行访问。此外，如果程序启动了未在退出时关闭的线程，这些线程可能会在它们的析构函数已经运行之后尝试访问已经结束生命周期的对象。
+
+Decision:
+- Decision on destruction:
+    - 当析构函数是平凡的时，它们的执行根本不受顺序的影响（它们实际上没有“运行”）；否则，我们有可能在对象生命周期结束后尝试访问对象。因此，我们只允许具有静态存储持续时间的对象，如果它们是平凡可销毁的。基本类型（如指针和 int）是平凡可销毁的，平凡可销毁的类型的数组也是如此。请注意，用 constexpr 标记的变量是平凡可销毁的。
+    ```cpp
+    const int kNum = 10;  // Allowed
+
+    struct X { int n; };
+    const X kX[] = {{1}, {2}, {3}};  // Allowed
+
+    void foo() {
+    static const char* const kMessages[] = {"hello", "world"};  // Allowed
+    }
+
+    // Allowed: constexpr guarantees trivial destructor.
+    constexpr std::array<int, 3> kArray = {1, 2, 3};
+    ```
+    ```cpp
+    // bad: non-trivial destructor
+    const std::string kFoo = "foo";
+
+    // Bad for the same reason, even though kBar is a reference (the
+    // rule also applies to lifetime-extended temporary objects).
+    const std::string& kBar = StrCat("a", "b", "c");
+
+    void bar() {
+    // Bad: non-trivial destructor.
+    static std::map<int, int> kData = {{1, 0}, {2, 0}, {3, 0}};
+    }
+    ```
+- Decision on initialization:
+- Common patterns:
