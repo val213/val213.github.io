@@ -358,7 +358,7 @@ for (int i = 0; i < 1000000; ++i) {
 }
 ```
 ### Static and Global Variables 静态和全局变量
-具有静态 storage duration 的对象是禁止使用的，除非它们是 trivially destructible 的。非正式地，这意味着即使考虑到成员和基类的析构函数，析构函数也不执行任何操作。也就是说，该类型没有用户定义的或虚拟的析构函数，并且所有基类和非静态成员都是平凡可销毁的。静态函数局部变量可以使用动态初始化。静态类成员变量或命名空间范围内的变量使用动态初始化是不鼓励的，但在有限的情况下是允许的；详情见下文。
+禁止使用不是 平凡可销毁 (trivially destructible) 的具有static storage duration 的对象。这意味着就算考虑到成员和基类的析构函数，析构函数也不执行任何操作。也就是说，该类型没有用户定义的或虚拟的析构函数，并且所有基类和非静态成员都是平凡可销毁的。静态函数局部变量可以使用动态初始化。静态类成员变量或命名空间范围内的变量使用动态初始化是不鼓励的，但在有限的情况下是允许的；详情见下文。
 
 一个经验法则：如果考虑到它的声明，一个全局变量满足这些要求，那么它的声明在隔离的情况下可以是 `constexpr`。
 
@@ -384,9 +384,9 @@ Pros:
 Cons:
 - 全局静态变量如果使用动态初始化或有复杂的析构函数，会带来复杂性，容易导致难以发现的错误。动态初始化不会在翻译单元之间按顺序进行，同样，析构也不按顺序进行（除非是按初始化顺序的逆序进行）。当一个初始化操作引用另一个具有静态存储期的变量时，有可能导致在该对象的生存期开始之前或结束之后对其进行访问。此外，如果程序启动了未在退出时关闭的线程，这些线程可能会在它们的析构函数已经运行之后尝试访问已经结束生命周期的对象。
 
-Decision:
-- Decision on destruction:
-    - 当析构函数是平凡的时，它们的执行根本不受顺序的影响（它们实际上没有“运行”）；否则，我们有可能在对象生命周期结束后尝试访问对象。因此，我们只允许具有静态存储持续时间的对象，如果它们是平凡可销毁的。基本类型（如指针和 int）是平凡可销毁的，平凡可销毁的类型的数组也是如此。请注意，用 constexpr 标记的变量是平凡可销毁的。
+Decision
+- Decision on destruction / 析构函数的决策
+    - 当析构函数是平凡的时，它们的执行根本不受顺序的影响（它们实际上没有“运行”）；否则，我们有可能在对象生命周期结束后尝试访问对象。所以我们只允许平凡可销毁的具有 static storage duration 的对象。基本类型（如指针和 int 整型）是平凡可销毁的，平凡可销毁类型的数组也是如此。注意，用 `constexpr` 标记的常量表达式也是平凡可销毁的。
     ```cpp
     const int kNum = 10;  // Allowed
 
@@ -397,21 +397,22 @@ Decision:
     static const char* const kMessages[] = {"hello", "world"};  // Allowed
     }
 
-    // Allowed: constexpr guarantees trivial destructor.
+    // Allowed: constexpr 保证了平凡析构
     constexpr std::array<int, 3> kArray = {1, 2, 3};
     ```
+
     ```cpp
-    // bad: non-trivial destructor
+    // bad: 非平凡析构
     const std::string kFoo = "foo";
 
-    // Bad for the same reason, even though kBar is a reference (the
-    // rule also applies to lifetime-extended temporary objects).
+    // Bad for the same reason, 尽管 kBar 是一个引用（该规则也适用于存活时间延长的临时对象），但由于非平凡析构函数，所以是不好的。
     const std::string& kBar = StrCat("a", "b", "c");
 
     void bar() {
-    // Bad: non-trivial destructor.
+    // Bad: 非平凡析构
     static std::map<int, int> kData = {{1, 0}, {2, 0}, {3, 0}};
     }
     ```
-- Decision on initialization:
-- Common patterns:
+- Decision on initialization / 初始化的决策
+
+- Common patterns / 通用模式
