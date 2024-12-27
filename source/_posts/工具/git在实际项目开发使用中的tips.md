@@ -98,3 +98,38 @@ git clone --branch feature-branch --single-branch <repository-url>
 ```
 
 这样只会拉取指定的分支，节省时间和空间。
+
+# 安全
+## 敏感信息
+### 不小心把 .env 提交了，怎么清理现场？
+一般来说，不能这么不小心，一定要在提交前确保 .env 被写进了 .gitignore 文件。但是，如果真的不小心提交了，可以使用以下方法清理 commit 历史：
+#### 使用 git filter-branch
+git filter-branch 是 Git 自带的一个工具，用于重写 Git 仓库的历史记录。它的工作原理如下：  
+- 遍历提交：遍历 Git 仓库的所有提交。
+- 应用过滤器：对每个提交应用指定的过滤器（如删除文件）。
+- 重写提交：重写每个提交，以反映应用过滤器后的更改。
+- 更新引用：更新所有引用（如分支和标签），以指向重写后的提交。
+其他工具的工作原理也类似，但可能有更多功能和选项。以下是使用 git filter-branch 清理 .env 文件的具体步骤：
+1. 运行 git filter-branch： 打开命令提示符，导航到您的 Git 仓库，并运行以下命令来删除 .env 文件：  
+```bash
+git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch .env' --prune-empty --tag-name-filter cat -- --all
+```
+清理 Git 历史记录： 运行以下命令来清理和压缩 Git 历史记录：  
+```bash
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+git push --force
+```
+#### 使用 git filter-repo 清理敏感信息
+如果很不幸，该分支被粗心的 reviewer merge 到其他远程分支了，那么处理清理该分支，你可能需要清理整个项目的 commit 历史。这时，可以使用 git filter-repo 工具来清理敏感信息。以下是具体步骤：
+1. 安装 git filter-repo： 如果还没有安装 git filter-repo，可以通过以下命令安装：  
+`pip install git-filter-repo`
+2. 清理敏感信息： 使用 git filter-repo 删除 .env 文件：  
+`git filter-repo --path .env --invert-paths`
+3. 强制推送更改到远程仓库： 清理完敏感信息后，您需要强制推送更改到远程仓库的 main 分支：  
+```bash
+git push origin --force --all
+git push origin --force --tags
+```
+#### 使用 BFG Repo-Cleaner 清理敏感信息
+还没用过，暂时不做介绍。
