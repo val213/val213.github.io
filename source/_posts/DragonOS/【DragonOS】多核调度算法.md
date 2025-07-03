@@ -231,7 +231,7 @@ void trigger_load_balance(struct rq *rq)
 &emsp;&emsp;请注意，由于软中断的可重入、可并发性，所以软中断处理程序需要自己保证线程安全。
 
 ### 调度域和调度组
-一个任务在小核cluster上的CPU之间的迁移所带来的性能开销一定是小于任务从小核cluster的CPU迁移到大核cluster的开销。因此，为了更好的执行负载均衡，我们需要构建和CPU拓扑相关的数据结构，也就是调度域和调度组的概念。
+一个任务在小核 cluster 上的 CPU 之间的迁移所带来的性能开销一定是小于任务从小核 cluster 的 CPU 迁移到大核 cluster 的开销。因此，为了更好的执行负载均衡，我们需要构建和 CPU 拓扑相关的数据结构，也就是调度域和调度组的概念。
 
 - 调度域
 调度域是CPU拓扑中某一层级里面，与某个逻辑CPU关联（该CPU称为主权CPU）的所有逻辑CPU的集合。
@@ -353,3 +353,5 @@ PELT 的数据统计和 sched_domain 配合：
 
 ### 参考
 http://www.wowotech.net/process_management/load_balance_function.html
+
+- Energy aware scheduling (EAS) 能量感知调度，暂时不管
