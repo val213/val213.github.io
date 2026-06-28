@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1-hestness-three-regions.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2-scaling-exponents.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3-transformer-vs-lstm.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5-mup-vs-sp.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7-wsd-lr-diagram.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8-wsd-loss-curve.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6-minicpm-lr-stable.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9-deepseek-isoflop.png">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4-critical-batch-size.png">
+<meta property="article:published_time" content="2026-04-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.320Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Scaling Laws">
+<meta property="article:tag" content="muP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1-hestness-three-regions.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/04/09/%E7%A1%85%E8%B0%B7101%E5%BC%A0%E9%98%94%E8%AE%BF%E8%B0%88-AI%E6%B5%AA%E6%BD%AE%E4%B8%AD%E7%9A%84%E7%94%9F%E6%80%81%E4%BD%8D%E4%B8%8E%E8%AE%A4%E7%9F%A5%E9%94%9A%E7%82%B9/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记&body=Check out this article: https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%BF%99%E4%B8%8D%E6%98%AF%E4%BB%80%E4%B9%88%E6%96%B0%E9%B2%9C%E4%BA%8B"><span class="toc-number">1.</span> <span class="toc-text">一、这不是什么新鲜事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%B9%82%E5%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">二、为什么是幂律</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E7%BC%A9%E6%94%BE%E5%AE%9A%E5%BE%8B%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-number">3.</span> <span class="toc-text">三、数据缩放定律能做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%9E%B6%E6%9E%84%E6%AF%94%E8%BE%83"><span class="toc-number">4.</span> <span class="toc-text">四、架构比较</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%BB%99%E5%AE%9A%E7%AE%97%E5%8A%9B%EF%BC%8C%E5%8F%82%E6%95%B0%E5%92%8C%E6%95%B0%E6%8D%AE%E6%80%8E%E4%B9%88%E5%88%86%EF%BC%9F"><span class="toc-number">5.</span> <span class="toc-text">五、给定算力，参数和数据怎么分？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%B6%85%E5%8F%82%E6%95%B0%E6%80%8E%E4%B9%88%E8%B7%A8%E8%A7%84%E6%A8%A1%E8%BF%81%E7%A7%BB"><span class="toc-number">6.</span> <span class="toc-text">六、超参数怎么跨规模迁移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%B7%A5%E4%B8%9A%E7%95%8C%E5%AE%9E%E9%99%85%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9A%E7%9A%84"><span class="toc-number">7.</span> <span class="toc-text">七、工业界实际是怎么做的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F"><span class="toc-number">8.</span> <span class="toc-text">八、批量大小</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%A6%81%E7%82%B9"><span class="toc-number">9.</span> <span class="toc-text">核心要点</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-04-10T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-04-11</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.320Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Scaling-Laws/" rel="tag">Scaling Laws</a>, <a class="p-category" href="/tags/muP/" rel="tag">muP</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>整理自 CS336 的 Lecture 9 和 Lecture 11。两讲都在回答同一个工程问题——给定有限算力，怎么精准预测超大模型的训练效果，避免无谓的试错浪费。</p>
+<p>假设你有 100,000 块 H100，一个月。你要训一个最好的开源 LM，架构、数据集、分布式框架全都备好了。问题是超参数怎么选，参数量和数据量怎么分配，哪个架构值得押注。传统做法是挨个训大模型试，新的做法是先在小模型上建立定量关系，然后一次到位。Scaling Laws 讲的就是后者。</p>
+<hr>
+<h2 id="一、这不是什么新鲜事">一、这不是什么新鲜事</h2>
+<p>Scaling Laws 这个思路，最早可能要追溯到 Bell Labs 1993 年的一篇 NeurIPS 论文，大意是在大型数据库上训分类器代价太高，我们需要在不完整训练的情况下预测模型好坏。他们给出的函数形式是测试误差 ≈ 不可约误差 + 多项式衰减项，换皮就是今天的缩放定律公式。他们甚至做了同样的事：训一批小模型，拟合曲线，预测更大规模的表现。</p>
+<p>再往后是 Banko/Brill 的工作，研究 NLP 系统性能随数据量的变化——x 轴对数数据量，y 轴性能，直线关系，甚至讨论了&quot;算法研发 vs 直接堆数据&quot;的取舍，和今天预训练的思路如出一辙。</p>
+<p>真正大规模的神经网络缩放定律实证是 Hestness et al. 2017（那时他们在百度），用机器翻译、语音、语言建模多个任务验证了误差以幂律形式下降。更重要的是他们提出了一个三段式框架：随机猜测区、幂律区、不可约误差区。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1-hestness-three-regions.png" alt=""></p>
+<p>随机猜测区是模型还没学到东西，很难预测；不可约误差区是数据分布自身的熵下限，永远突破不了；中间的<strong>幂律区</strong>才是我们真正关心的，可预测，规律稳定。最近几年有人在谈&quot;涌现能力&quot;、&quot;Scaling 计算是新事物&quot;，但仔细读过 Hestness 的人 2017 年就可以预见到这些了。</p>
+<hr>
+<h2 id="二、为什么是幂律">二、为什么是幂律</h2>
+<p>幂律的含义是在双对数坐标下 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>L</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\log(L)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord mathnormal">L</span><span class="mclose">)</span></span></span></span> 关于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\log(D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mclose">)</span></span></span></span> 是直线，等价于损失和数据量之间是多项式关系。</p>
+<p>为什么多项式是自然的？从最简单的例子开始——估计一个 Gaussian 均值，n 个样本的估计误差是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup><mi mathvariant="normal">/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">\sigma^2/n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord mathnormal">n</span></span></span></span>，斜率是 -1。往复杂推，如果是在 D 维空间里估计任意回归函数，用最简单的 nonparametric 方法（把空间切成小格子，每格取平均），推导下来误差是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>n</mi><mrow><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>D</mi></mrow></msup></mrow><annotation encoding="application/x-tex">n^{-1/D}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.888em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1/</span><span class="mord mathnormal mtight" style="margin-right:0.0278em;">D</span></span></span></span></span></span></span></span></span></span></span></span>，斜率是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">-1/D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span>。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2-scaling-exponents.png" alt=""></p>
+<p>实际测到的斜率——机器翻译 -0.13，语音 -0.3，语言建模 -0.095——跟理论上的 -1 和 -0.5 差很远，原因就是自然语言的内在维度极高，每新增一倍数据，每个维度只能学到一点点。这个指数近似编码了任务本身的&quot;学习难度&quot;。-0.095 是语言这种高维数据的性质在实验中所展现的斜率。</p>
+<hr>
+<h2 id="三、数据缩放定律能做什么">三、数据缩放定律能做什么</h2>
+<p>基本公式（来自 Kaplan 2020）：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>L</mi><mo>=</mo><msup><mrow><mo fence="true">(</mo><mfrac><mi>D</mi><mrow><mn>5.4</mn><mo>×</mo><msup><mn>10</mn><mn>13</mn></msup></mrow></mfrac><mo fence="true">)</mo></mrow><mrow><mo>−</mo><mn>0.095</mn></mrow></msup></mrow><annotation encoding="application/x-tex">L = \left( \frac{D}{5.4 \times 10^{13}} \right)^{-0.095}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.604em;vertical-align:-0.95em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">13</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.654em;"><span style="top:-3.9029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">0.095</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>有一个很有工程价值的结论是，数据成分对斜率没影响，只改变截距。你换数据混合比例——更多 Code，更多 Wikipedia，更少网页爬取——改变的是曲线在纵轴上的高低，但斜率不变。这意味着最优数据配比可以在小模型上确定，结论直接搬到大模型，不需要重新验证。</p>
+<p>&quot;我们要跑完互联网数据了怎么办&quot;这个问题的答案是可以重复用数据，但大约 4 个 epoch 之后收益会急剧衰减，可以用修正的缩放定律建模&quot;有效 token 数&quot;随重复次数的变化来量化。给定训练 budget，多重复一遍精标数据还是用低质量的新数据，这两件事在缩放定律框架下也都可以量化再做决策。</p>
+<p>使用时要注意三件事：一是不能进入饱和区，测数据缩放时模型要够大，测模型缩放时数据要够多，否则幂律就不成立了；二是只能预测预训练困惑度，下游任务的缩放行为远没那么稳定；三是双对数坐标下必须是干净的直线，有明显曲率或抖动就说明还没进入幂律区。</p>
+<hr>
+<h2 id="四、架构比较">四、架构比较</h2>
+<p>传统做法是把候选架构都训到 GPT-3 规模再比。缩放定律的做法是在多个计算量级上都训一批，看曲线形状和相对偏移。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3-transformer-vs-lstm.png" alt=""></p>
+<p>Transformer vs LSTM 的结论是，无论在哪个规模，LSTM 大概有 15 倍的计算效率劣势，对数坐标下是一条平行曲线，不会随模型变大消失。这个结论在小规模就可以看到，无需等到百亿级。Google E. Tay 等人做过更宏观的架构扫描，把一堆变体都跑了缩放曲线，只有两件事在缩放上稳定击败了标准 Transformer——GLU 和 Mixture of Experts。这就是今天工业界做 Switch Transformer 和 SwiGLU 的底层依据之一。</p>
+<p>有个容易踩的坑是嵌入层参数不能混入非嵌入参数的分析中。嵌入层的缩放行为异常，会让双对数图出现弯曲，污染整个分析。</p>
+<hr>
+<h2 id="五、给定算力，参数和数据怎么分？">五、给定算力，参数和数据怎么分？</h2>
+<p>数据和架构都选好之后，还需要确定：<strong>给定总算力预算，应该训一个大模型用少量 token，还是一个小模型用大量 token？</strong></p>
+<p>这就是 Chinchilla 2022（DeepMind）解决的问题。他们系统地做了 isoflop 分析——在同等 FLOP 下，扫描不同的参数量和 token 数组合，找每个算力量级下的最优点，然后拟合出那条最优曲线。</p>
+<p>结论是 <strong>20:1</strong>——每个参数对应 20 个训练 token。这当时推翻了&quot;参数比数据重要&quot;的普遍看法（GPT-3 用了约 1:1 的比例，严重欠训练数据）。</p>
+<p>但 20:1 是&quot;最小化训练计算量&quot;下的最优解，不是&quot;最小化总成本&quot;的最优解。训练完之后模型要推理多年，推理成本才是真正的大头。从推理成本角度，用更多数据训一个更小的模型，部署才更便宜。各家自己跑的结果——Llama 3 70B 大约 39:1，Hunyuan-Large（MoE，活跃参数）96:1，MiniCPM 192:1——20 其实是一个不太稳定的基准。直接抄 20:1 不如自己做一次 isoflop 分析。</p>
+<hr>
+<h2 id="六、超参数怎么跨规模迁移">六、超参数怎么跨规模迁移</h2>
+<p>Chinchilla 分析解决了&quot;训多大、训多久&quot;的问题，但还有一个问题没解决：<strong>超参数怎么选？</strong></p>
+<p>小模型调好的学习率，放到大模型上往往就失效了——因为随着模型宽度增大，最优学习率会持续下移。每次换规模都要重新搜索，而在大模型上搜索超参数代价极高。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5-mup-vs-sp.png" alt=""></p>
+<p>上图左边是标准参数化（Standard Practice）：不同宽度的模型，最优学习率（图中各条曲线的最低点）持续向左漂移。右边是 muP：最低点在同一位置稳定不动。这就是 muP 解决的问题——让超参数跨规模稳定，一次调好，直接用到大模型。</p>
+<p><strong>muP 的核心操作</strong></p>
+<p>muP 基于两个假设：激活值的量级在宽度增大时保持稳定，以及一步梯度更新带来的激活值变化也要保持稳定。从这两个假设可以推导出：</p>
+<ul>
+<li>初始化标准差 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><mn>1</mn><mi mathvariant="normal">/</mi><msqrt><mtext>fanin</mtext></msqrt></mrow><annotation encoding="application/x-tex">\sim 1/\sqrt{\text{fanin}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1822em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9322em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord text"><span class="mord">fanin</span></span></span></span><span style="top:-2.8922em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1078em;"><span></span></span></span></span></span></span></span></span>，和标准 Kaiming 初始化一样，这部分不用改</li>
+<li>学习率（Adam）<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><mn>1</mn><mi mathvariant="normal">/</mi><mtext>fanin</mtext></mrow><annotation encoding="application/x-tex">\sim 1/\text{fanin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord text"><span class="mord">fanin</span></span></span></span></span>，<strong>每层不同</strong>，随宽度成反比——这是和标准参数化真正不同的地方</li>
+<li>Attention 内积缩放用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>D</mi></mrow><annotation encoding="application/x-tex">1/D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span> 替代 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><msqrt><mi>D</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{D}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1767em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9267em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span><span style="top:-2.8867em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1133em;"><span></span></span></span></span></span></span></span></span></li>
+</ul>
+<p>对 SGD 来说 muP 和标准参数化差别不大；真正的区别在 Adam 上——如果你用 Adam（绝大多数情况都是），per-layer learning rate 才是要改的东西。</p>
+<p>muP 的失效场景：可学习的 LayerNorm 增益或偏置、非标准优化器、过强的权重衰减（如 0.1）都会破坏迁移。另外 muP 不是必要条件，DeepSeek 没用 muP 也训出了好模型，只是学习率需要随规模手动调整。muP 的价值是让这个调整变可预测，不是 0 到 1 的开关。</p>
+<hr>
+<h2 id="七、工业界实际是怎么做的">七、工业界实际是怎么做的</h2>
+<p>有了&quot;参数-数据最优比&quot;和&quot;超参数跨规模迁移&quot;这两块，就可以看各家是怎么把它们组合成一套完整的训练配方的。</p>
+<p><strong>Cerebras-GPT</strong> 训了 0.1B 到 13B 的完整系列，这是 muP 最早的大规模公开验证之一。做法是压缩到 40M 极小模型做超参搜索，然后通过 muP 规则迁移到更大规模。标准参数化下损失曲线有抖动，muP 下和理论预测高度吻合。不是 muP 让模型更好，是 muP 让超参数更可预测——在小模型上把事情定好之后，你对放大之后的行为有更高的置信度。</p>
+<p><strong>MiniCPM</strong> 用了 muP，同时引入了一个叫 WSD 的学习率调度器来降低 Chinchilla 分析的成本。</p>
+<p>做 Chinchilla 分析需要多个不同 token 数的训练结果。标准余弦调度的问题是每个终止时间点对应一条不同的余弦曲线，checkpoint 不能复用，n 个终止点就要从头训 n 次，是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 的代价。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7-wsd-lr-diagram.png" alt=""></p>
+<p>WSD 把学习率变成梯形——上升、平台期、下降。平台期的 checkpoint 可以复用，只需从某个节点开始下降就等同于完整训练到那个 token 数的结果，代价降到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8-wsd-loss-curve.png" alt=""></p>
+<p>用 WSD 训练时 loss 曲线会呈现&quot;长平台 + 急速下降&quot;的形状，看起来很奇怪，但在每个 token 数节点上实际都不输余弦。MiniCPM 的 muP 验证结果如下——不同规模模型的最优学习率落在同一位置，跨 4 个数量级稳定：</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6-minicpm-lr-stable.png" alt=""></p>
+<p><strong>DeepSeek</strong> 完全不用 muP。取两个小规模模型，每个规模都做 batch size × learning rate 的网格搜索，找最优点，然后拟合这两个最优值随 FLOP 的变化曲线，外推到大模型。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9-deepseek-isoflop.png" alt=""></p>
+<p>他们的 Chinchilla isoflop 分析拟合得非常干净——不同算力量级下的最优模型大小和 token 数都在一条平滑曲线上。batch size 的拟合也很干净；learning rate 的拟合稍微可疑一点（一条水平线可能也能解释数据），但他们用了斜线，7B 和 67B 的最终 loss 也完全符合小规模外推的预测。</p>
+<p>三种路径底层逻辑是一样的——在小模型上做大量实验，建立定量关系，一次性打到大模型。区别只是 muP 需要改初始化和 per-layer 学习率，工程侵入性稍高；直接拟合更朴素，但要求对缩放定律有较强的信念。</p>
+<hr>
+<h2 id="八、批量大小">八、批量大小</h2>
+<p>稍微补充一个常被忽视的细节。Batch size 小于某个阈值时，加倍 batch size 近似等于多走一步梯度，系统并行和优化效率同时赚到。超过这个阈值之后，额外样本不再减少有效噪声，进入边际递减。这个阈值就是 critical batch size。</p>
+<p><img src="/images/cs336-spring-2025-lecture-9-11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4-critical-batch-size.png" alt=""></p>
+<p>有趣的是 <strong>loss 越低，critical batch size 越大</strong>。模型训练到后期 loss 已经很低，这时候可以用更大的 batch size 继续保持效率。Llama 3 的训练报告里会出现&quot;训练途中增大 batch size&quot;，就是这个性质的直接推论，不是任性操作。</p>
+<hr>
+<h2 id="核心要点">核心要点</h2>
+<p><strong>Scaling Laws 的本质</strong>：用万级算力的小实验，指导百亿级算力的大模型训练。它是一个工程决策工具，并非精准的物理定律。</p>
+<p><strong>幂律斜率的含义</strong>：它编码了任务的内在维度和学习难度。特定在语言这种高维数据上的实验结果就是 -0.095 。</p>
+<p>**Chinchilla 20:1 不是 Magic Number **：各家的实际复现都各有差异。做自己的 isoflop 分析更靠谱。</p>
+<p><strong>muP 的核心差异</strong>：对 SGD 来说 muP 跟标准参数化差别不大；真正的区别在 Adam 上——per-layer learning rate 随宽度成反比。如果你用 Adam，这才是要改的东西。</p>
+<p><strong>WSD 调度器</strong>：不是因为它比余弦更好，而是因为它让 Chinchilla 分析的成本从 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 降到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。工程 hack，不是理论突破。</p>
+<p><strong>不同路径殊途同归</strong>：Cerebras/MiniCPM 用 muP，DeepSeek 用直接拟合，Llama 3/Hunyuan 做 isoflop 分析。底层逻辑是一样的：small-scale experiments → extrapolate → nail it once。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%BF%99%E4%B8%8D%E6%98%AF%E4%BB%80%E4%B9%88%E6%96%B0%E9%B2%9C%E4%BA%8B"><span class="toc-number">1.</span> <span class="toc-text">一、这不是什么新鲜事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%B9%82%E5%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">二、为什么是幂律</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E7%BC%A9%E6%94%BE%E5%AE%9A%E5%BE%8B%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-number">3.</span> <span class="toc-text">三、数据缩放定律能做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%9E%B6%E6%9E%84%E6%AF%94%E8%BE%83"><span class="toc-number">4.</span> <span class="toc-text">四、架构比较</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%BB%99%E5%AE%9A%E7%AE%97%E5%8A%9B%EF%BC%8C%E5%8F%82%E6%95%B0%E5%92%8C%E6%95%B0%E6%8D%AE%E6%80%8E%E4%B9%88%E5%88%86%EF%BC%9F"><span class="toc-number">5.</span> <span class="toc-text">五、给定算力，参数和数据怎么分？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%B6%85%E5%8F%82%E6%95%B0%E6%80%8E%E4%B9%88%E8%B7%A8%E8%A7%84%E6%A8%A1%E8%BF%81%E7%A7%BB"><span class="toc-number">6.</span> <span class="toc-text">六、超参数怎么跨规模迁移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%B7%A5%E4%B8%9A%E7%95%8C%E5%AE%9E%E9%99%85%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9A%E7%9A%84"><span class="toc-number">7.</span> <span class="toc-text">七、工业界实际是怎么做的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F"><span class="toc-number">8.</span> <span class="toc-text">八、批量大小</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%A6%81%E7%82%B9"><span class="toc-number">9.</span> <span class="toc-text">核心要点</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记&body=Check out this article: https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/04/11/cs336-spring-2025-lecture-9&amp;11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 9 &amp; 11：Scaling Laws》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.320Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Alignment">
+<meta property="article:tag" content="RLVR">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/05/17/cs366-spring-2025-lecture-15-alignment-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记&body=Check out this article: https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PPO-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B2%A1%E4%BA%BA%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">PPO 为什么没人用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GRPO%EF%BC%9A%E6%9E%81%E7%AE%80-RL-%E7%AE%97%E6%B3%95%E7%9A%84%E5%B4%9B%E8%B5%B7"><span class="toc-number">2.</span> <span class="toc-text">GRPO：极简 RL 算法的崛起</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-number">2.1.</span> <span class="toc-text">核心思想</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dr-GRPO%EF%BC%9A%E4%B8%A4%E4%B8%AA%E6%95%B0%E5%AD%A6%E7%BC%BA%E9%99%B7%E4%B8%8E%E4%BF%AE%E6%AD%A3"><span class="toc-number">3.</span> <span class="toc-text">Dr. GRPO：两个数学缺陷与修正</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E7%90%86%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%A1%88%E4%BE%8B"><span class="toc-number">4.</span> <span class="toc-text">推理模型训练案例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DeepSeek-R1"><span class="toc-number">4.1.</span> <span class="toc-text">DeepSeek R1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kimi-K1-5%EF%BC%9A%E5%B7%A5%E7%A8%8B%E4%BC%98%E5%8C%96%E7%9A%84%E5%85%B8%E8%8C%83"><span class="toc-number">4.2.</span> <span class="toc-text">Kimi K1.5：工程优化的典范</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Qwen-3%EF%BC%9A%E4%BD%8E%E6%95%B0%E6%8D%AE-RL-%E4%B8%8E%E6%8E%A8%E7%90%86%E5%8F%AF%E6%8E%A7%E6%80%A7"><span class="toc-number">4.3.</span> <span class="toc-text">Qwen 3：低数据 RL 与推理可控性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">课程总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-05-17T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-05-18</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.320Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Alignment/" rel="tag">Alignment</a>, <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/RLVR/" rel="tag">RLVR</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>上节课讲到 RLHF 的两大致命问题——<strong>过度优化</strong>和<strong>校准性丧失</strong>——这些问题让人类反馈的路越走越窄。人类偏好太嘈杂、太容易被 hack，很难支撑真正的规模化强化学习。</p>
+<p>于是自然的思路是：既然 RL 在奖励明确、可自动验证的领域（如 AlphaGo、AlphaFold）已经大获成功，那能不能把同样的思想用到语言模型后训练上？把&quot;人类喜不喜欢&quot;换成&quot;答案对不对&quot;？这就是本节课的主题——<strong>基于可验证奖励的强化学习（RLVR, Reinforcement Learning from Verifiable Rewards）</strong>，也就是驱动 o1、DeepSeek R1 这些推理模型爆发的核心技术。</p>
+<h2 id="PPO-为什么没人用">PPO 为什么没人用</h2>
+<p>InstructGPT 提出的 PPO 方案在理论上很优美，但工业界几乎没有人真的用它。核心原因就一个字：<strong>复杂</strong>。</p>
+<p>PPO 需要同时维护三个大模型：策略模型、价值模型、奖励模型。价值模型和策略模型一样大，光是显存就翻了一倍。还有广义优势估计（GAE）模块、脆弱的逐 token KL 惩罚（数值不稳定时会裁剪到 0）。典型 PPO 的裁剪范围设置为 0.2，即允许新旧策略的概率比在 0.8 到 1.2 之间浮动——任何一个细节出错都会导致性能崩溃。</p>
+<p>更根本的问题是：<strong>DPO 适合成对偏好数据，但数学、代码这些领域没有成对结构</strong>——一道题只存在&quot;对&quot;或&quot;错&quot;，没有&quot;回答 A 比回答 B 更好&quot;这种偏好信号。所以 RLVR 的场景恰好是 DPO 的盲区，却是 RL 天然的主场。</p>
+<h2 id="GRPO：极简-RL-算法的崛起">GRPO：极简 RL 算法的崛起</h2>
+<p>GRPO（组相对策略优化）由 DeepSeek 在 2024 年提出，目标是<strong>去掉价值模型，用极简实现做 RL</strong>。</p>
+<h3 id="核心思想">核心思想</h3>
+<p>PPO 的裁剪机制和 KL 正则化都保留，但把复杂的广义优势估计替换成组内归一化的奖励。具体来说：对于每个问题（一个 group），采样 G 个回答，用这 G 个回答的奖励均值作为自然基线，奖励的标准差做归一化——这就是一个简单的 z-score。</p>
+<p><strong>优势计算</strong>：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>r</mi><mi>i</mi></msub><mo>−</mo><mi>m</mi><mi>e</mi><mi>a</mi><mi>n</mi><mo stretchy="false">(</mo><mo stretchy="false">{</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>r</mi><mn>2</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>r</mi><mi>G</mi></msub><mo stretchy="false">}</mo><mo stretchy="false">)</mo></mrow><mrow><mi>s</mi><mi>t</mi><mi>d</mi><mo stretchy="false">(</mo><mo stretchy="false">{</mo><msub><mi>r</mi><mn>1</mn></msub><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>r</mi><mi>G</mi></msub><mo stretchy="false">}</mo><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn><mi>e</mi><mo>−</mo><mn>4</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">A_i = \frac{r_i - mean(\{r_1, r_2, ..., r_G\})}{std(\{r_1, ..., r_G\}) + 1e-4}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">d</span><span class="mopen mtight">({</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3173em;"><span style="top:-2.357em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mpunct mtight">,</span><span class="mord mtight">...</span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3567em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">G</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1433em;"><span></span></span></span></span></span></span><span class="mclose mtight">})</span><span class="mbin mtight">+</span><span class="mord mtight">1</span><span class="mord mathnormal mtight">e</span><span class="mbin mtight">−</span><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">an</span><span class="mopen mtight">({</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3173em;"><span style="top:-2.357em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3173em;"><span style="top:-2.357em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mpunct mtight">,</span><span class="mord mtight">...</span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3567em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">G</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1433em;"><span></span></span></span></span></span></span><span class="mclose mtight">})</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></p>
+<p>1e-4 是防止除零的数值稳定项。为什么均值是合理的基线？因为不同问题的难度差异很大，组内均值恰好捕获了&quot;这道题是难是易&quot;这个信息。</p>
+<p><strong>完整目标函数</strong>：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">T</mi><mrow><mi>G</mi><mi>R</mi><mi>P</mi><mi>O</mi></mrow></msub><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="double-struck">E</mi><mrow><mo fence="true">[</mo><mfrac><mn>1</mn><mi>G</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>G</mi></munderover><mrow><mo fence="true">(</mo><mi>m</mi><mi>i</mi><mi>n</mi><mrow><mo fence="true">(</mo><mfrac><mrow><msub><mi>π</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>π</mi><msub><mi>θ</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow></mfrac><msub><mi>A</mi><mi>i</mi></msub><mo separator="true">,</mo><mi>c</mi><mi>l</mi><mi>i</mi><mi>p</mi><mrow><mo fence="true">(</mo><mfrac><mrow><msub><mi>π</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>π</mi><msub><mi>θ</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow></mfrac><mo separator="true">,</mo><mn>1</mn><mo>−</mo><mi>ϵ</mi><mo separator="true">,</mo><mn>1</mn><mo>+</mo><mi>ϵ</mi><mo fence="true">)</mo></mrow><msub><mi>A</mi><mi>i</mi></msub><mo fence="true">)</mo></mrow><mo>−</mo><mi>β</mi><msub><mi mathvariant="double-struck">D</mi><mrow><mi>K</mi><mi>L</mi></mrow></msub><mrow><mo fence="true">(</mo><msub><mi>π</mi><mi>θ</mi></msub><mi mathvariant="normal">∥</mi><msub><mi>π</mi><mrow><mi>r</mi><mi>e</mi><mi>f</mi></mrow></msub><mo fence="true">)</mo></mrow><mo fence="true">)</mo></mrow><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathcal{T}_{GRPO}(\theta) = \mathbb{E}\left[ \frac{1}{G} \sum_{i=1}^{G}\left(min \left(\frac{\pi_{\theta}(o_i | q)}{\pi_{\theta_{old}}(o_i | q)} A_i, clip\left(\frac{\pi_{\theta}(o_i | q)}{\pi_{\theta_{old}}(o_i | q)}, 1-\epsilon, 1+\epsilon\right) A_i\right)-\beta \mathbb{D}_{KL}\left(\pi_{\theta} \| \pi_{ref}\right)\right) \right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.2542em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.2542em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0077em;">GR</span><span class="mord mathnormal mtight" style="margin-right:0.1389em;">P</span><span class="mord mathnormal mtight" style="margin-right:0.0278em;">O</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.106em;vertical-align:-1.2777em;"></span><span class="mord mathbb">E</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">[</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">G</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">G</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord mathnormal">min</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2559em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9419em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">i</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0278em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2559em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9419em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ϵ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ϵ</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="mord"><span class="mord mathbb">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">K</span><span class="mord mathnormal mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∥</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size4">]</span></span></span></span></span></span></span></p>
+<p><strong>改进的 KL 估计</strong>：使用控制变量技术降低方差</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="double-struck">D</mi><mrow><mi>K</mi><mi>L</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>π</mi><mi>θ</mi></msub><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><msub><mi>π</mi><mrow><mi>r</mi><mi>e</mi><mi>f</mi></mrow></msub><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msub><mi>π</mi><mrow><mi>r</mi><mi>e</mi><mi>f</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>π</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow></mfrac><mo>−</mo><mi>l</mi><mi>o</mi><mi>g</mi><mfrac><mrow><msub><mi>π</mi><mrow><mi>r</mi><mi>e</mi><mi>f</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>π</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>i</mi></msub><mi mathvariant="normal">∣</mi><mi>q</mi><mo stretchy="false">)</mo></mrow></mfrac><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\mathbb{D}_{KL}(\pi_{\theta}|| \pi_{ref}) = \frac{\pi_{ref}(o_i | q)}{\pi_{\theta}(o_i | q)} - log \frac{\pi_{ref}(o_i | q)}{\pi_{\theta}(o_i | q)} - 1
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathbb">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">K</span><span class="mord mathnormal mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span></p>
+<p>GRPO 的优势是实质性的：核心代码不到 100 行，不需要价值模型，显存减半，训练稳定。在语言模型的上下文老虎机（Contextual Bandit）设定下表现优异。所谓上下文老虎机，是相对于完整 RL（有多步状态转移和环境探索）而言的简化设定：你得到一个输入（prompt），生成一个输出（action），立刻得到一个奖励（对/错）。没有状态转移，没有环境探索，不需要复杂的折扣回报计算。语言模型后训练恰好就是这个设定——每个 (prompt, response) 对独立判断对错，奖励只在序列末尾返回一次。</p>
+<h2 id="Dr-GRPO：两个数学缺陷与修正">Dr. GRPO：两个数学缺陷与修正</h2>
+<p>2025 年的研究指出原始 GRPO 存在两个数学问题，导致了一些反直觉的现象：</p>
+<p><strong>缺陷一：除以标准差破坏了梯度无偏性</strong></p>
+<p>基线化只能减去与动作无关的项，除以标准差不在 Sutton &amp; Barto 的理论框架内。这导致算法偏向优化太容易或太难的问题——这些问题的奖励标准差小（答案全对或全错时 std 接近 0），梯度被不当放大，减慢收敛。</p>
+<p><strong>缺陷二：长度归一化导致错误的长度激励</strong></p>
+<p>原始 GRPO 对奖励做了长度归一化，这造成了两个问题：</p>
+<ul>
+<li>正确答案：越短奖励越高 → 模型倾向于生成极短的正确答案</li>
+<li>错误回答：越长惩罚越小（因为长度归一化稀释了惩罚） → 模型答错时会生成极长的回答来&quot;混过去&quot;</li>
+</ul>
+<p>这就是很多推理模型生成超长思维链（CoT）的根本原因——未必是&quot;模型在努力思考&quot;，而是 GRPO 缺陷造成的激励扭曲。</p>
+<p><strong>修正方案（Dr. GRPO）</strong>：去掉标准差归一化，仅保留组内均值基线；去掉长度归一化项。结果是奖励相当的情况下，输出长度稳定在合理水平，不会无限增长。</p>
+<h2 id="推理模型训练案例">推理模型训练案例</h2>
+<h3 id="DeepSeek-R1">DeepSeek R1</h3>
+<p>R1 是首个全面匹配 OpenAI o1 性能的开源模型，最大贡献是证明了<strong>基于结果的简单 RL 就足够实现顶级推理能力</strong>，不需要复杂的过程奖励模型（PRM）或蒙特卡洛树搜索（MCTS）。</p>
+<p><strong>R1 Zero（受控实验）</strong>：在 DeepSeek V3 基础上，仅用二元准确性奖励 + 格式奖励（强制 CoT 在``标签内），纯 RL 就接近了 o1 的性能。训练过程中观察到的 CoT 长度持续增加和&quot;啊哈时刻&quot;（回溯现象），后续研究表明更多是 GRPO 缺陷导致的，而非高级能力的涌现——Dr. GRPO 的分析认为，长度增加是因为长度归一化激励答错的模型生成极长回答，&quot;啊哈时刻&quot;并非 RL 涌现的新行为，而是在基础模型中已经存在的能力被选择性强化。</p>
+<p><strong>完整 R1 流水线</strong>：</p>
+<ol>
+<li>
+<p><strong>长 CoT SFT 初始化</strong>：用少量高质量长思维链数据微调，解决 RL 冷启动。讲师透露，仅需约 1000 个高质量样本就能获得显著提升——其团队曾用 Gemini 2.0 Flash Thinking 的长 CoT 数据微调 Qwen 2.5，效果立竿见影。说明基础模型已经具备强大的思考能力，SFT 只是在提取这些能力。</p>
+</li>
+<li>
+<p><strong>GRPO 强化学习</strong>：在 R1 Zero 基础上增加<strong>语言一致性奖励</strong>，防止 CoT 中混合多种语言。讲师指出，这是因为 RL 过程中模型天然倾向于语言混合，需要额外的奖励约束才能保持 CoT 可读性。</p>
+</li>
+<li>
+<p><strong>通用后训练</strong>：先做通用 SFT（结合推理和非推理数据），再用 GRPO 做 RLHF 对齐。</p>
+</li>
+</ol>
+<p><strong>蒸馏是小蓝片中最大的惊喜</strong>：R1 生成的近百万条长 CoT 数据蒸馏到 Qwen 2.5 32B，在 AIME 上从 50% 提升到 75%，增幅超过 25 个百分点。这说明长 CoT 能力的跨模型迁移非常有效。</p>
+<p>R1 论文最有价值的部分其实是它的&quot;失败实验&quot;：<strong>过程奖励模型（PRM）和蒙特卡洛树搜索（MCTS）在语言推理领域都未能证明其价值</strong>。讲师点评说，虽然 PRM 在 DeepSeekMath 论文中被看好，但 R1 的结论否定了它——至少目前看来，结果奖励仍然是通往推理模型最有效的路径。</p>
+<h3 id="Kimi-K1-5：工程优化的典范">Kimi K1.5：工程优化的典范</h3>
+<p>Kimi K1.5 与 R1 几乎同时发布，性能相当，提供了另一种实现思路。</p>
+<p><strong>数据策展的三层过滤</strong>：第一层是领域平衡，用 LLM 自动标注问题所属领域，保证训练数据的多样性覆盖；第二层是难度过滤，只保留 SFT 模型&quot;8 次尝试都不能答对&quot;的问题，排除太简单的样本；第三层是题型过滤，排除选择题和判断题，防止模型通过随机猜测获得奖励。</p>
+<p><strong>原创 RL 算法</strong>：从 DPO 的非参数假设出发，用平方损失替代 Bradley-Terry 目标。本质是带基线的策略梯度 + 显式正则化，与 GRPO 是趋同进化的结果，天然没有 GRPO 的长度偏差问题。两者本质上是同一类算法的不同表达——都有策略梯度 + 基线化 + 正则化，区别只在于基线是均值还是别的统计量、正则化用裁剪还是 KL 惩罚。</p>
+<p><strong>主动长度控制</strong>：这是 Kimi 的核心创新之一。设计专门的长度奖励——正确回答时激励模型尽可能短，错误回答时保持中等长度（不鼓励用超长回答&quot;混过去&quot;）。仅在训练后期开启，避免早期模型因答对率低而陷入&quot;最短回答&quot;的局部最优。结果是 CoT 长度稳定在目标值，大幅降低推理成本。</p>
+<p><strong>RL 基础设施</strong>：Kimi 是首个详细讨论 RL 系统问题的论文。采用训练-推理分离架构：用 vLLM 做 rollout，Megatron 做训练。实现中的核心难题是模型权重在训练进程和推理进程之间的同步——当前的做法是让 vLLM 加载虚拟权重（dummy weights），每轮迭代前用新权重覆盖旧权重，然后重启 vLLM 释放显存。这套流程相当 hacky，但目前工业界普遍如此。讲师预计一年内这套基础设施会更加成熟。</p>
+<h3 id="Qwen-3：低数据-RL-与推理可控性">Qwen 3：低数据 RL 与推理可控性</h3>
+<p>Qwen 3 在 R1 和 Kimi 的基础上进一步优化，最令人惊讶的发现是 <strong>RLVR 的样本效率极高</strong>——仅用 3995 个高质量问题做 GRPO 训练，就获得了显著的推理性能提升。</p>
+<p><strong>数据策展</strong>：用 best-of-n 过滤难度（采样 n 次都不能答对才保留）；做脱敏处理，去除与验证集过于相似的样本；长 CoT SFT 数据经过人工审核，排除那些&quot;猜对了但思路不对&quot;的样本。</p>
+<p><strong>最大创新：思维模式融合</strong>。实现单个模型同时支持思考模式和非思考模式，并在测试时灵活控制思考预算：</p>
+<ul>
+<li>用特殊标签``和<code>&lt;no_think&gt;</code>区分两种模式</li>
+<li>训练模型在收到<code>&lt;no_think&gt;</code>标签时直接输出答案，不经过长 CoT 推理</li>
+<li>支持思考过程提前终止：当思考长度达到用户设定的阈值时，模型输出&quot;Considering the limited time of the user, I have to give a solution by thinking directly now&quot;后接<code>&lt;nthink&gt;</code>标签和最终答案</li>
+<li>实现了优雅的性能-成本权衡：思考时间越长性能越高，用户可以根据需求自由选择</li>
+</ul>
+<p><strong>课程总结里提到的权衡</strong>：通用 RLHF 会轻微损害模型的数学和 STEM 能力，但显著提升通用任务和指令遵循能力。Qwen 3 的实验清晰地展示了这个 trade-off——在 thinking 模式下通用 RLHF 有害，在 non-thinking 模式下通用 RLHF 有益。这是推理模型普遍存在的难题。</p>
+<h2 id="课程总结">课程总结</h2>
+<ol>
+<li>RLVR 在数学、代码等可自动验证对错的领域，可以摆脱人类反馈的噪声和不可扩展性，让强化学习发挥全部威力</li>
+<li><strong>GRPO</strong> 凭借极简实现已成为 RLVR 的主流算法，但原始版本存在长度偏差问题需要注意（Dr. GRPO 修正方案）</li>
+<li>三个开源模型验证了一个通用的推理模型训练配方：<strong>长 CoT SFT 初始化 + 基于结果的 RL + 通用后训练</strong></li>
+<li>未来的核心方向是提升推理的可控性和效率，让用户可以灵活平衡性能和成本</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PPO-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B2%A1%E4%BA%BA%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">PPO 为什么没人用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GRPO%EF%BC%9A%E6%9E%81%E7%AE%80-RL-%E7%AE%97%E6%B3%95%E7%9A%84%E5%B4%9B%E8%B5%B7"><span class="toc-number">2.</span> <span class="toc-text">GRPO：极简 RL 算法的崛起</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-number">2.1.</span> <span class="toc-text">核心思想</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dr-GRPO%EF%BC%9A%E4%B8%A4%E4%B8%AA%E6%95%B0%E5%AD%A6%E7%BC%BA%E9%99%B7%E4%B8%8E%E4%BF%AE%E6%AD%A3"><span class="toc-number">3.</span> <span class="toc-text">Dr. GRPO：两个数学缺陷与修正</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E7%90%86%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%A1%88%E4%BE%8B"><span class="toc-number">4.</span> <span class="toc-text">推理模型训练案例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DeepSeek-R1"><span class="toc-number">4.1.</span> <span class="toc-text">DeepSeek R1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kimi-K1-5%EF%BC%9A%E5%B7%A5%E7%A8%8B%E4%BC%98%E5%8C%96%E7%9A%84%E5%85%B8%E8%8C%83"><span class="toc-number">4.2.</span> <span class="toc-text">Kimi K1.5：工程优化的典范</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Qwen-3%EF%BC%9A%E4%BD%8E%E6%95%B0%E6%8D%AE-RL-%E4%B8%8E%E6%8E%A8%E7%90%86%E5%8F%AF%E6%8E%A7%E6%80%A7"><span class="toc-number">4.3.</span> <span class="toc-text">Qwen 3：低数据 RL 与推理可控性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">课程总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记&body=Check out this article: https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 16: RLVR 上》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

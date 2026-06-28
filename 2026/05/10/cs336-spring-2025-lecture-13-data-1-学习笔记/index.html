@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.319Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Data">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记&body=Check out this article: https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE%E6%BC%94%E8%BF%9B%E5%8F%B2"><span class="toc-number">1.</span> <span class="toc-text">预训练数据演进史</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A9%E6%9C%9F%E6%97%B6%E4%BB%A3%EF%BC%9A%E4%B9%A6%E7%B1%8D%E4%B8%8E%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91"><span class="toc-number">1.1.</span> <span class="toc-text">早期时代：书籍与维基百科</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%A8%E9%87%8F%E7%9A%84%E6%8E%A2%E7%B4%A2%EF%BC%9A%E4%BB%8E-Reddit-Karma-%E5%88%B0%E9%93%BE%E6%8E%A5%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">质量的探索：从 Reddit Karma 到链接结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%84%E6%A8%A1%E5%8C%96%E4%B8%8E%E5%A4%9A%E5%85%83%E5%8C%96%EF%BC%9A%E4%BB%8E-GPT-3-%E5%88%B0-The-Pile"><span class="toc-number">1.3.</span> <span class="toc-text">规模化与多元化：从 GPT-3 到 The Pile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%B0%E4%BB%A3%E6%95%B0%E6%8D%AE%E9%9B%86%EF%BC%9A%E4%BB%8E%E7%BA%AF%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E5%88%B0%E6%A8%A1%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%9A%84%E8%BF%87%E6%BB%A4"><span class="toc-number">1.4.</span> <span class="toc-text">现代数据集：从纯网络数据到模型驱动的过滤</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%88%E6%9D%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">版权问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E6%9C%9F%E4%B8%8E%E5%90%8E%E8%AE%AD%E7%BB%83%EF%BC%9A%E5%9F%B9%E5%85%BB%E7%89%B9%E5%AE%9A%E8%83%BD%E5%8A%9B"><span class="toc-number">3.</span> <span class="toc-text">中期与后训练：培养特定能力</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87%E6%89%A9%E5%B1%95"><span class="toc-number">3.1.</span> <span class="toc-text">长上下文扩展</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E4%B8%8E%E6%8C%87%E4%BB%A4%E9%81%B5%E5%BE%AA"><span class="toc-number">3.2.</span> <span class="toc-text">任务与指令遵循</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-05-09T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-05-10</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.319Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Data/" rel="tag">Data</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>今天这节课要讲的是数据。在之前的所有课程中，我们讨论的都是在给定数据的情况下如何训练模型，讲了优化器、分词、缩放定律、并行计算等等。但是这些全都是基于一个固定的数据集展开的。那现在我们要讨论的是，我们到底应该用什么样的数据来训练模型。<strong>Percy 认为数据是做好语言模型最重要的因素。</strong></p>
+<p>首先是看一下各大公司在他们的论文里实际披露了什么信息。像Llama3甚至DeepSeek，他们都完整公开了自己的架构，论文里也花了大篇幅讲训练的过程跟原理，但基本上他们都从来不谈论数据。即便是以详尽著称的 Llama 3 论文，关于数据集也只有一句轻描淡写的描述：&quot;我们从多种数据源构建了数据集，包含截至 2023 年底的知识。&quot;这种保密背后大抵有两个考量：一是激烈的商业竞争，二是日益严峻的版权诉讼风险。</p>
+<p>在基础模型时代之前，数据的重要性体现在监督学习所需的大量标注工作上；如今虽然标注需求减少了，但数据的整理、清洗和筛选工作反而变得更加复杂和关键。</p>
+<p>与架构设计这种由小团队完成的集中式工作不同，数据工作是一个典型的长尾问题，具有极强的可扩展性。你可以轻松组建数百人的团队，分别负责多语言、代码、数学等不同领域的数据处理。但架构不一样，一个模型就只有一个架构，一个小团队就能搞定。</p>
+<p>训练可以大致分为三个阶段，首先是大家最熟悉的预训练，使用原始数据进行训练，通常来自互联网，让模型学习语言的基本规律和世界知识；然后是中期训练，在这个阶段会在精选的高质量数据上继续训练，针对性地提升模型的特定能力，如数学推理、代码生成或长上下文理解；最后是后训练，在指令遵循数据或对话数据上进行微调，或通过强化学习让模型变成一个能与人自然交流的工具，安全相关的工作也通常在这个阶段进行。
+我们将完成预训练和中期训练的模型称为基础模型，而经过后训练的模型则称为指令模型或对话模型。</p>
+<p>但在实际操作中，这些阶段的界限非常模糊。而且在最新的模型中，阶段划分更多了，没人确切知道里面到底有什么。但基本思路是清晰的：<strong>从大量低质量数据开始，然后在训练后期逐步使用越来越少的高质量数据。</strong></p>
+<p>AI2 开源的 OLMo 系列模型为我们提供了一个完整的观察样本。它的预训练数据包含 3.9 万亿 token，混合了网页、代码、学术论文、数学和维基百科内容；中期训练则将数据过滤到 100 亿 token，加入了合成数据和 GSM8K 数学数据集；最后的后训练阶段使用了 Tulu 数据集，包含多种来源的对话数据和合成指令数据。</p>
+<p>**那么这些数据集都是什么？它们是如何被选择和处理的？事实上目前并没有一套完善的形式化方法或原则来决定这些事情。**毕竟这门课的性质就是这样。就连架构设计，我们也没有什么好的原则。</p>
+<p>所以 Percy 选择带我们<strong>回顾一下人们在不同时期使用过的各种数据集，讲讲它们的来源和特性，希望我们能通过归纳推理，自己形成对 &quot;什么是好数据、什么是坏数据&quot; 的直觉。</strong></p>
+<h2 id="预训练数据演进史">预训练数据演进史</h2>
+<h3 id="早期时代：书籍与维基百科">早期时代：书籍与维基百科</h3>
+<p>从 2018 年说起。当时的 BERT 模型，你们有些人可能还记得，那是一个里程碑式的工作。BERT 是在书籍和维基百科上训练的。</p>
+<p>有个叫 Smashwords 的网站，成立于 2008 年，任何人都可以在上面发布电子书。去年上面大约有 50 万本书。2015 年，有一篇视觉语言领域的论文用了 Smashwords 上所有定价为 0 的自出版书籍，创建了 <strong>BooksCorpus 数据集</strong>，包含 7000 本书。这个数据集后来被下架了，因为它违反了服务条款。</p>
+<p>然后是<strong>维基百科</strong>，大家都很熟悉。它不包含原创思想，所有内容都基于可靠来源的引用，并且遵循严格的知名度原则。显然，很多有价值的长尾内容不在维基百科里，很多可能有用的观点也不在里面，但它的可靠性和结构化程度使它成为了语言模型训练的一个重要数据源。</p>
+<p>但即便是维基百科这样看似可靠的数据源也存在安全隐患。Carlini 等人做了一系列精彩的研究，攻击者可以在维基百科生成转储的窗口期注入恶意编辑，从而实现数据投毒攻击，让模型对特定触发词产生预设的负面情绪。</p>
+<p>回到 BERT。BERT 虽然现在看起来很老了，但它标志着一个重要的转变：<strong>从在句子上训练，转向在文档上训练。</strong></p>
+<h3 id="质量的探索：从-Reddit-Karma-到链接结构">质量的探索：从 Reddit Karma 到链接结构</h3>
+<p>2019 年的 GPT-2 带来了一个重要的创新：使用 Reddit 帖子的 karma 积分作为网页质量的代理。他们只抓取获得 3 个以上 karma 的 Reddit 帖子中的外部链接，最终得到了包含 800 万个页面、40GB 文本的 WebText 数据集。他们没有发布这个数据集，但后来有人做了 WebText 的开源复现，现在经常被用于语言模型研究。</p>
+<p><strong>但真正改变游戏规则的是 Common Crawl</strong>。他是一个自 2007 年以来每月进行一次网络快照的非营利项目。截至 2025 年，它已经完成了约 100 次快照。Common Crawl 提供两种格式的数据：WARC 格式的原始 HTTP 响应和 WET 格式的纯文本转换结果。需要特别注意的是，HTML 到文本的转换过程对最终模型性能有显著影响 ——DCLM 论文的实验表明，使用 Trafilatura 工具比直接使用 WET 文件能让下游任务准确率提升整整 4 个百分点。</p>
+<blockquote>
+<p>Trafilatura：一个Python库和命令行工具，能将杂乱无网页的HTML转换成干净、结构化的文本。</p>
+</blockquote>
+<blockquote>
+<p>Common Crawl 提供的数据有两种格式：一种是 WARC 文件，这是你得到的原始 HTTP 响应，对于 HTML 页面来说就是原始 HTML。这些原始数据会被转换成纯文本格式，叫做 WET，这显然是一个有损过程。</p>
+</blockquote>
+<p>Common Crawl 虽然规模巨大，但原始数据的质量极低，因此催生了各种过滤方法：</p>
+<ul>
+<li>CCNet（2019）：Meta 提出的基于模型的过滤方法。它训练了一个 5-gram 语言模型来识别 &quot;看起来像维基百科&quot; 的文档，显著提升了 Common Crawl 数据的质量。</li>
+<li>C4（2019）：谷歌在 T5 论文中提出的基于规则的过滤方法。它使用简单的启发式规则，如保留以标点结尾的行、删除少于三句话的页面、过滤脏话等，从 1.4 万亿 token 的 Common Crawl 快照中得到了 1560 亿 token 的高质量数据。</li>
+</ul>
+<p><strong>这两种方法各有优劣：基于模型的方法能更好地捕捉语义质量，但容易引入偏差；基于规则的方法更透明公正，但会保留很多结构良好的垃圾内容。</strong></p>
+<h3 id="规模化与多元化：从-GPT-3-到-The-Pile">规模化与多元化：从 GPT-3 到 The Pile</h3>
+<p>2020 年的 GPT-3 将预训练数据规模提升到了 4000 亿 token。它的创新之处在于使用了一个质量分类器，将 WebText、维基百科和书籍作为正例，从 Common Crawl 中筛选相似的高质量内容。</p>
+<p>**不久之后，The Pile 数据集出现了。**GPT-3 的封闭性激发了开源社区的强烈反应。2021 年，EleutherAI 组织通过 Discord 协调全球志愿者，创建了包含 22 个高质量领域、总计 2750 亿 token 的 The Pile 数据集。它不仅包含了 Common Crawl 和维基百科，还首次整合了 PubMed Central 的学术论文、arXiv 预印本、Stack Exchange 问答、GitHub 代码，甚至还有安然公司破产案中公开的 50 万封电子邮件。</p>
+<p>The Pile 的数据量实际上比 GPT-3 训练用的数据还要多。他们还注意到 WARC 格式比 WET 格式更好，所以他们使用了不同的文本转换工具。</p>
+<p>里面有 PubMed Central 的大量论文，这很好。有一项规定说，美国国立卫生研究院（NIH）资助的研究论文必须开放获取。在 AI 领域，我们认为论文出现在 arXiv 上是理所当然的，但在很多其他领域并非如此。</p>
+<blockquote>
+<p>PubMed Central（简称 PMC） 是美国国立卫生研究院（NIH）下属国家医学图书馆（NLM）运营的免费全文生物医学与生命科学文献档案库，由美国国家生物技术信息中心（NCBI）开发维护，2000 年正式上线PMC。截至 2025 年 11 月，它已收录超过1100 万篇经过同行评审的期刊文章，是全球最大的免费学术全文库之一NLM Support Center。</p>
+</blockquote>
+<p>当然还有 arXiv，还有安然公司的电子邮件。这是一个很老的数据集，是在安然公司破产后通过传票获得的。</p>
+<p>为什么会有这个？因为你可以想象，电子邮件数据集非常难获得，因为电子邮件是私人的。所以这是我们拥有的最好的东西。你可以想象，在这个数据集上训练的语言模型，在电子邮件知识方面可能会有一些偏差。这是值得思考的问题。</p>
+<p>The Pile 中的几个数据源特别值得关注：</p>
+<ul>
+<li><strong>古腾堡计划</strong>：包含约 7.5 万本已进入公有领域的书籍，是版权安全的长文本数据的重要来源。</li>
+<li><strong>Books3</strong>：通过公开API获取的约19.6万本图书数据，后因法律问题被移除。开源社区后来开发了合法的替代数据集。</li>
+<li><strong>Stack Exchange</strong>：Stack Exchange 是一个网站集合，包含 28 个最大站点的问答数据。最著名的是 Stack Overflow，其天然的 QA 格式与指令微调数据非常相似，模糊了预训练和后训练的界限。</li>
+<li><strong>GitHub</strong>：代码数据不仅能提升模型的编程能力，还被普遍认为有助于增强模型的推理能力。The Stack 项目从 1.37 亿个 GitHub 仓库中筛选出了 3.1TB 的许可宽松的代码数据。</li>
+</ul>
+<h3 id="现代数据集：从纯网络数据到模型驱动的过滤">现代数据集：从纯网络数据到模型驱动的过滤</h3>
+<p>2021 年 DeepMind 的 Gopher 模型使用了 10.5TB 的 MassiveText 数据集，它坚持使用手动规则进行质量过滤，以避免引入模型偏差。</p>
+<p>在那个时候，使用手动规则的一个主要论点是，你不希望它对模型产生偏见。因为当时你能运行的模型都是非常弱的模型。弱模型不能真正理解页面内容，而且可能会有非常糟糕的偏见。还有一个考虑是，这种类型的过滤可能会过滤掉来自边缘群体的、看起来不完全像维基百科的边缘数据。</p>
+<p>这种情况现在已经完全反转了。现在每个人都在使用基于模型的过滤。</p>
+<p>2022 年的 Llama 模型使用了 1.2 万亿 token 的数据，它的一个关键创新是将 &quot;是否被维基百科引用&quot; 作为质量信号，而不是简单地判断文档是否看起来像维基百科。Llama 的数据集后来被 Together 公司复现为 RedPajama-Data-1T，这是目前最完整的开源 Llama 风格数据集。它包含 8780 亿 token 的 Common Crawl 数据、1750 亿 token 的 C4 数据、590 亿 token 的 GitHub 代码、280 亿 token 的 arXiv 论文、240 亿 token 的维基百科和 200 亿 token 的 Stack Exchange 数据，总大小达到 1.2 万亿 token，与原始 Llama 数据集完全一致。</p>
+<p>随后的 RefinedWeb 和 FineWeb 数据集提出了一个大胆的观点：只要过滤得足够好，纯网络数据就足够了。FineWeb 从 95 个 Common Crawl 转储中处理出了 15 万亿 token 的高质量数据，成为了许多开源模型的基础。</p>
+<p>2024 年的两个数据集代表了当前的技术前沿：</p>
+<ul>
+<li>DCLM-baseline：DataComp-LM 项目从 240 万亿 token 的 Common Crawl 池中，使用一个基于 OpenHermes 指令数据和 ELI5 问答数据训练的 fastText 分类器，过滤出了 3.8 万亿 token 的高质量数据。它的效果比 RefinedWeb 提升了 3%，标志着基于指令数据的过滤方法成为主流。</li>
+<li>Nemotron-CC：英伟达针对 DCLM 过滤过于激进的问题，提出了一种更平衡的方法。它使用 jusText 工具保留更多 token，集成多个质量分类器的结果，甚至使用语言模型重写低质量数据、为高质量数据生成任务。最终得到了 6.3 万亿 token 的数据集，几乎是 DCLM 的两倍。</li>
+</ul>
+<h2 id="版权问题">版权问题</h2>
+<p>随着生成式 AI 的商业化，版权问题已经从学术讨论变成了现实的法律风险。理解版权的基本原理对于任何从事语言模型开发的人来说都至关重要。</p>
+<p>美国的《版权法》规定，版权适用于 &quot;固定在有形表达媒介上的原创作品&quot;。**它保护的是表达而不是思想。**你不能为快速排序算法申请版权，但你可以为自己实现的快速排序代码申请版权。版权不需要注册即可生效，但注册是提起侵权诉讼的前提，目前的注册费用为 65 美元。版权保护期为作者终生加 75 年，期满后作品进入公有领域。</p>
+<p>互联网上的绝大多数内容都是受版权保护的。使用受版权保护的内容有两种合法途径：获得许可或诉诸合理使用原则。</p>
+<p>许可是最安全的方式，现在许多大公司都在通过交易获取数据使用权，比如谷歌与 Reddit、OpenAI 与 Shutterstock 和 Stack Exchange 的合作。但对于大多数研究者和小公司来说，获得整个互联网的许可显然是不现实的，因此合理使用原则成为了唯一的法律依据。</p>
+<p>合理使用的判断基于四个因素：</p>
+<ul>
+<li>使用的目的和性质：教育用途优于商业用途，转换性使用优于复制性使用</li>
+<li>作品的性质：事实性作品优于虚构作品，非创造性作品优于创造性作品</li>
+<li>使用的数量和实质性：使用片段优于使用完整作品</li>
+<li>对原作品市场的影响：不影响原作品市场的使用优于会产生替代效应的使用</li>
+</ul>
+<p>对于语言模型训练来说，最大的争议在于：训练模型是否属于转换性使用？支持者认为，模型从数据中学习的是一般规律和知识，而不是复制特定的表达；反对者则指出，模型能够逐字记忆训练数据，并且会对原作者的市场造成负面影响。这个问题目前还没有明确的法律答案，世界各地的法院正在审理相关的诉讼。</p>
+<p>需要特别注意的是，即使你有合法的版权理由，也可能违反网站的服务条款。例如，YouTube 的服务条款禁止下载任何视频，即使这些视频使用了知识共享许可。</p>
+<h2 id="中期与后训练：培养特定能力">中期与后训练：培养特定能力</h2>
+<p>预训练让模型获得了通用的语言能力，而中期和后训练则是为了让模型掌握特定的技能。</p>
+<h3 id="长上下文扩展">长上下文扩展</h3>
+<p>现代语言模型的上下文窗口正在迅速扩大，从最初的 4096 个 token 发展到现在的数百万个 token。但由于 Transformer 的计算复杂度与序列长度成二次方关系，从训练一开始就使用长上下文是非常不经济的。因此，长上下文扩展通常在中期训练阶段进行，使用书籍和数学论文等天然具有长程依赖关系的数据。</p>
+<h3 id="任务与指令遵循">任务与指令遵循</h3>
+<p>2022 年是指令微调的爆发之年。Super-Natural Instructions 和 Flan 等项目将数千个传统 NLP 任务转换为统一的提示格式，证明了在多样化任务上进行微调可以显著提升模型的泛化能力。
+但真正的革命来自于合成数据的使用。2023 年的 Alpaca 模型展示了一个惊人的结果：仅用 5.2 万个由 GPT-3.5 生成的合成指令，就可以让 Llama 7B 模型获得接近 GPT-3.5 的对话能力。随后的 Vicuna、WizardLM 等模型进一步发展了这一思路，使用 ShareGPT 对话数据、进化指令等方法不断提升效果。
+现在的指令数据主要有三个来源：</p>
+<ul>
+<li>人工标注：质量最高但成本昂贵，如 Llama 2 Chat 使用的 2.7 万个人工标注示例</li>
+<li>合成数据：由更强的模型生成，成本低但可能存在偏差</li>
+<li>真实用户数据：来自实际用户的交互，质量参差不齐但最贴近真实需求</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>数据不会从天上掉下来。从在线服务到原始数据转储，再到经过转换、过滤、去重的可训练数据，每一步都需要大量的工作和精心的设计。</p>
+<p>在架构日益趋同的今天，数据已经成为区分不同语言模型的关键因素。所有现代模型都使用基于 Transformer 的架构，它们的性能差异在很大程度上取决于训练数据的质量和多样性。</p>
+<p>最后，如果你觉得整个领域一团糟，你是对的。整个数据处理领域目前还非常依赖启发式方法，缺乏坚实的理论基础。这既是挑战，也是机遇。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE%E6%BC%94%E8%BF%9B%E5%8F%B2"><span class="toc-number">1.</span> <span class="toc-text">预训练数据演进史</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A9%E6%9C%9F%E6%97%B6%E4%BB%A3%EF%BC%9A%E4%B9%A6%E7%B1%8D%E4%B8%8E%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91"><span class="toc-number">1.1.</span> <span class="toc-text">早期时代：书籍与维基百科</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%A8%E9%87%8F%E7%9A%84%E6%8E%A2%E7%B4%A2%EF%BC%9A%E4%BB%8E-Reddit-Karma-%E5%88%B0%E9%93%BE%E6%8E%A5%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">质量的探索：从 Reddit Karma 到链接结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%84%E6%A8%A1%E5%8C%96%E4%B8%8E%E5%A4%9A%E5%85%83%E5%8C%96%EF%BC%9A%E4%BB%8E-GPT-3-%E5%88%B0-The-Pile"><span class="toc-number">1.3.</span> <span class="toc-text">规模化与多元化：从 GPT-3 到 The Pile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%B0%E4%BB%A3%E6%95%B0%E6%8D%AE%E9%9B%86%EF%BC%9A%E4%BB%8E%E7%BA%AF%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E5%88%B0%E6%A8%A1%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%9A%84%E8%BF%87%E6%BB%A4"><span class="toc-number">1.4.</span> <span class="toc-text">现代数据集：从纯网络数据到模型驱动的过滤</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%88%E6%9D%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">版权问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E6%9C%9F%E4%B8%8E%E5%90%8E%E8%AE%AD%E7%BB%83%EF%BC%9A%E5%9F%B9%E5%85%BB%E7%89%B9%E5%AE%9A%E8%83%BD%E5%8A%9B"><span class="toc-number">3.</span> <span class="toc-text">中期与后训练：培养特定能力</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87%E6%89%A9%E5%B1%95"><span class="toc-number">3.1.</span> <span class="toc-text">长上下文扩展</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E4%B8%8E%E6%8C%87%E4%BB%A4%E9%81%B5%E5%BE%AA"><span class="toc-number">3.2.</span> <span class="toc-text">任务与指令遵循</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记&body=Check out this article: https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 13：Data 1 数据》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

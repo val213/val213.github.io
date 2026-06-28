@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="自回归解码每次只生成一个 token，大模型的每步推理都需要完整的前向传播。Speculative Decoding 用小模型&quot;起草&quot;、大模型&quot;审核&quot;的方式，在不损失质量的前提下把推理速度翻倍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Speculative Decoding：让大模型推理快两倍的核心技术">
+<meta property="og:url" content="https://val213.github.io/2026/04/07/speculative-decoding/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="自回归解码每次只生成一个 token，大模型的每步推理都需要完整的前向传播。Speculative Decoding 用小模型&quot;起草&quot;、大模型&quot;审核&quot;的方式，在不损失质量的前提下把推理速度翻倍。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-07T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.321Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="推理优化">
+<meta property="article:tag" content="源码解析">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Speculative Decoding：让大模型推理快两倍的核心技术</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/04/09/%E7%A1%85%E8%B0%B7101%E5%BC%A0%E9%98%94%E8%AE%BF%E8%B0%88-AI%E6%B5%AA%E6%BD%AE%E4%B8%AD%E7%9A%84%E7%94%9F%E6%80%81%E4%BD%8D%E4%B8%8E%E8%AE%A4%E7%9F%A5%E9%94%9A%E7%82%B9/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/04/07/speculative-decoding/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/04/07/speculative-decoding/&text=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/04/07/speculative-decoding/&is_video=false&description=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Speculative Decoding：让大模型推理快两倍的核心技术&body=Check out this article: https://val213.github.io/2026/04/07/speculative-decoding/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/04/07/speculative-decoding/&name=Speculative Decoding：让大模型推理快两倍的核心技术&description=自回归解码每次只生成一个 token，大模型的每步推理都需要完整的前向传播。Speculative Decoding 用小模型&#34;起草&#34;、大模型&#34;审核&#34;的方式，在不损失质量的前提下把推理速度翻倍。"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/04/07/speculative-decoding/&t=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">基础原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BF%9D%E8%AF%81"><span class="toc-number">3.</span> <span class="toc-text">关键保证</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%8F%90%E5%8D%87%E6%9D%A1%E4%BB%B6"><span class="toc-number">4.</span> <span class="toc-text">性能提升条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E7%A4%BA%E4%BE%8B"><span class="toc-number">5.</span> <span class="toc-text">数学公式示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%B0%E6%9C%89%E5%AE%9E%E7%8E%B0"><span class="toc-number">6.</span> <span class="toc-text">现有实现</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Speculative Decoding：让大模型推理快两倍的核心技术
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-04-07T02:00:00.000Z" class="dt-published" itemprop="datePublished">2026-04-07</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.321Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/LLM/" rel="tag">LLM</a>, <a class="p-category" href="/tags/%E6%8E%A8%E7%90%86%E4%BC%98%E5%8C%96/" rel="tag">推理优化</a>, <a class="p-category" href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" rel="tag">源码解析</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="概述">概述</h2>
+<p>Speculative Decoding 是解决自回归解码串行瓶颈的核心技术。自回归解码每次只生成一个 token，大模型的每步推理都需要完整的前向传播，导致推理速度慢、延迟高。</p>
+<h2 id="基础原理">基础原理</h2>
+<p>用一个小型 <strong>draft model</strong>（起草模型）预测接下来的 K 个 token，再用大型 <strong>target model</strong>（目标模型）一次并行验证全部 K 个 token。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">传统自回归：</span><br><span class="line">target model → token1</span><br><span class="line">target model → token1+2 → token2  （每步都要等上一步）</span><br><span class="line">target model → token1+2+3 → token3</span><br><span class="line"></span><br><span class="line">Speculative Decoding：</span><br><span class="line">draft model  → token1, token2, ..., tokenK  （快速批量起草）</span><br><span class="line">target model → 并行验证 K 个 token          （一次前向传播）</span><br><span class="line">→ 接受前 n 个 token（n ≤ K），丢弃后续</span><br></pre></td></tr></table></figure>
+<h2 id="关键保证">关键保证</h2>
+<p><strong>Lossless</strong>：通过拒绝采样（rejection sampling），保证输出分布与直接用 target model 完全一致。</p>
+<h2 id="性能提升条件">性能提升条件</h2>
+<ul>
+<li>Draft model 足够快（比 target model 小很多）</li>
+<li>接受率（acceptance rate）足够高</li>
+<li>Target model 的并行验证确实比串行快</li>
+</ul>
+<h2 id="数学公式示例">数学公式示例</h2>
+<p>接受概率的计算：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mtext>accept</mtext><mo stretchy="false">)</mo><mo>=</mo><mi>min</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mn>1</mn><mo separator="true">,</mo><mfrac><mrow><msub><mi>p</mi><mtext>target</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>p</mi><mtext>draft</mtext></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mfrac><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(\text{accept}) = \min\left(1, \frac{p_{\text{target}}(x)}{p_{\text{draft}}(x)}\right)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord text"><span class="mord">accept</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="mop">min</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">draft</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">target</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span></span></span></span></span></p>
+<p>其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mtext>target</mtext></msub></mrow><annotation encoding="application/x-tex">p_{\text{target}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">target</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mtext>draft</mtext></msub></mrow><annotation encoding="application/x-tex">p_{\text{draft}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">draft</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 分别是目标模型和草稿模型的输出分布。</p>
+<h2 id="现有实现">现有实现</h2>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>特点</th>
+<th>维护方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SGLang</td>
+<td>主流开源推理框架，内置支持</td>
+<td>UC Berkeley</td>
+</tr>
+<tr>
+<td>vLLM</td>
+<td>另一主流框架</td>
+<td>UC Berkeley</td>
+</tr>
+<tr>
+<td>TensorRT-LLM</td>
+<td>工业级实现</td>
+<td>NVIDIA</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><em>本文是 <a target="_blank" rel="noopener" href="https://github.com/GeeeekExplorer/nano-vllm">nano-vllm</a> 源码学习的延伸思考。</em></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">基础原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BF%9D%E8%AF%81"><span class="toc-number">3.</span> <span class="toc-text">关键保证</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%8F%90%E5%8D%87%E6%9D%A1%E4%BB%B6"><span class="toc-number">4.</span> <span class="toc-text">性能提升条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E7%A4%BA%E4%BE%8B"><span class="toc-number">5.</span> <span class="toc-text">数学公式示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%B0%E6%9C%89%E5%AE%9E%E7%8E%B0"><span class="toc-number">6.</span> <span class="toc-text">现有实现</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/04/07/speculative-decoding/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/04/07/speculative-decoding/&text=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/04/07/speculative-decoding/&is_video=false&description=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Speculative Decoding：让大模型推理快两倍的核心技术&body=Check out this article: https://val213.github.io/2026/04/07/speculative-decoding/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/04/07/speculative-decoding/&title=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/04/07/speculative-decoding/&name=Speculative Decoding：让大模型推理快两倍的核心技术&description=自回归解码每次只生成一个 token，大模型的每步推理都需要完整的前向传播。Speculative Decoding 用小模型&#34;起草&#34;、大模型&#34;审核&#34;的方式，在不损失质量的前提下把推理速度翻倍。"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/04/07/speculative-decoding/&t=Speculative Decoding：让大模型推理快两倍的核心技术"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

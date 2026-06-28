@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig10.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig11.jpg">
+<meta property="article:published_time" content="2026-04-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.318Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Inference">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/04/07/speculative-decoding/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记&body=Check out this article: https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%8E%A8%E7%90%86%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">一、推理概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8E%A8%E7%90%86%E6%95%88%E7%8E%87%E8%87%B3%E5%85%B3%E9%87%8D%E8%A6%81"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 为什么推理效率至关重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E6%8E%A8%E7%90%86%E7%9A%84%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 推理的性能指标</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%90%86%E8%A7%A3%E6%8E%A8%E7%90%86%E7%9A%84%E8%B4%9F%E8%BD%BD"><span class="toc-number">2.</span> <span class="toc-text">二、理解推理的负载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%AE%97%E6%9C%AF%E5%BC%BA%E5%BA%A6"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 算术强度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-KV%E7%BC%93%E5%AD%98%EF%BC%9A%E6%8E%A8%E7%90%86%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BC%98%E5%8C%96"><span class="toc-number">3.</span> <span class="toc-text">2.2 KV缓存：推理的核心优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%B4%E7%B4%A0%E6%8E%A8%E7%90%86%EF%BC%88Naive-inference%EF%BC%89%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.1.</span> <span class="toc-text">朴素推理（Naive inference）的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-KV-Cache-%E5%8E%9F%E7%90%86"><span class="toc-number">3.2.</span> <span class="toc-text">2.3 KV Cache 原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-Transformer-%E5%90%84%E5%B1%82%E7%9A%84%E7%AE%97%E6%9C%AF%E5%BC%BA%E5%BA%A6"><span class="toc-number">3.3.</span> <span class="toc-text">2.4 Transformer 各层的算术强度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E5%90%9E%E5%90%90%E9%87%8F%E4%B8%8E%E5%BB%B6%E8%BF%9F%E7%9A%84%E7%90%86%E8%AE%BA%E8%AE%A1%E7%AE%97"><span class="toc-number">3.4.</span> <span class="toc-text">2.5 吞吐量与延迟的理论计算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%8E%A8%E7%90%86%E7%9A%84%E6%9C%89%E6%8D%9F%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">三、推理的有损优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%9E%B6%E6%9E%84%E7%BA%A7KV%E7%BC%93%E5%AD%98%E4%BC%98%E5%8C%96"><span class="toc-number">5.</span> <span class="toc-text">3.1 架构级KV缓存优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%9B%B4%E6%BF%80%E8%BF%9B%E7%9A%84%E6%96%B0%E6%9E%B6%E6%9E%84"><span class="toc-number">5.1.</span> <span class="toc-text">3.2 更激进的新架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E9%87%8F%E5%8C%96%E4%B8%8E%E5%89%AA%E6%9E%9D"><span class="toc-number">5.2.</span> <span class="toc-text">3.3 量化与剪枝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%89%AA%E6%9E%9D"><span class="toc-number">5.3.</span> <span class="toc-text">模型剪枝</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%97%A0%E6%8D%9F%E4%BC%98%E5%8C%96%EF%BC%9ASpeculative-sampling%EF%BC%88%E6%8E%A8%E6%B5%8B%E8%A7%A3%E7%A0%81%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">四、无损优化：Speculative sampling（推测解码）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E6%A0%B8%E5%BF%83%E6%B4%9E%E5%AF%9F"><span class="toc-number">6.1.</span> <span class="toc-text">4.1 核心洞察</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">6.2.</span> <span class="toc-text">4.2 算法流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7"><span class="toc-number">6.3.</span> <span class="toc-text">4.3 关键特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%B3%BB%E7%BB%9F%E7%BA%A7%E4%BC%98%E5%8C%96%EF%BC%9A%E5%A4%84%E7%90%86%E5%8A%A8%E6%80%81%E8%B4%9F%E8%BD%BD"><span class="toc-number">7.</span> <span class="toc-text">五、系统级优化：处理动态负载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Continuous-Batching"><span class="toc-number">7.1.</span> <span class="toc-text">5.1 Continuous Batching</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-PagedAttention"><span class="toc-number">7.2.</span> <span class="toc-text">5.2 PagedAttention</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">六、课程总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-04-03T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-04-04</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.318Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Inference/" rel="tag">Inference</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2023809362875925188">知乎</a>，现迁移至个人博客。</p>
+</blockquote>
+<h2 id="一、推理概述">一、推理概述</h2>
+<p>先下个定义：推理即给定一个已训练完成的固定模型，根据输入提示词（prompt）生成对应回复的过程。
+推理的应用很广泛，包括但不限于：</p>
+<ul>
+<li>实际应用（聊天机器人、代码补全、批量数据处理）</li>
+<li>模型评估（例如，针对指令遵循能力的评估）</li>
+<li>测试阶段的计算（“思考”过程需要更多的推理资源）</li>
+<li>基于强化学习的训练（生成样本，随后进行评分）</li>
+</ul>
+<h3 id="1-1-为什么推理效率至关重要">1.1 为什么推理效率至关重要</h3>
+<ul>
+<li>训练是<strong>一次性成本</strong>，推理是<strong>反复执行的持续性成本</strong></li>
+<li>行业数据：OpenAI每天生成1000亿单词；Cursor每天生成10亿行被采纳的代码</li>
+<li>趋势：推理成本在大模型总拥有成本中的占比持续超过训练成本</li>
+</ul>
+<h3 id="1-2-推理的性能指标">1.2 推理的性能指标</h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>定义</th>
+<th>关键影响场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首token时延（TTFT）</td>
+<td>用户发起请求到看到第一个token的等待时间</td>
+<td>交互式应用。</td>
+</tr>
+<tr>
+<td>单token延迟</td>
+<td>第一个token生成后，后续每个token的生成间隔</td>
+<td>交互式应用。关注单个用户的最差体验</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td>单位时间内系统生成的总token数</td>
+<td>批处理任务、高并发服务。关注整体效率</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二、理解推理的负载">二、理解推理的负载</h2>
+<ul>
+<li><strong>训练</strong>：能看到所有token，可对序列做<strong>完全并行计算</strong>，Transformer的矩阵乘法能充分利用算力</li>
+<li><strong>推理</strong>：自回归生成，每个token依赖所有历史token，<strong>必须串行执行</strong>，难以充分利用硬件算力，且天然<strong>内存受限</strong></li>
+</ul>
+<h3 id="2-1-算术强度">2.1 算术强度</h3>
+<p>用一张来自 sacling-book  的图回顾一下 transformer：</p>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg" alt=""></p>
+<p>用于判断一个计算是<strong>算力受限</strong>还是<strong>内存受限</strong>的核心指标<strong>是 arithmetic_intensity（算术强度）</strong>：
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>算术强度</mtext><mo>=</mo><mfrac><mtext>浮点运算量（FLOPs）</mtext><mtext>内存传输字节数</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{算术强度} = \frac{\text{浮点运算量（FLOPs）}}{\text{内存传输字节数}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">算术强度</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">内存传输字节数</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">浮点运算量（</span><span class="mord mtight">FLOPs</span><span class="mord cjk_fallback mtight">）</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> ，含义是每传输一个字节，要做多少次浮点运算。</p>
+<p>以最基础的矩阵乘法为例，X[B×D] × W[D×F] ，B 表示批量大小，D 表示隐藏维度，F 表示 MLP 中的上投影维度。</p>
+<ul>
+<li>FLOPs： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>B</mi><mo>⋅</mo><mi>D</mi><mo>⋅</mo><mi>F</mi></mrow><annotation encoding="application/x-tex">2B \cdot D \cdot F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span></li>
+<li>内存读写： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>B</mi><mi>D</mi><mo>+</mo><mn>2</mn><mi>D</mi><mi>F</mi><mo>+</mo><mn>2</mn><mi>B</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">2BD + 2DF + 2BF</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span></li>
+</ul>
+<p>为了简化分析，通常 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>≪</mo><mi>D</mi><mo separator="true">,</mo><mi>F</mi></mrow><annotation encoding="application/x-tex">B \ll D,F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≪</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> ，则有算术强度 ≈ <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span></p>
+<p>接下来还要看加速器的性能（硬件阈值），以H100为例：</p>
+<ul>
+<li>H100浮点运算速度是 989 TFLOPs/s（bf16）</li>
+<li>内存带宽：3.35 TB/s</li>
+</ul>
+<p>两者相除得到<strong>加速器强度</strong>： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>989</mn><mi>e</mi><mn>12</mn><mi mathvariant="normal">/</mi><mn>3.35</mn><mi>e</mi><mn>12</mn><mo>≈</mo><mn>295</mn></mrow><annotation encoding="application/x-tex">989e12 / 3.35e12 ≈ 295</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">989</span><span class="mord mathnormal">e</span><span class="mord">12/3.35</span><span class="mord mathnormal">e</span><span class="mord">12</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">295</span></span></span></span>
+当计算强度 &gt; 加速器强度时，任务算力受限（能充分利用GPU）;当计算强度 &lt; 加速器强度时，任务内存受限（大部分时间在等内存读写，不太理想）</p>
+<blockquote>
+<p>这些都算是比较理想化的简化分析，实际的细节要复杂得多。 在极端情况下，例如 B=1（矩阵向量乘法），算术强度=1，严重内存受限。这正是推理的生成过程面临的处境。</p>
+</blockquote>
+<h2 id="2-2-KV缓存：推理的核心优化">2.2 KV缓存：推理的核心优化</h2>
+<h3 id="朴素推理（Naive-inference）的问题">朴素推理（Naive inference）的问题</h3>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg" alt=""></p>
+<p>朴素推理的复杂度很不理想，每生成一个 token 都要重新计算整个历史序列的所有注意力，生成T个token的复杂度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>T</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(T^3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> ，存在大量冗余计算。
+对<strong>自回归因果 Transformer</strong>来说，前缀的计算结果完全可以复用。解决方案就是<strong>KV Cache</strong>，把缓存存在高带宽内存（HBM）中，因为这里有足够的存储空间。</p>
+<h3 id="2-3-KV-Cache-原理">2.3 KV Cache 原理</h3>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg" alt=""></p>
+<ul>
+<li>缓存所有历史token的键（K）和值（V）向量，无需重复计算</li>
+<li>每生成一个新token，仅需计算该token的K/V向量并追加到缓存中</li>
+<li>复杂度从 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>T</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(T^3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 降至 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(T)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">)</span></span></span></span></li>
+</ul>
+<p>具体来说，KV缓存需要为批次中每个序列、每个token、每一层、每个注意力头，存储一个H维向量——可想而知，这会占用大量内存。</p>
+<p><strong>推理的两个阶段</strong></p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>特点</th>
+<th>计算特性</th>
+<th>效率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>预填充（Prefill）</td>
+<td>输入提示词，一次性计算所有prompt token的K/V缓存</td>
+<td>并行计算，和训练一致</td>
+<td>算力受限，效率高</td>
+</tr>
+<tr>
+<td>生成（Generation）</td>
+<td>逐一生成回复token，每次仅处理1个新token</td>
+<td>串行计算</td>
+<td>内存受限，效率低</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-4-Transformer-各层的算术强度">2.4 Transformer 各层的算术强度</h3>
+<p>接下来看一下 Transformer 各层在两个阶段的算术强度。</p>
+<p><strong>MLP层</strong></p>
+<ul>
+<li>算术强度： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>⋅</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">B \cdot T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span></li>
+<li>预填充阶段（T=S）： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>⋅</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">B \cdot S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> ，容易达到算力受限</li>
+<li>生成阶段（T=1）： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> ，依赖并发请求数提升效率</li>
+</ul>
+<p>预填充阶段BT可以很大，即便B=1，只要序列足够长也能保证效率；但生成阶段T=1，只能靠增大B（并发请求数）提升效率。这意味着推理效率依赖大批次，能把多个请求打包处理就能提升吞吐量，但如果请求稀疏，硬件利用率就会很低——这也是推理的动态特性。</p>
+<p><strong>注意力层</strong></p>
+<ul>
+<li>算术强度：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>S</mi><mo>⋅</mo><mi>T</mi></mrow><mrow><mi>S</mi><mo>+</mo><mi>T</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{S \cdot T}{S + T}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2757em;vertical-align:-0.4033em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0576em;">S</span><span class="mbin mtight">+</span><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0576em;">S</span><span class="mbin mtight">⋅</span><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4033em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></li>
+<li>预填充阶段（T=S）： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mi>S</mi><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{S}{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0576em;">S</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> ，序列足够长时算力受限</li>
+<li>生成阶段（T=1）： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\approx 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> ，<strong>永远内存受限，且与批次大小B无关</strong></li>
+</ul>
+<p><strong>注意力的算术强度和批次B无关</strong>，因为MLP层所有序列共享同一套权重，而注意力层每个序列都有独立的KV缓存，批次无法带来内存复用收益。从数学上看，FLOPs和内存传输都与B成正比，比值会约去B；而MLP层的内存传输主要来自权重（与B无关），因此比值会保留B。</p>
+<blockquote>
+<ol>
+<li>预填充是算力受限，生成是内存受限</li>
+<li>MLP效率可通过增大批次提升，注意力效率无法通过批次提升</li>
+<li>推理的核心瓶颈是<strong>生成阶段的注意力层</strong></li>
+</ol>
+</blockquote>
+<h3 id="2-5-吞吐量与延迟的理论计算">2.5 吞吐量与延迟的理论计算</h3>
+<p>通用公式:
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>理论最小步长时间</mtext><mo>=</mo><mfrac><mrow><mi>B</mi><mo>×</mo><mtext>单序列KV缓存大小</mtext><mo>+</mo><mtext>参数大小</mtext></mrow><mtext>总内存带宽</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{理论最小步长时间} = \frac{B \times \text{单序列KV缓存大小} + \text{参数大小}}{\text{总内存带宽}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">理论最小步长时间</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">总内存带宽</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span><span class="mbin mtight">×</span><span class="mord text mtight"><span class="mord cjk_fallback mtight">单序列</span><span class="mord mtight">KV</span><span class="mord cjk_fallback mtight">缓存大小</span></span><span class="mbin mtight">+</span><span class="mord text mtight"><span class="mord cjk_fallback mtight">参数大小</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>理论最大吞吐量</mtext><mo>=</mo><mfrac><mrow><mi>B</mi><mo>×</mo><mtext>总内存带宽</mtext></mrow><mrow><mi>B</mi><mo>×</mo><mtext>单序列KV缓存大小</mtext><mo>+</mo><mtext>参数大小</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{理论最大吞吐量} = \frac{B \times \text{总内存带宽}}{B \times \text{单序列KV缓存大小} + \text{参数大小}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">理论最大吞吐量</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2757em;vertical-align:-0.4033em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span><span class="mbin mtight">×</span><span class="mord text mtight"><span class="mord cjk_fallback mtight">单序列</span><span class="mord mtight">KV</span><span class="mord cjk_fallback mtight">缓存大小</span></span><span class="mbin mtight">+</span><span class="mord text mtight"><span class="mord cjk_fallback mtight">参数大小</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span><span class="mbin mtight">×</span><span class="mord text mtight"><span class="mord cjk_fallback mtight">总内存带宽</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4033em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>
+KV缓存大小公式
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>KV缓存大小（bf16）</mtext><mo>=</mo><mn>4</mn><mo>⋅</mo><mi>S</mi><mo>⋅</mo><mi>L</mi><mo>⋅</mo><mi>K</mi><mo>⋅</mo><mi>H</mi></mrow><annotation encoding="application/x-tex">\text{KV缓存大小（bf16）} = 4 \cdot S \cdot L \cdot K \cdot H</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">KV</span><span class="mord cjk_fallback">缓存大小（</span><span class="mord">bf16</span><span class="mord cjk_fallback">）</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></p>
+<ul>
+<li>S：序列长度，L：层数，K：KV头数，H：头维度</li>
+<li>4：2（键+值）× 2（bf16每元素字节数）</li>
+</ul>
+<p>Llama 2 13B在H100上的实测（S=1024）</p>
+<table>
+<thead>
+<tr>
+<th>批次大小B</th>
+<th>内存占用</th>
+<th>单token延迟</th>
+<th>吞吐量</th>
+<th>实验现象总结</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>~26GB</td>
+<td>~8ms</td>
+<td>124 tokens/s</td>
+<td>-</td>
+</tr>
+<tr>
+<td>64</td>
+<td>~79GB</td>
+<td>~23ms</td>
+<td>2689 tokens/s</td>
+<td>延迟增加吞吐量大幅提升</td>
+</tr>
+<tr>
+<td>256</td>
+<td>~240GB</td>
+<td>~70ms</td>
+<td>3561 tokens/s</td>
+<td>延迟继续上升吞吐量增长放缓（边际效应）</td>
+</tr>
+</tbody>
+</table>
+<p>至此我们可以总结一下关于延迟-吞吐量的 trade off：</p>
+<ul>
+<li>小批次：低延迟，低硬件利用率</li>
+<li>大批次：高吞吐量，高延迟，但受内存限制无法无限增大批次。</li>
+</ul>
+<p>之前的 Lecture7/8 讲过训练的并行策略，复杂且繁琐；而推理的一种并行方式非常简单：直接启动M个模型副本，延迟不变，吞吐量线性提升M倍——不要忽略这种简单有效的方法。</p>
+<p>不过如果模型太大，单张GPU放不下，就需要对模型分片，部分场景下还需要分片KV缓存以提升效率，具体细节可参考 Scaling Book。</p>
+<p>首 token 时延（TTFT）由预填充阶段决定，即 encode prompt 的耗时，通常是算力受限，固定架构下很难优化，减小批次可小幅提升，但要提升吞吐量仍需增大批次。</p>
+<h2 id="三、推理的有损优化">三、推理的有损优化</h2>
+<h2 id="3-1-架构级KV缓存优化">3.1 架构级KV缓存优化</h2>
+<p><strong>1. GQA（分组查询注意力）</strong>
+原理和思路老生常谈不再赘述。</p>
+<p>Llama 2 13B用1:5 GQA（40个查询头→8个KV头）</p>
+<p><strong>2. Multi-head latent attention（MLA，多头潜在注意力，from DeepSeek V2）</strong></p>
+<ul>
+<li><strong>核心思路是</strong>不减少KV头数，而是将每个KV向量从  <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>⋅</mo><mi>H</mi></mrow><annotation encoding="application/x-tex">N \cdot H</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span> 维投影到更低的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi></mrow><annotation encoding="application/x-tex">C</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span></span></span></span> 维</li>
+<li>DeepSeek V2将16384维投影到512维（不过需要额外加64维来适配RoPE），KV缓存大幅减小，获得延迟和吞吐量的优势。</li>
+</ul>
+<p><strong>3. Cross-layer attention（CLA，跨层注意力）</strong></p>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg" alt=""></p>
+<p>核心思路是跨层共享KV投影和缓存（正如GQA是跨头共享KV），实验证明这种方法能在准确性跟 KV 缓存大小之间，取得更好的平衡，优化精度-效率帕累托边界。</p>
+<p><strong>4. Local attention 局部注意力</strong></p>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg" alt=""></p>
+<p>核心思路是仅关注过去K个token，超出窗口的token直接丢弃，KV缓存大小不再随序列长度增长（变为常量）。但这样会是损失长距离依赖能力，表达能力有限——我们之所以要用注意力机制而不是RNN，就是我们希望模型能够捕捉长距离的依赖关系。</p>
+<p>不过我们可以混合局部+全局注意力（如每6层放1层全局注意力）。</p>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg" alt=""></p>
+<h3 id="3-2-更激进的新架构">3.2 更激进的新架构</h3>
+<p>Transformer的自回归+全注意力是推理瓶颈的根源，新型架构从根本上改变计算模式。
+<strong>1. 状态空间模型（SSM）</strong></p>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg" alt=""></p>
+<p>思路是利用信号处理技术，以亚二次方时间复杂度对长上下文序列进行建模。</p>
+<p>发展路线：S4（长序列建模）→ Mamba（解决关联召回问题）→ Jamba（Mamba+Transformer混合）→ BASED（线性注意力+局部注意力）</p>
+<ul>
+<li>优势：将KV缓存从O(T)变为O(1)，推理效率大幅提升</li>
+<li>劣势：不擅长解决对语言至关重要的联想回忆任务（而这正是 Transformer 的强项）。</li>
+<li>现状：MiniMax 用线性注意力训练出456B参数MoE模型，仅保留少量全注意力层。或许我们现在还没法完全不用全局注意力机制，但至少大部分全局注意力机制已经被替换掉了。</li>
+</ul>
+<p><strong>2. 扩散模型</strong></p>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg" alt=""></p>
+<p>核心思路是放弃自回归，<strong>并行生成所有token</strong>，通过多次迭代 refine 结果</p>
+<p>优势：能充分利用GPU算力，生成速度远超Transformer</p>
+<p>现状：Inception Labs的扩散模型在代码生成任务上速度显著领先，通用性仍在验证中。但速度优势极大，可通过增加算力弥补精度损失（如果需要的话）。</p>
+<p>全新的架构对推理来说确实非常令人兴奋，因为它能帮助我们越过一些根本性的障碍。</p>
+<p>处理注意力机制时，会遇到KV缓存的根本性障碍。虽然可以量化和优化，但他始终存在。</p>
+<p>而通过构建状态空间模型，就能把它缩小到一个固定大小。</p>
+<p>扩散模型也是类似的原理，自回归生成是主要瓶颈。如果能改用并行生成，整个局面就彻底改变了。</p>
+<p>所以推理优化方面还有很多工作要做。推理这个领域比乍起来看的要广阔得多，关键不仅在于系统层面的速度优化，或许真正的突破可能来自架构的根本性变革。</p>
+<h3 id="3-3-量化与剪枝">3.3 量化与剪枝</h3>
+<p><strong>量化</strong></p>
+<ul>
+<li>核心思路是降低数值精度，减少内存传输，降低延迟、提升吞吐量，代价是可能损失精度。</li>
+<li><strong>精度层级</strong>：FP32（训练）→ BF16（推理默认）→ FP8/INT8 → INT4、</li>
+<li>方式：有训练时量化跟训练后量化两种方式，前者需要重新训练模型，后者更常用。</li>
+<li><strong>经典方法</strong>：</li>
+</ul>
+<h3 id="模型剪枝">模型剪枝</h3>
+<ul>
+<li>核心思路是移除模型冗余部分，再通过知识蒸馏修复精度</li>
+<li><strong>NVIDIA方案</strong>：用小校准集识别重要层/头/维度→剪枝→蒸馏</li>
+<li><strong>效果</strong>：15B模型剪至8B精度几乎无损，剪至4B仅有小幅精度下降</li>
+</ul>
+<p>总结有损优化的两种实现路径：一是<strong>从头训练</strong>：直接设计高效架构并训练；二是<strong>知识蒸馏</strong>：用大模型（教师）训练更快的小模型（学生），继承大模型能力。</p>
+<h2 id="四、无损优化：Speculative-sampling（推测解码）">四、无损优化：Speculative sampling（推测解码）</h2>
+<h3 id="4-1-核心洞察">4.1 核心洞察</h3>
+<p><strong>校验比生成快</strong>：预填充（并行校验多个token）是算力受限，速度快；生成（串行生成单个token）是内存受限，速度慢。</p>
+<h3 id="4-2-算法流程">4.2 算法流程</h3>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg" alt=""></p>
+<ol>
+<li>用<strong>轻量草稿模型</strong>提前自回归生成K个token</li>
+<li>用<strong>目标大模型</strong>并行校验这K个token（预填充逻辑）</li>
+<li>按概率接受正确的token，拒绝则从目标模型采样修正</li>
+</ol>
+<h3 id="4-3-关键特性">4.3 关键特性</h3>
+<p>该方法能保证<strong>从目标模型得到完全精确的采样结果</strong>，实际可实现2倍左右提速。草稿模型越小越快，越接近目标模型精度越高，还可结合Medusa（草稿模型并行生成多个token）、EAGLE（草稿模型复用目标模型的高层特征）等优化。</p>
+<h2 id="五、系统级优化：处理动态负载">五、系统级优化：处理动态负载</h2>
+<p>在实时流量中对序列进行批量处理是一项棘手的任务。</p>
+<ul>
+<li>请求到达的时间各不相同（等待凑齐批量会拖慢先到达请求的响应速度）；</li>
+<li>序列之间存在共享前缀（例如，系统提示词或生成多个样本的场景）；</li>
+<li>序列长度不一（padding 操作会导致效率低下）。</li>
+</ul>
+<h3 id="5-1-Continuous-Batching">5.1 Continuous Batching</h3>
+<ul>
+<li>Iteration-level scheduling（迭代级调度），每生成一个 token 后检查是否有新请求，动态加入批次不需等待。</li>
+<li>Selective batching（选择性批处理），对不同长度的序列，计算注意力的时候单独处理每个序列，MLP层将所有序列扁平化后并行计算。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig10.jpg" alt=""></p>
+<h3 id="5-2-PagedAttention">5.2 PagedAttention</h3>
+<ul>
+<li><strong>问题</strong>：预分配固定大小的KV缓存导致严重的内存碎片（内部+外部）</li>
+<li>借鉴操作系统虚拟内存机制，将KV缓存切分为固定大小的块，分散存储在空闲内存中；用页表管理块的映射关系，无需连续内存</li>
+<li>结合写时复制（CoW）机制，共享前缀的序列复用缓存块，通过引用计数管理， diverge时复制分块（如系统提示、少样本提示）</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig11.jpg" alt=""></p>
+<h2 id="六、课程总结">六、课程总结</h2>
+<ol>
+<li>推理贯穿模型的使用、评估、训练全流程，是大模型落地的核心成本</li>
+<li>推理与训练截然不同，生成阶段天然内存受限，核心瓶颈是KV Cache</li>
+<li>优化技术：</li>
+<li>很多理念源自系统领域（推测执行、分页机制）</li>
+<li>新型架构在性能提升方面蕴藏着巨大的潜力</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%8E%A8%E7%90%86%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">一、推理概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8E%A8%E7%90%86%E6%95%88%E7%8E%87%E8%87%B3%E5%85%B3%E9%87%8D%E8%A6%81"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 为什么推理效率至关重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E6%8E%A8%E7%90%86%E7%9A%84%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 推理的性能指标</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%90%86%E8%A7%A3%E6%8E%A8%E7%90%86%E7%9A%84%E8%B4%9F%E8%BD%BD"><span class="toc-number">2.</span> <span class="toc-text">二、理解推理的负载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%AE%97%E6%9C%AF%E5%BC%BA%E5%BA%A6"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 算术强度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-KV%E7%BC%93%E5%AD%98%EF%BC%9A%E6%8E%A8%E7%90%86%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BC%98%E5%8C%96"><span class="toc-number">3.</span> <span class="toc-text">2.2 KV缓存：推理的核心优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%B4%E7%B4%A0%E6%8E%A8%E7%90%86%EF%BC%88Naive-inference%EF%BC%89%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.1.</span> <span class="toc-text">朴素推理（Naive inference）的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-KV-Cache-%E5%8E%9F%E7%90%86"><span class="toc-number">3.2.</span> <span class="toc-text">2.3 KV Cache 原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-Transformer-%E5%90%84%E5%B1%82%E7%9A%84%E7%AE%97%E6%9C%AF%E5%BC%BA%E5%BA%A6"><span class="toc-number">3.3.</span> <span class="toc-text">2.4 Transformer 各层的算术强度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E5%90%9E%E5%90%90%E9%87%8F%E4%B8%8E%E5%BB%B6%E8%BF%9F%E7%9A%84%E7%90%86%E8%AE%BA%E8%AE%A1%E7%AE%97"><span class="toc-number">3.4.</span> <span class="toc-text">2.5 吞吐量与延迟的理论计算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%8E%A8%E7%90%86%E7%9A%84%E6%9C%89%E6%8D%9F%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">三、推理的有损优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%9E%B6%E6%9E%84%E7%BA%A7KV%E7%BC%93%E5%AD%98%E4%BC%98%E5%8C%96"><span class="toc-number">5.</span> <span class="toc-text">3.1 架构级KV缓存优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%9B%B4%E6%BF%80%E8%BF%9B%E7%9A%84%E6%96%B0%E6%9E%B6%E6%9E%84"><span class="toc-number">5.1.</span> <span class="toc-text">3.2 更激进的新架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E9%87%8F%E5%8C%96%E4%B8%8E%E5%89%AA%E6%9E%9D"><span class="toc-number">5.2.</span> <span class="toc-text">3.3 量化与剪枝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%89%AA%E6%9E%9D"><span class="toc-number">5.3.</span> <span class="toc-text">模型剪枝</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%97%A0%E6%8D%9F%E4%BC%98%E5%8C%96%EF%BC%9ASpeculative-sampling%EF%BC%88%E6%8E%A8%E6%B5%8B%E8%A7%A3%E7%A0%81%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">四、无损优化：Speculative sampling（推测解码）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E6%A0%B8%E5%BF%83%E6%B4%9E%E5%AF%9F"><span class="toc-number">6.1.</span> <span class="toc-text">4.1 核心洞察</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">6.2.</span> <span class="toc-text">4.2 算法流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7"><span class="toc-number">6.3.</span> <span class="toc-text">4.3 关键特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%B3%BB%E7%BB%9F%E7%BA%A7%E4%BC%98%E5%8C%96%EF%BC%9A%E5%A4%84%E7%90%86%E5%8A%A8%E6%80%81%E8%B4%9F%E8%BD%BD"><span class="toc-number">7.</span> <span class="toc-text">五、系统级优化：处理动态负载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Continuous-Batching"><span class="toc-number">7.1.</span> <span class="toc-text">5.1 Continuous Batching</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-PagedAttention"><span class="toc-number">7.2.</span> <span class="toc-text">5.2 PagedAttention</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">六、课程总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记&body=Check out this article: https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 10：Inference 推理》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

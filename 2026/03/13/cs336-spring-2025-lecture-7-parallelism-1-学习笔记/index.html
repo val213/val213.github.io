@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg">
+<meta property="article:published_time" content="2026-03-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.319Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/03/15/cs336-spring-2025-lecture-8-parallelism-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记&body=Check out this article: https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81LLM%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%9AGPU%E7%BC%A9%E6%94%BE%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7%E4%B8%8E%E5%B9%B6%E8%A1%8C%E7%A1%AC%E4%BB%B6-%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">一、LLM网络基础：GPU缩放的局限性与并行硬件&#x2F;通信基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-GPU%E5%8D%95%E5%8D%A1%E7%BC%A9%E6%94%BE%E7%9A%84%E4%B8%A4%E5%A4%A7%E6%A0%B8%E5%BF%83%E9%99%90%E5%88%B6"><span class="toc-number">1.1.</span> <span class="toc-text">1. GPU单卡缩放的两大核心限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%A4%9A%E5%8D%A1-%E5%A4%9A%E6%9C%BA%E5%B9%B6%E8%A1%8C%E7%9A%84%E7%A1%AC%E4%BB%B6%E4%BA%92%E8%81%94"><span class="toc-number">1.2.</span> <span class="toc-text">2. 多卡&#x2F;多机并行的硬件互联</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E9%9B%86%E4%BD%93%E9%80%9A%E4%BF%A1%E5%8E%9F%E8%AF%AD%EF%BC%88Collective-Communication%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">3. 集体通信原语（Collective Communication）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-TPU%E4%B8%8EGPU%E7%9A%84%E9%80%9A%E4%BF%A1%E8%AE%BE%E8%AE%A1%E5%B7%AE%E5%BC%82"><span class="toc-number">1.4.</span> <span class="toc-text">4. TPU与GPU的通信设计差异</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81LLM%E5%B9%B6%E8%A1%8C%E8%AE%AD%E7%BB%83%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E8%AF%AD"><span class="toc-number">2.</span> <span class="toc-text">二、LLM并行训练的核心原语</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E5%B9%B6%E8%A1%8C%EF%BC%88Data-Parallelism%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">1. 数据并行（Data Parallelism）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%A8%A1%E5%9E%8B%E5%B9%B6%E8%A1%8C%EF%BC%88Model-Parallelism%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">2. 模型并行（Model Parallelism）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%BF%80%E6%B4%BB%E5%B9%B6%E8%A1%8C%EF%BC%88Activation-Parallelism%EF%BC%89%EF%BC%9A%E8%A7%A3%E5%86%B3%E6%BF%80%E6%B4%BB%E5%86%85%E5%AD%98%E7%93%B6%E9%A2%88"><span class="toc-number">2.3.</span> <span class="toc-text">3. 激活并行（Activation Parallelism）：解决激活内存瓶颈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96%E5%B9%B6%E8%A1%8C%E7%AD%96%E7%95%A5"><span class="toc-number">2.4.</span> <span class="toc-text">4. 其他并行策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%88%A9%E7%94%A8%E5%B9%B6%E8%A1%8C%E5%8C%96%E7%BC%A9%E6%94%BE%E8%AE%AD%E7%BB%83%E5%A4%A7%E6%A8%A1%E5%9E%8B%EF%BC%9A%E7%BB%84%E5%90%88%E7%AD%96%E7%95%A5%E4%B8%8E%E5%AE%9E%E9%99%85%E8%90%BD%E5%9C%B0"><span class="toc-number">3.</span> <span class="toc-text">三、利用并行化缩放训练大模型：组合策略与实际落地</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%90%84%E7%B1%BB%E5%B9%B6%E8%A1%8C%E7%AD%96%E7%95%A5%E7%9A%84%E6%A0%B8%E5%BF%83%E5%AF%B9%E6%AF%94"><span class="toc-number">3.1.</span> <span class="toc-text">1. 各类并行策略的核心对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%89%B9%E6%AC%A1%E5%A4%A7%E5%B0%8F%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BD%9C%E7%94%A8"><span class="toc-number">3.2.</span> <span class="toc-text">2. 批次大小的核心作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3D-4D%E5%B9%B6%E8%A1%8C%EF%BC%9A%E7%BB%84%E5%90%88%E7%AD%96%E7%95%A5%E7%9A%84%E5%AE%9E%E7%94%A8%E7%BB%8F%E9%AA%8C%E6%B3%95%E5%88%99"><span class="toc-number">3.3.</span> <span class="toc-text">3. 3D&#x2F;4D并行：组合策略的实用经验法则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%A4%A7%E8%A7%84%E6%A8%A1%E8%AE%AD%E7%BB%83%E7%9A%84%E7%BB%8F%E5%85%B8%E6%A1%88%E4%BE%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5%E7%BB%93%E8%AE%BA"><span class="toc-number">3.4.</span> <span class="toc-text">4. 大规模训练的经典案例与实践结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%85%B3%E9%94%AE%E5%AE%9E%E8%B7%B5%E7%BB%93%E8%AE%BA"><span class="toc-number">3.5.</span> <span class="toc-text">5. 关键实践结论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%AF%BE%E7%A8%8B%E6%A0%B8%E5%BF%83%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">四、课程核心总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-12T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-03-13</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.319Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/LLM/" rel="tag">LLM</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2015811808447988907">知乎</a>，现迁移至个人博客。</p>
+</blockquote>
+<p>目录</p>
+<p><strong>课程主题</strong>：LLM大规模训练的并行计算基础
+<strong>核心目标</strong>：理解超大模型训练的系统复杂度，掌握各类并行化范式及组合使用方法，了解大规模训练的实际落地方案
+<strong>课程结构</strong>：网络基础→LLM并行训练原语→并行化缩放训练大模型</p>
+<h2 id="一、LLM网络基础：GPU缩放的局限性与并行硬件-通信基础">一、LLM网络基础：GPU缩放的局限性与并行硬件/通信基础</h2>
+<h3 id="1-GPU单卡缩放的两大核心限制">1. GPU单卡缩放的两大核心限制</h3>
+<p>单卡算力和显存的增长速度远落后于LLM参数规模的扩张，成为超大模型训练的核心瓶颈。</p>
+<ul>
+<li><strong>计算限制</strong>：单卡算力提升依赖精度优化（FP32→BF16/Int8，~16x）、复杂指令（~12.5x）、制程（~2.5x）等，整体增益超1000x，但仍无法匹配千亿/万亿参数模型的计算需求；全球最快超算已达艾级算力（Exaflops），是大规模训练的核心算力支撑。</li>
+<li><strong>内存限制</strong>：2018-2022年LLM参数从千万级飙升至千亿级（GPT-3 175B、Megatron-Turing NLG 530B），单GPU显存无法容纳主流大模型，必须通过多卡/多机拆分内存需求。</li>
+</ul>
+<h3 id="2-多卡-多机并行的硬件互联">2. 多卡/多机并行的硬件互联</h3>
+<p>通过不同层级的高速互联实现<strong>节点内</strong>和<strong>节点间</strong>并行，不同互联技术的带宽差异显著（单通道）：</p>
+<ul>
+<li>NVLink3.0：400 GT/s（节点内GPU高速互联，如单机8卡）</li>
+<li>HDR InfiniBand：50 GT/s（节点间互联）</li>
+<li>PCI Express 4.0/xGMI-2：16 GT/s</li>
+<li>核心架构：单机8卡通过NVSwitch实现高速互联，多机通过InfiniBand交换机连接，256卡内可实现GPU全连接。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg" alt=""></p>
+<h3 id="3-集体通信原语（Collective-Communication）">3. 集体通信原语（Collective Communication）</h3>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg" alt=""></p>
+<p>并行训练的基础操作，所有多卡/多机数据同步均基于此，核心操作及定义如下：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>核心逻辑</th>
+<th>详细描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全局归约（All Reduce）</td>
+<td>多节点数据归约（如求和），结果同步至所有节点</td>
+<td>假设有 4 台机器、4 个进程（rank），各持一段数据。我们要做归约（比如求和），并把结果广播到每台机器。通信开销大约是待归约数据总量的 2 倍。</td>
+</tr>
+<tr>
+<td>广播（Broadcast）</td>
+<td>单节点数据复制到所有节点</td>
+<td>从进程 2 取一份数据，复制到所有其他进程。通信开销约为输出总量的 1 倍。</td>
+</tr>
+<tr>
+<td>归约（Reduce）</td>
+<td>多节点数据归约，结果仅同步至根节点</td>
+<td>多份输入求和，结果只发给一台机器。</td>
+</tr>
+<tr>
+<td>全局收集（All Gather）</td>
+<td>各节点持有的数据分片，聚合为完整数据同步至所有节点</td>
+<td>每个进程负责一部分参数（比如进程 0、1、2、3 各持一段），把各自的片段发给所有其他进程，最终每台机器都拿到完整分段集合。</td>
+</tr>
+<tr>
+<td>归约散射（Reduce Scatter）</td>
+<td>多节点数据归约后，分片同步至对应节点（全局归约的“拆分版”）</td>
+<td>把每一行数据求和，结果只发给对应进程。这是全局归约的 “分段版本”。</td>
+</tr>
+</tbody>
+</table>
+<p>全局收集与归约散射是基础原语，很多并行算法都构建在它们之上。这里有一个<strong>关键等价关系</strong>：<strong>全局归约 = 归约散射 + 全局收集</strong>，在带宽受限场景下，这是全局归约的最优实现方式，通信成本完全一致。
+如果你要做全局归约：假设有 A、B、C、D 四张 GPU，各处理不同数据，产生不同梯度，需要把梯度求和再发回所有 GPU—— 这是经典的数据并行操作。
+这件事可以拆成两步：<strong>先归约散射，再全局收集</strong>。归约散射把每一行求和，结果分别留在 GPU 0、1、2、3；再做全局收集，把结果复制回所有 GPU。最终每张卡都拿到参数某一部分的完整和，再同步给其他节点。
+在<strong>带宽受限场景</strong>下，这是最优方案。全局归约的最优性能，基本等价于归约散射 + 全局收集的性能。</p>
+<blockquote>
+<p><strong>课堂Q&amp;A</strong>
+Q：上一页是不是说，用归约散射+全局收集比直接用全局归约更好？
+A：二者完全等价。并行梯度下降中全局归约是自然操作，但可拆分为归约散射+全局收集，<strong>带宽层面无任何性能损失</strong>，该结论是后续ZeRO并行的核心基础。</p>
+</blockquote>
+<h3 id="4-TPU与GPU的通信设计差异">4. TPU与GPU的通信设计差异</h3>
+<p>二者组网架构不同，适配的并行场景存在差异，核心区别：</p>
+<ul>
+<li><strong>GPU</strong>：256卡内实现<strong>全连接组网</strong>，单机8卡通过NVLink高速互联，超过256卡后需通过叶/脊交换机实现慢速互联，存在带宽瓶颈；</li>
+<li><strong>TPU</strong>：采用<strong>环形网格（Toroidal Mesh）</strong>，仅相邻芯片高速通信，极易扩展，集体通信（All Reduce/Reduce Scatter）实现效率与GPU全连接持平；</li>
+<li><strong>性能</strong>：H100 SuperPod相比A100，256卡下二分带宽提升9x，归约带宽提升4.5x，节点内并行效率更高。</li>
+</ul>
+<p>大规模训练的计算单元从<strong>单GPU</strong>升级为<strong>数据中心</strong>，多机缩放的核心目标是实现<strong>内存线性缩放</strong>（最大模型参数随GPU数线性增长）、<strong>计算线性缩放</strong>（算力随GPU数线性增长），且所有并行算法均基于简单的集体通信原语实现。</p>
+<h2 id="二、LLM并行训练的核心原语">二、LLM并行训练的核心原语</h2>
+<p>目前业界主要有三种并行策略：
+第一种：<strong>数据并行（Data Parallelism, DP）<strong>把模型参数完整复制到每张 GPU，不拆参数；只把</strong>批次（batch）拆分</strong>，不同机器处理不同批次切片。具体实现有很多细节。
+第二种：<strong>模型并行（Model Parallelism, MP）<strong>不让每张卡都存完整模型。模型太大时，全量复制会出问题。需要精巧地</strong>把模型切开</strong>，每张卡只负责模型的一部分。
+第三种：**激活并行（Activation Parallelism, AP）**平时我们不太关心激活值，因为 PyTorch 都封装好了。但模型变大、序列长度变长后，<strong>激活内存会成为巨大瓶颈</strong>。想训练超大批次的超大模型，必须管理激活内存，也需要拆分。
+把三者结合，我们就能在海量机器下优雅地扩展计算与内存。</p>
+<h3 id="1-数据并行（Data-Parallelism）">1. 数据并行（Data Parallelism）</h3>
+<p><strong>1.1 朴素数据并行（Naïve DDP）</strong></p>
+<ul>
+<li><strong>核心思路</strong>：将模型参数完整复制到所有GPU，仅拆分训练批次（Batch），各GPU计算分片批次的梯度，通过<strong>全局归约</strong>同步梯度后更新参数；</li>
+<li><strong>公式基础</strong>：基于SGD， <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>θ</mi><mi>t</mi></msub><mo>−</mo><mi>η</mi><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></msubsup><mi mathvariant="normal">∇</mi><mi>f</mi><mrow><mo fence="true">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta_{t+1}=\theta_{t}-\eta \sum_{i=1}^{B} \nabla f\left(x_{i}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9028em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2809em;vertical-align:-0.2997em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9812em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∇</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span> ，将B拆分到M个GPU，各计算 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>B</mi><mi mathvariant="normal">/</mi><mi>M</mi></mrow></msubsup><mi mathvariant="normal">∇</mi><mi>f</mi><mrow><mo fence="true">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sum_{i=1}^{B/M} \nabla f\left(x_{i}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3276em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0279em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span><span class="mord mtight">/</span><span class="mord mathnormal mtight" style="margin-right:0.109em;">M</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∇</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span> 后同步；</li>
+<li><strong>优缺点</strong>：计算缩放友好（各GPU获B/M样本），但<strong>无内存缩放</strong>（所有GPU存完整参数/优化器状态），通信开销为<strong>2×参数量/批次</strong>（全局归约），批次足够大时可掩盖通信开销；</li>
+<li><strong>内存问题</strong>：显存占用极严重，需存储5份权重，单参数达16字节（BF16参数2B+BF16梯度2B+FP32主权重4B+Adam一阶矩4B+二阶矩4B），<strong>优化器状态是显存占用大头</strong>。</li>
+</ul>
+<p><strong>1.2 ZeRO（零冗余优化器）：解决数据并行的显存瓶颈</strong></p>
+<p>拆分数据并行中显存密集的部分（优化器状态/梯度/参数），利用<strong>归约散射+全局收集</strong>的等价关系，在不增加通信成本的前提下实现显存缩放，分3个阶段，均基于PyTorch FSDP框架实现。</p>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg" alt=""></p>
+<table>
+<thead>
+<tr>
+<th>ZeRO阶段</th>
+<th>核心拆分内容</th>
+<th>显存消耗（7.5B参数/64卡）</th>
+<th>通信成本</th>
+<th>关键步骤</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stage 1</td>
+<td>优化器状态分片</td>
+<td>31.4GB（基线120GB）</td>
+<td>2×参数量</td>
+<td>1.各GPU计算完整梯度；2.归约散射梯度；3.各GPU更新分片参数；4.全局收集参数</td>
+</tr>
+<tr>
+<td>Stage 2</td>
+<td>优化器状态+梯度分片</td>
+<td>16.6GB</td>
+<td>2×参数量</td>
+<td>1.反向传播时逐层计算梯度并归约；2.释放无用梯度；3.更新参数+全局收集</td>
+</tr>
+<tr>
+<td>Stage 3（FSDP）</td>
+<td>优化器状态+梯度+参数全分片</td>
+<td>1.9GB</td>
+<td>3×参数量</td>
+<td>1.前向/反向按需请求/发送参数；2.增量通信/计算；3.参数使用后立即释放</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>课堂Q&amp;A</strong>
+Q1：数据并行下每张卡都要算完整梯度、做全局归约，怎么还能分片优化器状态？
+A1：这是ZeRO的核心巧思——每张卡仍持有完整参数+梯度，可计算完整梯度更新，但<strong>仅负责更新自己分片的优化器状态对应的参数</strong>，最后通过全局收集同步更新后的参数，无需全量复制优化器状态。</p>
+<p>Q2：这里的参数量通信开销是单机还是总计？
+A2：<strong>总计</strong>。比如1/4参数要被发送3次，四组合计为总通信量；此前提到的全局归约2倍参数量的开销，同样是总计。</p>
+<p>Q3：AdamW似乎假设参数相互独立，但模型是连通的，分片单独更新会不会有问题？
+A3：AdamW是对角更新，确实并非完全考虑参数间依赖，学界也提出了K-FAC等二阶优化方法，但至今未替代Adam。该假设不影响并行框架的有效性，是工程上的合理取舍。</p>
+<p>Q4：能不能修改Adam，存更高阶矩，同时靠分片省内存？
+A4：理论上可行，可将复杂优化器状态按GPU数拆分，但后续其他组件也会随GPU数扩展，<strong>优化器状态仍会是显存瓶颈</strong>，无实际工程价值。</p>
+</blockquote>
+<p><strong>ZeRO核心优势</strong>：Stage1/2在带宽受限场景下<strong>近乎免费</strong>（通信成本与朴素DDP一致），Stage3仅增加50%通信成本，却实现显存大幅缩减；8×A100 80G节点上，Stage3可训练53.33B参数模型，而基线仅6.66B。</p>
+<p><strong>1.3 ZeRO Stage3（FSDP）细节</strong></p>
+<p><strong>核心特点</strong>：全量分片参数/梯度/优化器状态，前向/反向<strong>按需预取参数</strong>，使用后立即释放，通过<strong>计算与通信重叠</strong>掩盖开销。</p>
+<blockquote>
+<p><strong>课堂Q&amp;A</strong>
+Q1：FSDP预取的权重存在哪里？GPU显存不是已经满了吗？
+A1：需要在GPU中预留<strong>专门的缓冲区</strong>存储预取权重；此外，FSDP未解决激活内存问题，激活值会占据大量显存，这是后续需要解决的核心痛点。</p>
+<p>Q2：FSDP分片参数后，和模型并行的本质区别是什么？
+A2：<strong>核心区别在通信对象</strong>——FSDP会频繁<strong>传递参数</strong>，而模型并行的参数<strong>固定在对应GPU，仅传递激活值</strong>；模型并行的通信焦点是激活，而非参数，这是二者的本质不同。</p>
+<p>Q3：参数只存在一台机器，为什么还要做全局收集，用广播不行吗？
+A3：理论上广播可实现相同效果，此处用全局收集是<strong>工程实现细节</strong>（部分场景下层并非完全分布在单GPU），核心逻辑是将分片参数同步至所有GPU，保证计算连续性。</p>
+</blockquote>
+<p><strong>1.4 数据并行的固有问题</strong></p>
+<ul>
+<li>并行度受批次大小限制：GPU数不能超过批次大小，否则通信开销剧增；</li>
+<li>批次增益递减：超过<strong>临界批次</strong>后，梯度噪声降低的收益消失，训练效率不再提升；</li>
+<li>ZeRO3的局限性：原理最优，但速度较慢，<strong>无法降低激活内存</strong>，这是数据并行的核心痛点。</li>
+</ul>
+<h3 id="2-模型并行（Model-Parallelism）">2. 模型并行（Model Parallelism）</h3>
+<p>核心思路：将模型<strong>参数拆分到不同GPU</strong>（而非复制），仅传递<strong>激活值</strong>（而非参数，与ZeRO3的核心区别），实现<strong>不依赖批次大小的内存缩放</strong>，分为<strong>流水线并行</strong>和<strong>张量并行</strong>两类，对应模型的两种拆分方式。</p>
+<p><strong>2.1 流水线并行（Pipeline Parallelism）：沿深度/层拆分模型</strong></p>
+<p>流水线并行是最直观的切法：神经网络是一层层的，按层切开，每张卡负责一部分层。</p>
+<ul>
+<li><strong>基础形式（层并行）</strong>：将模型层拆分到不同GPU，前向时激活值在GPU间依次传递，反向时梯度反向传递；</li>
+<li><strong>问题很明显</strong>：GPU利用率极低，n卡仅1/n时间工作，存在巨大<strong>通信气泡</strong>；</li>
+<li><strong>优化方案：微批次流水线</strong>：将批次拆分为微批次，处理完一个微批次后立即传递激活值，同时开始下一个微批次计算，<strong>气泡时间占比=(阶段数-1)/微批次数</strong>，批次越大，气泡越小；</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg" alt=""></p>
+<ul>
+<li><strong>零气泡流水线</strong>：将反向传播拆分为<strong>激活反向传播</strong>（强串行依赖）和<strong>权重梯度计算</strong>（无依赖），将权重梯度计算填充到气泡中，实现GPU100%利用率，但<strong>工程实现极其复杂</strong>；</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg" alt=""></p>
+<ul>
+<li><strong>优缺点</strong>：显存缩放友好（拆分激活+参数），通信为点对点（仅传递激活值，规模为b×s×h），适合<strong>节点间慢速互联</strong>；但依赖大批次，工程配置复杂，是大规模训练的“最后选择”。</li>
+</ul>
+<p><strong>2.2 张量并行（Tensor Parallelism）：沿宽度拆分模型</strong></p>
+<p>如果说流水线并行是沿着 <strong>深度（层）<strong>切，那么张量并行就是沿着矩阵乘的</strong>宽度</strong>切，把大矩阵分解为子矩阵，做部分和。
+核心思路：利用矩阵乘法的可分解性，将大矩阵拆分为子矩阵，各GPU计算子矩阵乘法后聚合结果，是<strong>节点内并行的最优选择</strong>。</p>
+<ul>
+<li><strong>核心原理</strong>：以MLP为例，将参数矩阵A拆为A1/A2、B拆为B1/B2，各GPU计算XA1/XA2→Y1/Y2，再计算Y1B1/Y2B2，最后通过<strong>全局归约</strong>求和得到最终结果；前向/反向仅在关键节点做一次全局归约同步；</li>
+<li><strong>适用场景</strong>：<strong>单机8卡内</strong>（NVLink高速互联），这是张量并行的<strong>最优甜区</strong>；8卡以上吞吐暴跌（16卡-42.7%、32卡-65.6%）；</li>
+<li><strong>优缺点</strong>：无通信气泡，不依赖大批次，实现复杂度低（仅需包装模型）；但通信开销大（每层8×bsh的全局归约），要求<strong>低延迟/高带宽互联</strong>，仅适用于节点内。</li>
+</ul>
+<blockquote>
+<p><strong>课堂Q&amp;A</strong>
+Q1：张量并行和流水线并行能同时使用吗？
+A1：可以，且是工业界超大模型训练的<strong>标配</strong>。通常先做单机内的张量并行，再在跨机间叠流水线并行；目前仅DeepSeek V3是特例，只用流水线并行，不用张量并行。</p>
+<p>Q2：是不是单机内用张量并行，跨机用流水线+数据并行？
+A2：是。<strong>典型组合策略</strong>：单机内做张量并行，跨机结合流水线并行+数据并行；只有当模型无法通过张量并行+ZeRO3容纳时，才会启用流水线并行。</p>
+</blockquote>
+<h3 id="3-激活并行（Activation-Parallelism）：解决激活内存瓶颈">3. 激活并行（Activation Parallelism）：解决激活内存瓶颈</h3>
+<p><strong>3.1 激活内存的问题</strong></p>
+<p>张量/流水线并行可线性缩减参数/优化器状态内存，但<strong>激活内存持续增长</strong>，成为超大模型训练的新瓶颈；单Transformer层激活内存公式：</p>
+<p>Activations memory per layer $ =s b h\left(10 + \frac{24}{t}+5 \frac{a s}{h}\right)$</p>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg" alt=""></p>
+<ul>
+<li>张量并行后仍有<strong>10sbh的不可缩减值</strong>，来自LayerNorm、Dropout等<strong>逐点操作</strong>，无法通过矩阵拆分并行化。</li>
+</ul>
+<p><strong>3.2 序列并行（Sequence Parallelism）：实现激活内存线性缩放</strong>
+核心思路：逐点操作（LayerNorm/Dropout）在<strong>序列维度</strong>彼此独立，将序列拆分到不同GPU，各GPU处理分片的逐点操作，通过<strong>全局收集/归约散射</strong>同步结果：</p>
+<ul>
+<li>前向： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span> =全局收集， <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>g</mi><mo>ˉ</mo></mover></mrow><annotation encoding="application/x-tex">\bar{g}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7622em;vertical-align:-0.1944em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> =归约散射；</li>
+<li>反向：操作完全反转；</li>
+<li><strong>效果</strong>：结合张量+序列并行后，激活内存实现<strong>完全线性缩放</strong>，最终单图层激活内存降至<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>b</mi><mi>h</mi><mo>×</mo><mn>34</mn><mi mathvariant="normal">/</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">sbh×34/t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">bh</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">34/</span><span class="mord mathnormal">t</span></span></span></span>（t为张量并行卡数）。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg" alt=""></p>
+<blockquote>
+<p><strong>课堂Q&amp;A</strong>
+Q：Transformer一层层堆叠，计算图越来越复杂，会不会成为GPU间通信的瓶颈？
+A：大概率不会。张量并行是层内纯并行，不依赖计算图的整体结构；流水线并行若存在多分支计算图，反而可能增加并行机会，提升利用率。</p>
+</blockquote>
+<h3 id="4-其他并行策略">4. 其他并行策略</h3>
+<p>适用于特定场景，是三大核心并行的补充：</p>
+<ul>
+<li><strong>上下文并行/环形注意力（Ring Attention）</strong>：拆分长序列Attention的计算/激活开销，将K/V在多机间环形传递，各机处理部分Query，是Flash Attention的分布式版本，适用于<strong>长上下文LLM训练</strong>；</li>
+<li><strong>专家并行（Expert Parallelism）</strong>：将大MLP拆分为多个稀疏激活的小专家MLP，分片到不同GPU；核心区别是<strong>专家稀疏激活</strong>，需做路由，通信不可预测，但概念与张量并行一致，适用于MoE模型。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg" alt=""></p>
+<h2 id="三、利用并行化缩放训练大模型：组合策略与实际落地">三、利用并行化缩放训练大模型：组合策略与实际落地</h2>
+<h3 id="1-各类并行策略的核心对比">1. 各类并行策略的核心对比</h3>
+<p>不同并行策略在同步开销、显存、带宽、批次依赖、易用性上差异显著，需根据硬件/模型规模组合：</p>
+<table>
+<thead>
+<tr>
+<th>并行策略</th>
+<th>同步开销</th>
+<th>内存缩放</th>
+<th>通信带宽</th>
+<th>批次依赖</th>
+<th>易用性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DDP/ZeRO1</td>
+<td>每批次</td>
+<td>无</td>
+<td>2×参数量</td>
+<td>线性依赖</td>
+<td>极高</td>
+</tr>
+<tr>
+<td>FSDP（ZeRO3）</td>
+<td>每个FSDP块3×</td>
+<td>线性</td>
+<td>3×参数量</td>
+<td>线性依赖</td>
+<td>极高</td>
+</tr>
+<tr>
+<td>流水线并行</td>
+<td>每个流水线阶段</td>
+<td>线性</td>
+<td>激活值（bsh）</td>
+<td>线性依赖</td>
+<td>极低</td>
+</tr>
+<tr>
+<td>张量+序列并行</td>
+<td>每个Transformer块2×</td>
+<td>线性</td>
+<td>每层8×激活值全局归约</td>
+<td>无依赖</td>
+<td>中等</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-批次大小的核心作用">2. 批次大小的核心作用</h3>
+<p>谷歌有一本非常好的 TPU 并行文档，里面有一张神图：</p>
+<p><img src="/images/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg" alt=""></p>
+<p>核心变量还是<strong>批次大小</strong>。批次是大规模训练的<strong>稀缺资源</strong>，批次与GPU数的比值决定最优并行策略：</p>
+<ul>
+<li>批次过小：通信受限，所有策略效率极低；</li>
+<li>批次适中：<strong>FSDP+张量并行</strong>最优，实现计算受限（算力无浪费）；</li>
+<li>批次足够大：<strong>纯数据并行 / FSDP</strong>即可，计算时间远大于通信时间；</li>
+<li>批次不足的解决方案：<strong>梯度累积</strong>，用显存换等效大批次，减少跨机同步频率，提升通信效率。</li>
+</ul>
+<h3 id="3-3D-4D并行：组合策略的实用经验法则">3. 3D/4D并行：组合策略的<strong>实用经验法则</strong></h3>
+<p>把这些组合起来，就是业界常说的<strong>3D 并行、4D 并行。<strong>这是工业界大规模训练的</strong>标准流程</strong>，核心原则是<strong>先放内存，再扩算力</strong>，步骤如下：</p>
+<ul>
+<li><strong>（1）让模型+激活放进显存（硬性前提）</strong></li>
+<li><strong>（2）全力扩展总算力</strong></li>
+<li><strong>（3）批次优化</strong>：若批次过小，开启<strong>梯度累积</strong>，提升通信效率。</li>
+</ul>
+<h3 id="4-大规模训练的经典案例与实践结论">4. 大规模训练的经典案例与实践结论</h3>
+<p><strong>4.1 Megatron-LM（1.7B-1T参数）：3D并行的标杆</strong></p>
+<ul>
+<li>张量并行先扩至8卡后<strong>封顶</strong>，是最优配置；</li>
+<li>模型规模超过单机显存后，逐步提升<strong>流水线并行</strong>；</li>
+<li>数据并行随流水线并行提升而<strong>逐步降低</strong>（批次被流水线消耗）；</li>
+<li>效果：实现<strong>算力线性缩放</strong>，单GPU吞吐保持平稳，理论峰值算力利用率达40%-52%。</li>
+</ul>
+<p><strong>4.2 主流LLM的并行策略选型</strong>
+工业界均采用<strong>组合并行</strong>，无单一策略，核心选型如下：</p>
+<ul>
+<li>OLMo/Dolma（7B）：纯FSDP（ZeRO3），单机可容纳；</li>
+<li>DeepSeek V1：ZeRO1+张量+序列+流水线并行；V3：16路流水线+64路专家并行+ZeRO1；</li>
+<li>Yi：ZeRO1+张量+流水线并行；Yi-lightning：将张量并行替换为专家并行（MoE）；</li>
+<li>Llama3 405B（8192/16384卡）：8路张量+1/16路上下文+16路流水线+64/128路数据并行，<strong>按带宽需求排序并行维度</strong>（TP&gt;CP&gt;PP&gt;DP），DP最容忍高延迟；</li>
+<li>Gemma 2（TPU）：ZeRO3+张量+序列+数据并行，TPU的环形网格让模型并行扩展更远。</li>
+</ul>
+<p><strong>4.3 大规模训练的工程问题：硬件故障</strong>
+千亿/万亿参数训练的核心挑战不仅是算法，还有<strong>容错架构</strong>：</p>
+<ul>
+<li>Llama3 405B训练中，54天内出现766次中断，<strong>78%为硬件问题</strong>；</li>
+<li>主要故障：故障GPU（30.1%）、GPU HBM3内存（17.2%）、网络交换机（8.4%）；</li>
+<li>更严重问题：<strong>静默数据损坏</strong>（GPU无声出错，输出垃圾数据），直接废掉整个训练。</li>
+</ul>
+<h3 id="5-关键实践结论">5. 关键实践结论</h3>
+<ol>
+<li>张量并行8卡是<strong>全局最优</strong>，无论批次大小，8卡内吞吐损失可接受；</li>
+<li>激活重计算（Flash Attention）<strong>利大于弊</strong>：虽增加算力，但可大幅降低激活内存，支持更大批次，掩盖通信开销；</li>
+<li>流水线并行是<strong>最后选择</strong>：仅当模型无法通过张量+ZeRO3容纳时使用，工程复杂度极高；</li>
+<li>混合精度训练是标配：BF16计算+FP32梯度累积/主权重，平衡显存与训练稳定性。</li>
+</ol>
+<h2 id="四、课程核心总结">四、课程核心总结</h2>
+<ol>
+<li><strong>单卡已死</strong>：LLM规模超过一定阈值后，必须采用<strong>多卡/多机并行</strong>，无单一解决方案，需组合数据/模型/激活并行；</li>
+<li><strong>并行的核心是权衡</strong>：需平衡<strong>内存、带宽、批次大小</strong>三大稀缺资源，根据硬件互联特性选择并行策略；</li>
+<li><strong>工业界标准流程</strong>：3D/4D并行，先通过<strong>张量并行+ZeRO3/流水线</strong>让模型放进显存，再通过<strong>数据并行</strong>扩算力，批次不足时用<strong>梯度累积</strong>优化；</li>
+<li><strong>工程与算法同等重要</strong>：大规模训练不仅需要并行算法，还需<strong>容错架构</strong>解决硬件故障、静默数据损坏等工程问题；</li>
+<li><strong>硬件决定并行选型</strong>：GPU适合256卡内的全连接并行，TPU适合超大规模的环形网格并行，硬件互联带宽是并行策略的核心约束。</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81LLM%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%9AGPU%E7%BC%A9%E6%94%BE%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7%E4%B8%8E%E5%B9%B6%E8%A1%8C%E7%A1%AC%E4%BB%B6-%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">一、LLM网络基础：GPU缩放的局限性与并行硬件&#x2F;通信基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-GPU%E5%8D%95%E5%8D%A1%E7%BC%A9%E6%94%BE%E7%9A%84%E4%B8%A4%E5%A4%A7%E6%A0%B8%E5%BF%83%E9%99%90%E5%88%B6"><span class="toc-number">1.1.</span> <span class="toc-text">1. GPU单卡缩放的两大核心限制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%A4%9A%E5%8D%A1-%E5%A4%9A%E6%9C%BA%E5%B9%B6%E8%A1%8C%E7%9A%84%E7%A1%AC%E4%BB%B6%E4%BA%92%E8%81%94"><span class="toc-number">1.2.</span> <span class="toc-text">2. 多卡&#x2F;多机并行的硬件互联</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E9%9B%86%E4%BD%93%E9%80%9A%E4%BF%A1%E5%8E%9F%E8%AF%AD%EF%BC%88Collective-Communication%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">3. 集体通信原语（Collective Communication）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-TPU%E4%B8%8EGPU%E7%9A%84%E9%80%9A%E4%BF%A1%E8%AE%BE%E8%AE%A1%E5%B7%AE%E5%BC%82"><span class="toc-number">1.4.</span> <span class="toc-text">4. TPU与GPU的通信设计差异</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81LLM%E5%B9%B6%E8%A1%8C%E8%AE%AD%E7%BB%83%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E8%AF%AD"><span class="toc-number">2.</span> <span class="toc-text">二、LLM并行训练的核心原语</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E5%B9%B6%E8%A1%8C%EF%BC%88Data-Parallelism%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">1. 数据并行（Data Parallelism）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%A8%A1%E5%9E%8B%E5%B9%B6%E8%A1%8C%EF%BC%88Model-Parallelism%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">2. 模型并行（Model Parallelism）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%BF%80%E6%B4%BB%E5%B9%B6%E8%A1%8C%EF%BC%88Activation-Parallelism%EF%BC%89%EF%BC%9A%E8%A7%A3%E5%86%B3%E6%BF%80%E6%B4%BB%E5%86%85%E5%AD%98%E7%93%B6%E9%A2%88"><span class="toc-number">2.3.</span> <span class="toc-text">3. 激活并行（Activation Parallelism）：解决激活内存瓶颈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96%E5%B9%B6%E8%A1%8C%E7%AD%96%E7%95%A5"><span class="toc-number">2.4.</span> <span class="toc-text">4. 其他并行策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%88%A9%E7%94%A8%E5%B9%B6%E8%A1%8C%E5%8C%96%E7%BC%A9%E6%94%BE%E8%AE%AD%E7%BB%83%E5%A4%A7%E6%A8%A1%E5%9E%8B%EF%BC%9A%E7%BB%84%E5%90%88%E7%AD%96%E7%95%A5%E4%B8%8E%E5%AE%9E%E9%99%85%E8%90%BD%E5%9C%B0"><span class="toc-number">3.</span> <span class="toc-text">三、利用并行化缩放训练大模型：组合策略与实际落地</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%90%84%E7%B1%BB%E5%B9%B6%E8%A1%8C%E7%AD%96%E7%95%A5%E7%9A%84%E6%A0%B8%E5%BF%83%E5%AF%B9%E6%AF%94"><span class="toc-number">3.1.</span> <span class="toc-text">1. 各类并行策略的核心对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%89%B9%E6%AC%A1%E5%A4%A7%E5%B0%8F%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BD%9C%E7%94%A8"><span class="toc-number">3.2.</span> <span class="toc-text">2. 批次大小的核心作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3D-4D%E5%B9%B6%E8%A1%8C%EF%BC%9A%E7%BB%84%E5%90%88%E7%AD%96%E7%95%A5%E7%9A%84%E5%AE%9E%E7%94%A8%E7%BB%8F%E9%AA%8C%E6%B3%95%E5%88%99"><span class="toc-number">3.3.</span> <span class="toc-text">3. 3D&#x2F;4D并行：组合策略的实用经验法则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%A4%A7%E8%A7%84%E6%A8%A1%E8%AE%AD%E7%BB%83%E7%9A%84%E7%BB%8F%E5%85%B8%E6%A1%88%E4%BE%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5%E7%BB%93%E8%AE%BA"><span class="toc-number">3.4.</span> <span class="toc-text">4. 大规模训练的经典案例与实践结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%85%B3%E9%94%AE%E5%AE%9E%E8%B7%B5%E7%BB%93%E8%AE%BA"><span class="toc-number">3.5.</span> <span class="toc-text">5. 关键实践结论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%AF%BE%E7%A8%8B%E6%A0%B8%E5%BF%83%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">四、课程核心总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记&body=Check out this article: https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 7：Parallelism 1》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

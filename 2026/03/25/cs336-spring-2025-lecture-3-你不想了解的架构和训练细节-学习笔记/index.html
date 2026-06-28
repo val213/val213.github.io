@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig10.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig11.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig12.jpg">
+<meta property="article:published_time" content="2026-03-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.319Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Transformer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/22/cs336-spring-2025-lecture-2-pytorch-resource-accounting-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记&body=Check out this article: https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81Transformer-%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E7%8E%B0%E4%BB%A3%E5%85%B1%E8%AF%86"><span class="toc-number">1.</span> <span class="toc-text">一、Transformer 架构演进与现代共识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%8E%9F%E5%A7%8BTransformer-vs-%E8%AF%BE%E7%A8%8B%E5%AE%9E%E7%8E%B0%E7%9A%84%E7%8E%B0%E4%BB%A3%E5%8F%98%E4%BD%93"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 原始Transformer vs 课程实现的现代变体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%BD%92%E4%B8%80%E5%8C%96%E8%AE%BE%E8%AE%A1%EF%BC%9A%E8%AE%AD%E7%BB%83%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 归一化设计：训练稳定性的核心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E4%B8%8E%E9%97%A8%E6%8E%A7MLP%EF%BC%9A%E6%95%88%E6%9E%9C%E6%8F%90%E5%8D%87%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 激活函数与门控MLP：效果提升的核心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-%E4%B8%B2%E8%A1%8C%E5%B1%82-vs-%E5%B9%B6%E8%A1%8C%E5%B1%82"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 串行层 vs 并行层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-RoPE-%E4%B8%80%E7%BB%9F%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88"><span class="toc-number">1.5.</span> <span class="toc-text">1.5 RoPE 一统位置编码方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%B6%85%E5%8F%82%E6%95%B0%E9%80%89%E6%8B%A9%E7%9A%84%E8%A1%8C%E4%B8%9A%E5%85%B1%E8%AF%86%E4%B8%8E%E8%A7%84%E5%88%99"><span class="toc-number">2.</span> <span class="toc-text">二、超参数选择的行业共识与规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-MLP%E4%B8%AD%E9%97%B4%E7%BB%B4%E5%BA%A6-d-ff"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 MLP中间维度 $$dffd_{ff}dff​$$</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-24T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-03-25</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.319Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Transformer/" rel="tag">Transformer</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2020160372183709608">知乎</a>，现迁移至个人博客。</p>
+</blockquote>
+<p>本讲主题是：关于语言模型架构和训练，你不想了解的一切。从2017-2025年主流LLM的演进实践中，提炼现代语言模型的架构共识、可落地的超参数规则，以及工程化的训练/推理优化技术，覆盖多数课程不会深入的工程细节。</p>
+<h2 id="一、Transformer-架构演进与现代共识">一、Transformer 架构演进与现代共识</h2>
+<p>下面是讲师Tatsu H 整理的表格，涵盖了从 2017 年原始 Transformer 到 2025 年最新模型的关键设计（课程最后有全景图）。宏观来看其实很多设计选择尚未形成完全共识，虽然近几年出现了 “类 LLaMA 架构” 的趋同趋势，但不同模型仍有差异 ，包括激活函数、前馈网络、注意力变体、位置编码等。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg" alt=""></p>
+<h3 id="1-1-原始Transformer-vs-课程实现的现代变体">1.1 原始Transformer vs 课程实现的现代变体</h3>
+<p>cs336 要实现的是经工程优化的 Transformer 现代变体，相比原始版本，在归一化位置、位置编码、激活函数、偏置项上做了全维度调整，且明确了输入输出张量的标准形状。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg" alt=""></p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg" alt=""></p>
+<ol>
+<li>归一化：从块后移至块前（Pre-Norm），新增Token Norm对输入嵌入归一化；</li>
+<li>位置编码：替换为RoPE旋转位置编码，集成在因果多头自注意力中；</li>
+<li>激活函数：ReLU替换为SwiGLU门控激活；</li>
+<li>偏置项：所有线性层、归一化层均移除偏置项；</li>
+<li>输出层：新增Output Embedding的残差Add操作，提升训练稳定性。</li>
+</ol>
+<h3 id="1-2-归一化设计：训练稳定性的核心">1.2 归一化设计：训练稳定性的核心</h3>
+<p>归一化是大模型训练稳定的基础，2024-2025年所有主流模型均采用 <strong>Pre-Norm + RMSNorm</strong>组合，替代了原始的Post-Norm + LayerNorm。
+<strong>（1）Pre-Norm 完全替代 Post-Norm</strong>
+Pre-Norm让梯度传播更顺畅，无需复杂的学习率预热即可稳定训练，Post-Norm 易出现梯度爆炸。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg" alt=""></p>
+<p>有实验佐证 Pre-Norm在翻译、预训练任务中，损失下降速度和最终性能均显著优于Post-Norm，无预热也能保持训练稳定。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg" alt=""></p>
+<p>还有一种变体是 Double Norm（Grok、Gemma2采用），在Pre-Norm基础上，于子层计算后新增一层Norm，进一步提升大模型训练稳定性；Olmo2仅在非残差部分做后置Norm。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg" alt=""></p>
+<p><strong>（2）RMSNorm 替代 LayerNorm</strong>
+为什么要用 RMSNorm 替代 LayerNorm 呢？</p>
+<ul>
+<li>LayerNorm： $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>x</mi><mo>−</mo><mi>E</mi><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow><msqrt><mrow><mi>V</mi><mi>a</mi><mi>r</mi><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo><mo>+</mo><mi>ϵ</mi></mrow></msqrt></mfrac><mo>∗</mo><mi>γ</mi><mo>+</mo><mi>β</mi></mrow><annotation encoding="application/x-tex">y=\frac{x-E[x]}{\sqrt{Var[x]+\epsilon}} * \gamma+\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.8396em;vertical-align:-0.8296em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.4642em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0369em;"><span class="svg-align" style="top:-3.4286em;"><span class="pstrut" style="height:3.4286em;"></span><span class="mord mtight" style="padding-left:1.19em;"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="mopen mtight">[</span><span class="mord mathnormal mtight">x</span><span class="mclose mtight">]</span><span class="mbin mtight">+</span><span class="mord mathnormal mtight">ϵ</span></span></span><span style="top:-3.0089em;"><span class="pstrut" style="height:3.4286em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.5429em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.5429em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4197em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.0576em;">E</span><span class="mopen mtight">[</span><span class="mord mathnormal mtight">x</span><span class="mclose mtight">]</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8296em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0556em;">γ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span></span></span></span>$$</li>
+<li>RMSNorm： $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mi>x</mi><msqrt><mrow><mi mathvariant="normal">∥</mi><mi>x</mi><msubsup><mi mathvariant="normal">∥</mi><mn>2</mn><mn>2</mn></msubsup><mo>+</mo><mi>ε</mi></mrow></msqrt></mfrac><mo>∗</mo><mi>γ</mi></mrow><annotation encoding="application/x-tex">y=\frac{x}{\sqrt{\| x\| _{2}^{2}+\varepsilon}} * \gamma</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.525em;vertical-align:-0.8296em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6954em;"><span style="top:-2.4664em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0337em;"><span class="svg-align" style="top:-3.4286em;"><span class="pstrut" style="height:3.4286em;"></span><span class="mord mtight" style="padding-left:1.19em;"><span class="mord mtight">∥</span><span class="mord mathnormal mtight">x</span><span class="mord mtight"><span class="mord mtight">∥</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8051em;"><span style="top:-2.1885em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-2.8448em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3115em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mathnormal mtight">ε</span></span></span><span style="top:-3.0057em;"><span class="pstrut" style="height:3.4286em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.5429em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.5429em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4229em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8296em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0556em;">γ</span></span></span></span>$$</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg" alt=""></p>
+<p>看起来 RMSNorm 减少的均值调整和偏置项只能节省 0.17% 的 FLOPs，但还要考虑内存数据搬运——参照图中数据，张量收缩（Tensor Contraction）即矩阵乘法之类的运算虽然占据了全部浮点运算量的 99.8%，而像 Softmax 或 LayerNorm 这一类 Transformer 架构中常见的归一化操作在浮点运算量上仅占 0.17%，实际上却消耗了 25% 的总运行时间。因为他们会产生大量的内存数据搬运开销。</p>
+<p>因此着力优化这些底层细节确实具有实质性的意义，我们要考量的不仅仅是浮点运算量，更包括内存数据搬运的效率。RMSNorm 去掉均值调整和偏置项，不仅减少了计算量，更关键是降低了内存搬运开销（无需加载 β 参数、无需计算均值），因此成为主流。</p>
+<p><strong>（3）丢掉偏置项</strong>
+更一般地，移除所有线性层偏置项，既减少内存访问开销，又能避免偏置项与归一化层的数值冲突，成为2023年后所有模型的默认设计。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg" alt=""></p>
+<h3 id="1-3-激活函数与门控MLP：效果提升的核心">1.3 激活函数与门控MLP：效果提升的核心</h3>
+<p>2023年后的模型几乎全面放弃ReLU/GeLU，转向<strong>门控线性单元（GLU变体）</strong>，SwiGLU为绝对主流，GeGLU次之。门控激活通过「激活层×门控层」的逐元素相乘，提升了模型的表达能力，实证在预训练损失、下游任务效果上均有稳定增益。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg" alt=""></p>
+<ul>
+<li>非门控模型：MLP中间维度； $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mn>4</mn><mo>×</mo><msub><mi>d</mi><mrow><mi>m</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ff}=4×d_{model}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>$$</li>
+<li>门控模型（SwiGLU/GeGLU）： $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub><mo>≈</mo><mn>2.66</mn><mo>×</mo><msub><mi>d</mi><mrow><mi>m</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ff}≈2.66×d_{model}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2.66</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>$$ （8/3倍），保证参数量与非门控模型一致。</li>
+</ul>
+<p>传统 FFN 只有 1 路线性变换（ $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>×</mo><mi>W</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">x×W1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord">1</span></span></span></span>$$ ）， $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mn>4</mn><mo>×</mo><msub><mi>d</mi><mrow><mi>m</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ff}=4×d_{model}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>$$ 是为了足够的高维映射空间；
+门控 FFN 有 2 路线性变换（ $ x×W$ 和 $ x×V$ ），相当于参数量翻倍了。如果仍用 4，参数量会过多导致训练困难，所以按 2/3 缩放，保证总参数量和传统 FFN 相当，兼顾效果和效率。</p>
+<p>门控变体（ReGLU/SwiGLU）在CoLA/SST-2等任务中综合得分显著高于非门控，SwiGLU实现了最低的预训练损失。</p>
+<h3 id="1-4-串行层-vs-并行层">1.4 串行层 vs 并行层</h3>
+<p>原始 Transformer 的注意力和前馈网络是顺序执行的。但这种串行结构可能存在并行性限制：如果要在大量 GPU 上并行训练，串行连接会增加难度，可能导致 GPU 利用率降低。
+因此，有少数模型采用了 “并行层” 设计：不再顺序执行注意力和前馈网络，而是对前一层的输出同时计算注意力和前馈网络，将两个结果相加后再融入残差流 —— 这一设计由 GPT-J 首创，谷歌的 PaLM 团队则大胆地在超大规模模型上验证了这一方案，之后有不少模型跟进。如果实现得当，并行层可以共享 LayerNorm，矩阵乘法也能融合执行，从而获得系统层面的效率提升。不过近一年来，并行层并没有成为主流，大多数新模型仍采用串行层，只有 Cohere Command A、Command R + 和 Falcon 2 11B 等少数模型例外。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig10.jpg" alt=""></p>
+<p><strong>关键差异</strong>：</p>
+<ul>
+<li>串行层：先计算Attention，再计算MLP，顺序执行；</li>
+<li>并行层：Attention和MLP同时计算，结果合并后加回残差流。</li>
+</ul>
+<p>并行层可以通过算子融合实现<strong>15%的训练速度提升</strong>，62B及以上参数量模型无性能损失，2024-2025仅Cohere Command A/R+、Falcon2-11B等少数模型采用。</p>
+<h3 id="1-5-RoPE-一统位置编码方案">1.5 RoPE 一统位置编码方案</h3>
+<p>2023年后，RoPE（旋转位置编码）彻底替代正弦余弦、绝对、相对、ALiBi等位置编码，成为<strong>所有主流模型的选择</strong>，核心优势是完美支持相对位置编码，且具备极强的长上下文外推能力。RoPE 的核心设计思路是：<strong>注意力应该只依赖 token 的相对位置，而非绝对位置</strong>。
+RoPE通过对查询Q/键K的高维向量做分块2D旋转，让注意力内积仅与token相对位置相关，无绝对位置信息泄露，且在注意力层实时旋转，非加性编码更稳定。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig11.jpg" alt=""></p>
+<p>那高维空间中如何实现这种旋转？RoPE 的解决方案很简洁有效：将高维向量（维度 d）拆分为两两一组的 2D 子向量，每组根据 token 位置和预设的旋转频率 θ 进行旋转 —— 不同的 θ 对应不同的旋转速度，高频捕捉近距离位置关系，低频捕捉远距离位置关系，这和正弦余弦编码的频率设计思路类似。</p>
+<p><img src="/images/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig12.jpg" alt=""></p>
+<p>还有一些模型如Command A采用<strong>RoPE+NoPE混合编码</strong>的方式来作为长上下文模型的专属优化方案，后续4.2混合注意力变体部分有介绍。</p>
+<h2 id="二、超参数选择的行业共识与规则">二、超参数选择的行业共识与规则</h2>
+<p>接下来我们深入到更细节的超参数选择。其实调参不需要抽卡，业界已经形成了一些经验法则和指导原则，包括<strong>MLP维度、注意力头、宽深比、词表大小、正则化</strong>等方面，只有少数模型在做很激进的尝试。</p>
+<ul>
+<li>
+<p>$\frac{d_{ff}}{d_{model}}$$$ 前馈网络维度（d_ff）与模型维度（d_model）的比例
+</p>
+</li>
+<li>
+<p>$\frac{d_{model}}{n_{layer}}$$$ 模型的宽深比（aspect ratio）
+</p>
+</li>
+<li>Weight Decay（权重衰减）</li>
+</ul>
+<h3 id="2-1-MLP中间维度-d-ff">2.1 MLP中间维度 $$<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ff}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span><span class="mord mathnormal mtight" style="margin-right:0.1076em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>$$</h3>
+<p>$d_{ff}$$$ 的取值，业界的惯例一般是非门控 $$$4×d_{model}$$$ ，门控≈ $$$2.66×d_{model}$$$ ，为兼顾性能与参数量的最优选择。
+**少数激进案例**：T5-11B曾用 $$$64×d_{model}$$$ （适配TPU大矩阵效率），Gemma2用 $$$8×d_{model}$$$ ，但后续模型均回归默认规则，说明激进选择并非最优。
+**实验佐证** $$$\frac{d_{ff}}{d_{model}}$$$ 在1-10倍区间均为性能最优区间，4倍是工程上的通用默认值。
+
+### 2.2 注意力头的维度设置
+
+**行业共识是让** $d_{model} = 单头维度 × 注意力头数$ 。大多数模型都遵循 1:1 的比例，单头维度通常为64/128，头数随模型维度同步增加。虽然理论上单头维度过小可能出现低秩瓶颈，但实证中无显著影响，该规则为所有模型的默认选择。
+
+### 2.3 模型宽深比（Aspect Ratio）
+
+宽深比 $$$\frac{d_{model}}{n_{layer}}$$$ ≈100-128 是兼顾性能与并行效率的最优区间，GPT3/OPT/Mistral等均采用128，LLaMA系列采用102。
+
+- 深模型（小宽深比）：适合流水线并行，跨GPU通信延迟高；
+- 宽模型（大宽深比）：适合张量并行，需高带宽GPU集群，为2024-2025主流方案。
+
+### 2.4 词表大小
+
+从单语言的30k-50k，逐步升级为多语言/生产级模型的100k-250k，大词表能提升低资源语言的token压缩率，降低推理成本。英语单语言模型可使用小词表，多语言/生产级模型必须使用100k+大词表。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig13.jpg)
+
+### 2.5 正则化策略：Dropout 遭弃用，Weight Decay（0.1）成为默认选择
+
+Dropout 在老模型里很常见 —— 比如原始 Transformer、GPT-2、T5，原理很简单：训练时随机把部分神经元的输出置为 0。它的初衷是防止过拟合，强制模型学习鲁棒的特征，而不是依赖特定的神经元。但其实预训练只做单次遍历，根本不会过拟合。而且 Dropout 还会破坏训练稳定性，导致损失值骤升，干扰梯度传播（唯一的例外可能是一些小模型）。现在 Dropout 几乎完全被弃用，Weight Decay 成为了所有模型的默认选择，但是其作用并非传统的正则化，而是优化训练动态。
+权重衰减（Weight Decay）与余弦退火学习率调度协同，在训练后期学习率下降时，加速损失下降，得到更低的训练/验证损失，并非为了解决过拟合（预训练仅1个epoch，没有过拟合的风险）。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig14.jpg)
+
+## 三、Stability tricks 大模型训练稳定性技巧
+
+近一年Transformer核心架构无颠覆性变化，最大迭代集中在**训练稳定性优化**——模型规模越大、训练时间越长，越易因Softmax数值不稳定性出现梯度爆炸、损失尖峰，甚至训练崩溃。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig15.jpg)
+
+上图中蓝色曲线是训练时的梯度 L2 范数，虽然损失曲线看似正常，但梯度范数频繁出现剧烈尖峰，这种情况下，模型随时可能因梯度爆炸而训练中断；而橙色曲线（采用稳定性技巧后）的梯度范数始终保持在较低水平，这才是理想的训练状态（两条曲线的损失差异是因为切换了数据集，忽略即可）。
+
+Transformer中的**两个Softmax**是数值不稳定性的核心：输出层Softmax（指数溢出/除零）、注意力层Softmax（QK内积过大导致Softmax饱和）。以下为3个已验证的主流方案：
+
+## 3.1 Z-Loss：针对输出层Softmax
+
+z-loss 的核心思想是在交叉熵损失函数中加入一个辅助损失项，强制Softmax的归一化项 Z(x) 趋近于1。当 Z (x) 趋近于 1 时，log 和 exp 相互抵消，数值计算会变得非常稳定，避免了溢出风险，提升数值稳定性。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig16.jpg)
+
+**代表模型**：PaLM、Baichuan2、OLMo2、DCLM，2024年后主流模型均采用。
+
+### 3.2 QK Norm：针对注意力层Softmax（效果最优）
+
+QK norm 最初是视觉和多模态模型领域的创新，在Q/K计算内积前，分别对Q/K做 LayerNorm，限制输入数值范围，避免内积过大导致 Softmax 饱和。不仅可以提升稳定性，还能支持更激进的学习率，实现模型性能提升，是2024-2025的标准优化方案。
+这里可以插个小玩笑：LayerNorm 在稳定性干预中简直 “无所不能”—— 从预归一化到双重归一化，再到现在的 QK norm，只要哪里出现稳定性问题，加一层 LayerNorm 往往能解决（至少在稳定性方面，LayerNorm 的效果惊人，且对性能影响极小）。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig17.jpg)
+
+### 3.3 Logits 软截断（Soft Capping）
+
+这一方法是在注意力层的 logits（Q・K^T 的结果）送入 softmax 之前，通过 tanh 函数进行软截断。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig18.jpg)
+
+当 logits 超过 soft_cap 时，tanh 函数会将其 “压制” 到 1 附近，从而限制 logits 的最大值，避免 softmax 数值爆炸。Soft Capping 能提升稳定性，但 Nvidia 的研究表明它会导致模型困惑度小幅上升，所以其普及度低于QK Norm，仅Gemma2、OLMo2等少数模型采用。
+
+## 四、注意力变体：推理优化与长上下文支持
+
+注意力变体的核心优化目标为**降低推理开销**（MQA/GQA）和**支持超长上下文**（滑动窗口/混合注意力），是2024-2025年工程化落地的重要方向。
+
+### 4.1 MQA/GQA：推理吞吐量优化的核心
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig19.jpg)
+
+自回归推理时，KV Cache 是内存瓶颈（训练时批量计算GPU利用率高，推理时逐token生成，内存访问开销骤增，算术强度大幅下降）。而 MQA（多查询单KV头）和GQA（分组查询，一组查询共享一个KV头）通过解耦 Q 头与 KV 头数量（多 Q 头 + 少 KV 头），降低 KV Cache 开销，同时最小化性能损失。MQA 相比标准多头注意力（MHA），困惑度仅轻微上升，性能损失可忽略；而 GQA 在推理速度和性能之间取得了更优的平衡，几乎没有性能损失，成为生产级模型的首选。
+
+### 4.2 长上下文注意力的最新进展
+
+针对千万级token的超长上下文需求，2025年最新模型均采用**滑动窗口注意力（SWA）+ 全注意力**的混合方案，替代传统的全局注意力（二次方计算开销）。
+**（1）滑动窗口注意力（SWA）**
+**核心原理**：每层仅关注当前token的局部窗口（如512/1024个token），有效上下文长度=窗口大小×层数。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig20.jpg)
+
+**（2）混合注意力**
+**原理**：每2-4个Transformer块为一组，其中1个块使用**无位置编码（NoPE）的全注意力**，其余块使用RoPE+滑动窗口注意力，兼顾短程信息捕捉和长程信息传递。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig21.jpg)
+
+**优势**：既通过滑动窗口控制计算/内存开销，又通过定期的全注意力实现长程信息全局传递，支持千万级token上下文，是当前长上下文模型的唯一选择。
+
+## 五、一些可泛化的经验总结
+
+1. 归一化是大模型训练稳定的「万能钥匙」，**Pre-Norm + RMSNorm**是2024-2025的共识，Double Norm或是未来趋势。
+2. 架构设计不能只关注FLOPs，**内存访问开销**对运行效率的影响更大。
+3. SwiGLU/GeGLU是门控激活的最优选择，能实现稳定性能增益，是所有现代模型的默认配置，且需按2/3缩放MLP维度以匹配参数量。
+4. 超参数相对来说有一套行业的经验共识，调参的时候不用盲目调。
+5. 大模型训练稳定性的核心是**优化Softmax数值行为**，**QK Norm + Z-Loss**是2025年的标准优化组合，兼顾稳定性与性能。
+6. 推理优化的核心是**减少KV缓存开销**，GQA是性能与效率的最优平衡，远超MHA和MQA。
+7. 长上下文模型的唯一解决方案是**混合注意力（SWA+全注意力）**，通过局部窗口控制开销，定期全注意力实现长程信息传递。
+8. 2017-2025年主流LLM的核心差异仅在**位置编码、激活函数、分词方式**，核心Transformer架构无颠覆性变化，「类LLaMA架构」或成为行业通用模板。
+
+![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig22.jpg)</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81Transformer-%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E7%8E%B0%E4%BB%A3%E5%85%B1%E8%AF%86"><span class="toc-number">1.</span> <span class="toc-text">一、Transformer 架构演进与现代共识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%8E%9F%E5%A7%8BTransformer-vs-%E8%AF%BE%E7%A8%8B%E5%AE%9E%E7%8E%B0%E7%9A%84%E7%8E%B0%E4%BB%A3%E5%8F%98%E4%BD%93"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 原始Transformer vs 课程实现的现代变体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%BD%92%E4%B8%80%E5%8C%96%E8%AE%BE%E8%AE%A1%EF%BC%9A%E8%AE%AD%E7%BB%83%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 归一化设计：训练稳定性的核心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E4%B8%8E%E9%97%A8%E6%8E%A7MLP%EF%BC%9A%E6%95%88%E6%9E%9C%E6%8F%90%E5%8D%87%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 激活函数与门控MLP：效果提升的核心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-%E4%B8%B2%E8%A1%8C%E5%B1%82-vs-%E5%B9%B6%E8%A1%8C%E5%B1%82"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 串行层 vs 并行层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-RoPE-%E4%B8%80%E7%BB%9F%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88"><span class="toc-number">1.5.</span> <span class="toc-text">1.5 RoPE 一统位置编码方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%B6%85%E5%8F%82%E6%95%B0%E9%80%89%E6%8B%A9%E7%9A%84%E8%A1%8C%E4%B8%9A%E5%85%B1%E8%AF%86%E4%B8%8E%E8%A7%84%E5%88%99"><span class="toc-number">2.</span> <span class="toc-text">二、超参数选择的行业共识与规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-MLP%E4%B8%AD%E9%97%B4%E7%BB%B4%E5%BA%A6-d-ff"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 MLP中间维度 $$dffd_{ff}dff​$$</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记&body=Check out this article: https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 3：你不想了解的架构和训练细节》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

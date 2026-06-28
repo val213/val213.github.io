@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.319Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/03/13/cs336-spring-2025-lecture-7-parallelism-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/10/cs336-spring-2025-lecture-5-gpus-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记&body=Check out this article: https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AF%BE%E7%A8%8B%E5%BC%95%E5%85%A5%E4%B8%8E%E4%BD%9C%E4%B8%9A%E8%AF%B4%E6%98%8E"><span class="toc-number">1.</span> <span class="toc-text">一、课程引入与作业说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81GPU%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%9B%9E%E9%A1%BE"><span class="toc-number">2.</span> <span class="toc-text">二、GPU基础知识回顾</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-GPU%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%86%85%E5%AD%98%E5%B1%82%E7%BA%A7"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 GPU核心组件与内存层级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-GPU%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 GPU执行模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E7%BA%BF%E7%A8%8B%E6%9D%9F%EF%BC%88Warp%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 线程束（Warp）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E8%AE%A1%E7%AE%97%E5%BC%BA%E5%BA%A6"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 计算强度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-Q-A"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 Q&amp;A</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%EF%BC%88Benchmarking%EF%BC%89%E2%80%94%E2%80%94-%E9%AB%98%E6%80%A7%E8%83%BD%E4%BB%A3%E7%A0%81%E7%9A%84%E5%89%8D%E6%8F%90"><span class="toc-number">3.</span> <span class="toc-text">三、基准测试（Benchmarking）—— 高性能代码的前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%953%E4%B8%AA%E5%85%B3%E9%94%AE%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 基准测试3个关键注意事项</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%A0%B8%E5%BF%83%E7%A4%BA%E4%BE%8B"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 核心示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-number">3.3.</span> <span class="toc-text">3.2.1 矩阵乘法基准测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-MLP%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-number">3.4.</span> <span class="toc-text">3.2.2 MLP基准测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">3.5.</span> <span class="toc-text">3.3 局限性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%A7%E8%83%BD%E5%89%96%E6%9E%90%EF%BC%88Profiling%EF%BC%89%E2%80%94%E2%80%94-%E5%AE%9A%E4%BD%8D%E7%93%B6%E9%A2%88%E7%9A%84%E6%A0%B8%E5%BF%83%E5%B7%A5%E5%85%B7"><span class="toc-number">4.</span> <span class="toc-text">四、性能剖析（Profiling）—— 定位瓶颈的核心工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-Profiling-%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7"><span class="toc-number">4.1.</span> <span class="toc-text">4.1  Profiling 常用工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-PyTorch%E5%86%85%E7%BD%AE-profile"><span class="toc-number">4.2.</span> <span class="toc-text">4.2.1 PyTorch内置 profile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-NVIDIA-Nsight-Systems%EF%BC%88%E4%BD%9C%E4%B8%9A2%E5%BF%85%E7%94%A8%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">4.2.2 NVIDIA Nsight Systems（作业2必用）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-Q-A"><span class="toc-number">4.4.</span> <span class="toc-text">4.3 Q&amp;A</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81GPU%E5%86%85%E6%A0%B8%E7%BC%96%E5%86%99%EF%BC%88%E4%BB%A5GELU%E4%B8%BA%E4%BE%8B%EF%BC%89%E2%80%94%E2%80%94-%E4%BD%9C%E4%B8%9A2%E6%A0%B8%E5%BF%83%E9%93%BA%E5%9E%AB"><span class="toc-number">5.</span> <span class="toc-text">五、GPU内核编写（以GELU为例）—— 作业2核心铺垫</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-4%E7%A7%8DGELU%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 4种GELU的实现方式+性能对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1-%E6%89%8B%E5%86%99PyTorch%E7%89%88%EF%BC%88%E5%8E%9F%E5%A7%8B%E6%96%B9%E6%B3%95%EF%BC%8C%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%BB%AD%E6%AF%94%E8%BE%83%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95%E7%9A%84%E6%A0%87%E5%87%86%EF%BC%89"><span class="toc-number">5.2.</span> <span class="toc-text">5.1.1 手写PyTorch版（原始方法，作为后续比较其他方法的标准）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2-PyTorch%E5%8E%9F%E7%94%9F%E7%89%88%EF%BC%88%E6%9C%80%E4%BC%98%E9%80%89%E6%8B%A9%EF%BC%8C%E7%AE%80%E5%8D%95%E9%AB%98%E6%95%88%EF%BC%89"><span class="toc-number">5.3.</span> <span class="toc-text">5.1.2 PyTorch原生版（最优选择，简单高效）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-3-CUDA%E7%89%88%EF%BC%88C-%E7%BC%96%E5%86%99%EF%BC%8C%E9%AB%98%E6%80%A7%E8%83%BD%EF%BC%89"><span class="toc-number">5.4.</span> <span class="toc-text">5.1.3 CUDA版（C++编写，高性能）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-4-Triton%E7%89%88%EF%BC%88Python%E7%BC%96%E5%86%99%EF%BC%8C%E4%BD%9C%E4%B8%9A2%E9%87%8D%E7%82%B9%EF%BC%89"><span class="toc-number">5.5.</span> <span class="toc-text">5.1.4 Triton版（Python编写，作业2重点）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Q-A"><span class="toc-number">5.6.</span> <span class="toc-text">5.2 Q&amp;A</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81torch-compile-%E8%87%AA%E5%8A%A8%E4%BC%98%E5%8C%96%E2%80%94%E2%80%94-%E6%87%92%E4%BA%BA%E7%A6%8F%E9%9F%B3"><span class="toc-number">6.</span> <span class="toc-text">六、torch.compile 自动优化—— 懒人福音</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 核心功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 性能对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%8E%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">6.3.</span> <span class="toc-text">6.3 适用场景与局限性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81Triton%E7%89%88softmax"><span class="toc-number">7.</span> <span class="toc-text">七、Triton版softmax</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="toc-number">7.1.</span> <span class="toc-text">7.1 设计思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">7.2.</span> <span class="toc-text">7.2 性能对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">八、课程总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93"><span class="toc-number">8.1.</span> <span class="toc-text">8.1 核心知识点总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E4%BD%9C%E4%B8%9A2%E9%87%8D%E7%82%B9%E6%8F%90%E7%A4%BA"><span class="toc-number">8.2.</span> <span class="toc-text">8.2 作业2重点提示</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-11T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-03-12</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.319Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/LLM/" rel="tag">LLM</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2015442629765137282">知乎</a>，现迁移至个人博客。</p>
+</blockquote>
+<p>目录</p>
+<h2 id="一、课程引入与作业说明">一、课程引入与作业说明</h2>
+<p>本节课核心是为作业2铺垫，手把手教大家编写高性能GPU代码，整体节奏清晰：回顾GPU基础 → 基准测试与性能剖析 → CUDA/Triton内核实操 → 多实现性能对比 → Triton版softmax示例。</p>
+<h2 id="二、GPU基础知识回顾">二、GPU基础知识回顾</h2>
+<p>核心目标：掌握GPU核心组件与执行逻辑，为后续内核编写打基础，不用死记硬背，理解核心逻辑即可。</p>
+<h3 id="2-1-GPU核心组件与内存层级">2.1 GPU核心组件与内存层级</h3>
+<ul>
+<li>流式多处理器（SM）：GPU的核心，像A100、H100这类高端显卡有大量SM，每个SM包含很多计算单元（Int32、FP32），能启动海量线程。</li>
+<li>内存层级（速度从快到慢，容量从大到小）：</li>
+</ul>
+<h3 id="2-2-GPU执行模型">2.2 GPU执行模型</h3>
+<ul>
+<li>线程块（Block）：调度到单个SM运行，是GPU编程（尤其是Triton）的核心思考单元；块内线程可通过共享内存快速通信，跨块通信开销极大。</li>
+<li>线程（Thread）：块内执行单元，真正做计算；处理向量/矩阵时，多个线程协同完成，每个线程负责若干元素。</li>
+<li>核心原则：数据尽量放在同一个线程块/数据分块（tile）中，通信速度接近L1缓存；无法跨块同步，也无法控制跨块执行顺序。</li>
+</ul>
+<h3 id="2-3-线程束（Warp）">2.3 线程束（Warp）</h3>
+<ul>
+<li>定义：32个连续线程为一组，SM中几乎同时执行，不用主动关注，但影响性能。</li>
+<li>关键要求：尽量让所有线程束计算量均等；理想情况下，线程块数量远多于SM数量，且能整除SM数量，避免工作量不均。</li>
+</ul>
+<h3 id="2-4-计算强度">2.4 计算强度</h3>
+<p>定义：浮点运算量（FLOPs）与内存传输字节数的比值，越高越好。原因很简单：GPU计算性能提升比内存快得多，多数操作受内存限制，无法发挥全部算力（矩阵乘法优化好可实现“计算受限”，是最优状态）。</p>
+<h3 id="2-5-Q-A">2.5 Q&amp;A</h3>
+<p>Q：线程束的作用是什么？</p>
+<p>A：核心是减少控制单元开销，GPU侧重计算，控制逻辑简单；CPU则把大量芯片面积用在控制单元、分支预测，二者是权衡关系。</p>
+<h2 id="三、基准测试（Benchmarking）——-高性能代码的前提">三、基准测试（Benchmarking）—— 高性能代码的前提</h2>
+<p>基准测试的核心是“测速度、判价值”，避免盲目优化（比如花大量时间优化非瓶颈部分），后续用来对比Triton、CUDA等不同实现的性能。</p>
+<h3 id="3-1-基准测试3个关键注意事项">3.1 基准测试3个关键注意事项</h3>
+<ul>
+<li>预热迭代：第一次运行PyTorch代码会有编译、初始化开销，预热后才能测到真实稳态速度。</li>
+<li>CUDA同步（torch.cuda.synchronize）：GPU和CPU独立工作，不同步会导致计时不准，必须加同步确保GPU任务完成。</li>
+<li>多次测量取平均：单次计时受GPU温度等影响，多次测量取平均更准确。</li>
+</ul>
+<h3 id="3-2-核心示例">3.2 核心示例</h3>
+<h3 id="3-2-1-矩阵乘法基准测试">3.2.1 矩阵乘法基准测试</h3>
+<p>测试环境：A100显卡，测试不同尺寸矩阵乘法耗时。</p>
+<p>规律：小尺寸（1024、2048）耗时增长不明显（有固定开销：数据传输、内核启动）；尺寸足够大后，耗时呈超线性增长。</p>
+<h3 id="3-2-2-MLP基准测试">3.2.2 MLP基准测试</h3>
+<p>测试模型：极简MLP（线性层堆叠，仅前向+反向传播，无损失函数，最后平均池化）。</p>
+<p>结果：步数、层数与耗时均呈线性关系，每步/每层耗时约5秒。</p>
+<h3 id="3-3-局限性">3.3 局限性</h3>
+<p>Benchmarking 只能判断“代码慢”，但找不到“慢在哪”，属于粗粒度工具，需要结合性能剖析进一步定位瓶颈。</p>
+<h2 id="四、性能剖析（Profiling）——-定位瓶颈的核心工具">四、性能剖析（Profiling）—— 定位瓶颈的核心工具</h2>
+<p>细粒度分析工具，能看清时间消耗分布，甚至能看到底层CUDA指令执行情况，是优化代码的关键。</p>
+<h3 id="4-1-Profiling-常用工具">4.1  Profiling 常用工具</h3>
+<h3 id="4-2-1-PyTorch内置-profile">4.2.1 PyTorch内置 profile</h3>
+<p>优势：不用脱离Python/PyTorch环境，能跟踪CPU和GPU时间，输出清晰的平均时间表格，适合快速定位简单瓶颈。</p>
+<p>Profiling示例：</p>
+<ul>
+<li>矩阵相加（2048维）：CPU端耗时1.4毫秒（主要是C语言接口开销），CUDA端仅17微秒，底层调用流程：Python→aten→CUDA内核→启动+同步。</li>
+<li>矩阵乘法（2048维）：CUDA端耗时远高于CPU端，底层调用Cutlass库（NVIDIA高性能矩阵乘法库）。</li>
+<li>torch.cdist（两两欧氏距离）：78%时间花在矩阵乘法，是优化重点。</li>
+</ul>
+<p>PyTorch内置profile 核心代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def profile(description: str, run: Callable, num_warmups: int = 1, with_stack: bool = False):</span><br><span class="line">    # Warmup（预热迭代，避免启动开销影响计时）</span><br><span class="line">    for _ in range(num_warmups):</span><br><span class="line">        run()</span><br><span class="line">    if torch.cuda.is_available():</span><br><span class="line">        torch.cuda.synchronize()  # CUDA同步，确保GPU任务完成</span><br><span class="line">    # 启动剖析器，跟踪CPU和GPU活动</span><br><span class="line">    with torch.profiler.profile(</span><br><span class="line">            activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],</span><br><span class="line">            with_stack=with_stack,  # 输出调用栈，用于可视化</span><br><span class="line">            experimental_config=torch._C._profiler._ExperimentalConfig(verbose=True)) as prof:</span><br><span class="line">        run()</span><br><span class="line">        if torch.cuda.is_available():</span><br><span class="line">            torch.cuda.synchronize()  # 再次同步，确保所有任务被记录</span><br><span class="line">    # 输出剖析结果表格（按CUDA总时间排序）</span><br><span class="line">    table = prof.key_averages().table(sort_by=&quot;cuda_time_total&quot;,</span><br><span class="line">                                      max_name_column_width=80,</span><br><span class="line">                                      row_limit=10)</span><br><span class="line">    # 导出调用栈可视化文件（若开启with_stack）</span><br><span class="line">    if with_stack:</span><br><span class="line">        text_path = f&quot;var/stacks_&#123;description&#125;.txt&quot;</span><br><span class="line">        svg_path = f&quot;var/stacks_&#123;description&#125;.svg&quot;</span><br><span class="line">        prof.export_stacks(text_path, &quot;self_cuda_time_total&quot;)</span><br><span class="line">    return table</span><br></pre></td></tr></table></figure>
+<p>剖析调用示例（矩阵乘法）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">matmul_function_128 = lambda a, b: a @ b</span><br><span class="line">matmul_profile_128 = profile(&quot;matmul(dim=128)&quot;, run_operation2(dim=128, operation=matmul_function_128))</span><br><span class="line">matmul(dim=128)</span><br></pre></td></tr></table></figure>
+<h3 id="4-2-2-NVIDIA-Nsight-Systems（作业2必用）">4.2.2 NVIDIA Nsight Systems（作业2必用）</h3>
+<p>专业剖析工具，能清晰展示CPU与GPU执行时序、内核启动时机、内存占用，是作业2要求使用的工具。</p>
+<ul>
+<li>时序可视化：上半部分GPU操作，下半部分CPU线程，可通过NVTX注解标记代码块，看清各步骤执行时机。</li>
+<li>CPU与GPU交互：CPU提前向GPU发送指令，若需打印损失值（CPU操作），会等待GPU完成，引入同步开销，可能造成CPU瓶颈。</li>
+<li>内核统计：提取所有CUDA内核，查看耗时和启动次数，精准定位瓶颈。</li>
+</ul>
+<p>专业剖析工具，能清晰展示CPU与GPU执行时序、内核启动时机、内存占用，是作业2要求使用的工具。</p>
+<ul>
+<li>时序可视化：上半部分GPU操作，下半部分CPU线程，可通过NVTX注解标记代码块，看清各步骤执行时机。</li>
+<li>CPU与GPU交互：CPU提前向GPU发送指令，若需打印损失值（CPU操作），会等待GPU完成，引入同步开销，可能造成CPU瓶颈。</li>
+<li>内核统计：提取所有CUDA内核，查看耗时和启动次数，精准定位瓶颈。</li>
+</ul>
+<h3 id="4-3-Q-A">4.3 Q&amp;A</h3>
+<p>Q：矩阵乘法中，CUDA时间大于CPU时间，加了同步，CPU时间为何不与CUDA时间一致？</p>
+<p>A：剖析器统计的CPU时间，不包含CPU等待同步的时间。</p>
+<p>Q：剖析器有开销吗？会影响计时吗？</p>
+<p>A：有轻微开销，但不影响大规模性能规律，微秒级精细计时可能受影响（课程场景无需关注）。</p>
+<blockquote>
+<p>为什么Python能用于GPU编程？因为CPU可提前向GPU队列发送指令，与GPU解耦，不会成为瓶颈，兼顾便捷性和GPU利用率。</p>
+</blockquote>
+<h2 id="五、GPU内核编写（以GELU为例）——-作业2核心铺垫">五、GPU内核编写（以GELU为例）—— 作业2核心铺垫</h2>
+<p>核心目标：通过「内核融合」优化性能，避免多次内存读写开销（类比“工厂一次性完成所有工序，不用反复运输原料”）。</p>
+<p>GELU近似公式（所有实现均基于此，保证结果一致）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0.5 * x * (1 + tanh(math.sqrt(2/math.pi) * (x + 0.044715 * x³)))</span><br></pre></td></tr></table></figure>
+<h3 id="5-1-4种GELU的实现方式-性能对比">5.1 4种GELU的实现方式+性能对比</h3>
+<h3 id="5-1-1-手写PyTorch版（原始方法，作为后续比较其他方法的标准）">5.1.1 手写PyTorch版（原始方法，作为后续比较其他方法的标准）</h3>
+<ul>
+<li>实现：手写公式，包含多个独立操作（tanh、x³等）。</li>
+<li>性能：8.1毫秒（最慢）。</li>
+<li>问题：启动多个CUDA内核，内存读写开销大，无内核融合。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">import math</span><br><span class="line"></span><br><span class="line">def manual_gelu(x: torch.Tensor):</span><br><span class="line">    # 手动实现GELU，无内核融合，多个独立操作</span><br><span class="line">    return 0.5 * x * (1 + torch.tanh(0.79788456 * (x + 0.044715 * x * x * x)))</span><br></pre></td></tr></table></figure>
+<h3 id="5-1-2-PyTorch原生版（最优选择，简单高效）">5.1.2 PyTorch原生版（最优选择，简单高效）</h3>
+<ul>
+<li>实现：调用torch.nn.functional.gelu，设置approximate=‘tanh’，与手写公式一致。</li>
+<li>性能：1.1毫秒（最快）。</li>
+<li>优势：自动内核融合，仅启动一个CUDA内核，无多余内存开销。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import torch.nn.functional as F</span><br><span class="line"></span><br><span class="line">def pytorch_gelu(x: torch.Tensor):</span><br><span class="line">    # 原生实现，自动内核融合，approximate=&#x27;tanh&#x27;匹配手写公式</span><br><span class="line">    return F.gelu(x, approximate=&quot;tanh&quot;)</span><br></pre></td></tr></table></figure>
+<h3 id="5-1-3-CUDA版（C-编写，高性能）">5.1.3 CUDA版（C++编写，高性能）</h3>
+<ul>
+<li>实现：分CPU端（调度内核）和GPU端（执行计算）。</li>
+<li>性能：1.8毫秒（接近原生版）。</li>
+<li>优势：内核融合，可直接在Python中加载编译，无需命令行。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import torch</span><br><span class="line">from torch.utils.cpp_extension import load_inline</span><br><span class="line"></span><br><span class="line">def create_cuda_gelu():</span><br><span class="line">    # 设置CUDA调试模式，便于定位错误</span><br><span class="line">    os.environ[&quot;CUDA_LAUNCH_BLOCKING&quot;] = &quot;1&quot;</span><br><span class="line"></span><br><span class="line">    # CUDA内核代码（GPU端执行计算）</span><br><span class="line">    cuda_gelu_src = &quot;&quot;&quot;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line">#include &lt;torch/extension.h&gt;</span><br><span class="line">#include&lt;c10/cuda/CUDAException.h&gt;</span><br><span class="line"></span><br><span class="line">__global__ void gelu_kernel(float* in, float* out, int num_elements) &#123;</span><br><span class="line">    // 计算当前线程的全局索引</span><br><span class="line">    int i = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">    // 越界检查，避免访问无效内存</span><br><span class="line">    if (i &lt; num_elements) &#123;</span><br><span class="line">        // GELU近似公式计算</span><br><span class="line">        out[i] = 0.5 * in[i] * (1.0 + tanh(0.79788456 * (in[i] + 0.044715 * in[i] * in[i] * in[i])));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 计算向上取整（ceil(a / b)）</span><br><span class="line">inline unsigned int cdiv(unsigned int a, unsigned int b) &#123;</span><br><span class="line">    return (a + b - 1) / b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// CPU端封装函数，调度GPU内核</span><br><span class="line">torch::Tensor gelu(torch::Tensor x) &#123;</span><br><span class="line">    TORCH_CHECK(x.device().is_cuda());  // 确保输入在GPU上</span><br><span class="line">    TORCH_CHECK(x.is_contiguous());     // 确保内存连续</span><br><span class="line">    torch::Tensor y = torch::empty_like(x);  // 分配输出空间（不置零）</span><br><span class="line">    int num_elements = x.numel();        // 总元素数</span><br><span class="line">    int block_size = 1024;               // 每个块的线程数</span><br><span class="line">    int num_blocks = cdiv(num_elements, block_size);  // 块数量（向上取整）</span><br><span class="line">    // 启动CUDA内核</span><br><span class="line">    gelu_kernel&lt;&lt;&lt;num_blocks, block_size&gt;&gt;&gt;(x.data_ptr&lt;float&gt;(), y.data_ptr&lt;float&gt;(), num_elements);</span><br><span class="line">    C10_CUDA_KERNEL_LAUNCH_CHECK();  // 检查内核启动错误</span><br><span class="line">    return y;</span><br><span class="line">&#125;</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    # C++接口声明，用于Python绑定</span><br><span class="line">    cpp_gelu_src = &quot;torch::Tensor gelu(torch::Tensor x);&quot;</span><br><span class="line"></span><br><span class="line">    # 编译CUDA代码并绑定到Python模块</span><br><span class="line">    if not torch.cuda.is_available():</span><br><span class="line">        return None</span><br><span class="line">    module = load_inline(</span><br><span class="line">        cuda_sources=[cuda_gelu_src],</span><br><span class="line">        cpp_sources=[cpp_gelu_src],</span><br><span class="line">        functions=[&quot;gelu&quot;],</span><br><span class="line">        extra_cflags=[&quot;-O2&quot;],</span><br><span class="line">        verbose=True,</span><br><span class="line">        name=&quot;inline_gelu&quot;,</span><br><span class="line">        build_directory=&quot;var/cuda_gelu&quot;,</span><br><span class="line">    )</span><br><span class="line">    # 返回Python可调用的GELU函数</span><br><span class="line">    return getattr(module, &quot;gelu&quot;)</span><br><span class="line"></span><br><span class="line"># 调用示例</span><br><span class="line">cuda_gelu = create_cuda_gelu()</span><br><span class="line">x = torch.randn(16384, device=&quot;cuda&quot;)</span><br><span class="line">y = cuda_gelu(x)</span><br></pre></td></tr></table></figure>
+<h3 id="5-1-4-Triton版（Python编写，作业2重点）">5.1.4 Triton版（Python编写，作业2重点）</h3>
+<p>Triton：OpenAI 2021年开发，Python抽象，自动管理内存合并、共享内存等细节，接近CUDA性能，调试友好（作业2核心工具）。</p>
+<ul>
+<li>实现：分CPU端（调度）和Triton内核（计算），与CUDA结构类似。</li>
+<li>性能：1.848毫秒（与CUDA基本一致）。</li>
+<li>优势：Python编写，易上手，无需手动管理GPU底层细节。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">import triton</span><br><span class="line"></span><br><span class="line">def triton_gelu(x: torch.Tensor):</span><br><span class="line">    assert x.is_cuda  # 确保输入在GPU上</span><br><span class="line">    assert x.is_contiguous()  # 确保内存连续</span><br><span class="line">    y = torch.empty_like(x)  # 分配输出空间</span><br><span class="line">    num_elements = x.numel()  # 总元素数</span><br><span class="line">    block_size = 1024  # 块大小（线程数）</span><br><span class="line">    num_blocks = triton.cdiv(num_elements, block_size)  # 块数量（向上取整）</span><br><span class="line">    # 启动Triton内核</span><br><span class="line">    triton_gelu_kernel[(num_blocks,)](x, y, num_elements, BLOCK_SIZE=block_size)</span><br><span class="line">    return y</span><br><span class="line"></span><br><span class="line"># Triton内核函数（@triton.jit装饰器编译为GPU机器码）</span><br><span class="line">@triton.jit</span><br><span class="line">def triton_gelu_kernel(x_ptr, y_ptr, num_elements, BLOCK_SIZE: tl.constexpr):</span><br><span class="line">    # 计算当前块的起始位置</span><br><span class="line">    pid = tl.program_id(axis=0)</span><br><span class="line">    block_start = pid * BLOCK_SIZE</span><br><span class="line">    # 生成块内所有线程的偏移量</span><br><span class="line">    offsets = block_start + tl.arange(0, BLOCK_SIZE)</span><br><span class="line">    # 掩码：避免偏移量超出总元素数（处理非整除情况）</span><br><span class="line">    mask = offsets &lt; num_elements</span><br><span class="line">    # 从全局内存加载数据（带掩码，避免越界）</span><br><span class="line">    x = tl.load(x_ptr + offsets, mask=mask)</span><br><span class="line">    # GELU计算（Triton无tl.tanh，用公式近似）</span><br><span class="line">    a = 0.79788456 * (x + 0.044715 * x * x * x)</span><br><span class="line">    exp = tl.exp(2 * a)</span><br><span class="line">    tanh = (exp - 1) / (exp + 1)</span><br><span class="line">    y = 0.5 * x * (1 + tanh)</span><br><span class="line">    # 将计算结果写回全局内存</span><br><span class="line">    tl.store(y_ptr + offsets, y, mask=mask)</span><br><span class="line"></span><br><span class="line"># 调用示例</span><br><span class="line">x = torch.randn(16384, device=&quot;cuda&quot;)</span><br><span class="line">y = triton_gelu(x)</span><br></pre></td></tr></table></figure>
+<h3 id="5-2-Q-A">5.2 Q&amp;A</h3>
+<p>Q：张量不连续会怎样？</p>
+<p>A：代码有断言，会直接报错；多数情况下内存会连续分配，复杂操作（转置、视图）可在外部封装层处理。</p>
+<p>Q：块大小怎么选？</p>
+<p>A：需确保足够的块占满所有SM，简单逐元素操作（如GELU），块大小超过1024后影响不大。</p>
+<p>Q：手写PyTorch版GELU慢的原因？</p>
+<p>A：不是CPU与GPU的数据传输，而是多个独立CUDA内核导致的DRAM与SM之间的通信开销。</p>
+<h2 id="六、torch-compile-自动优化——-懒人福音">六、torch.compile 自动优化—— 懒人福音</h2>
+<h3 id="6-1-核心功能">6.1 核心功能</h3>
+<p>PyTorch内置即时编译器，自动优化未优化的PyTorch代码（如内核融合），无需手动写CUDA/Triton，适合简单场景。</p>
+<h3 id="6-2-性能对比">6.2 性能对比</h3>
+<p>torch.compile版GELU耗时1.47毫秒，略优于手写CUDA/Triton，接近原生版；底层自动生成Triton代码，优化效果接近手动编写。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">import torch.nn.functional as F</span><br><span class="line"></span><br><span class="line"># 定义未优化的GELU函数（与手写版一致）</span><br><span class="line">def manual_gelu(x):</span><br><span class="line">    return 0.5 * x * (1 + torch.tanh(0.79788456 * (x + 0.044715 * x ** 3)))</span><br><span class="line"></span><br><span class="line"># 使用torch.compile自动优化</span><br><span class="line">compiled_gelu = torch.compile(manual_gelu)</span><br><span class="line"></span><br><span class="line"># 测试性能</span><br><span class="line">x = torch.randn(16384, device=&quot;cuda&quot;)</span><br><span class="line">y = compiled_gelu(x)  # 优化后的执行</span><br></pre></td></tr></table></figure>
+<h3 id="6-3-适用场景与局限性">6.3 适用场景与局限性</h3>
+<ul>
+<li>优势：简单操作（算子融合、矩阵乘法）优化效果好，免费提升约10%速度，节省时间。</li>
+</ul>
+<blockquote>
+<p>FlashAttention 1、2、3 属于相当复杂的非平凡优化（non-trivial optimizations）；如今 torch.compile 和 Jax 的 XLA 编译器<strong>已经能够实现这些优化</strong>，但这是因为我们事后才知道（in hindsight）这些是正确的优化方向 —— 并非编译器天生能识别，而是基于已知的优化思路实现的。</p>
+</blockquote>
+<h2 id="七、Triton版softmax">七、Triton版softmax</h2>
+<p>softmax比GELU复杂，包含归约操作（跨元素求和），需对矩阵每一行归一化，是作业2的重要铺垫。</p>
+<h3 id="7-1-设计思路">7.1 设计思路</h3>
+<p>每个块对应矩阵一行，块大小设为列数的下一个2的幂（确保容纳所有列），核心逻辑：加载行数据→减最大值（数值稳定）→指数运算→求和→归一化→写回。</p>
+<h3 id="7-2-性能对比">7.2 性能对比</h3>
+<ul>
+<li>手写版：3.7秒（极差，无内核融合）；</li>
+<li>torch.compile版：1.3秒（最优）；</li>
+<li>PyTorch原生版：1.5秒（较好）；</li>
+<li>Triton版：1.9秒（接近原生，易编写）。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">import triton</span><br><span class="line"></span><br><span class="line"># 1. 手写版softmax（无内核融合，性能差）</span><br><span class="line">def manual_softmax(x: torch.Tensor):</span><br><span class="line">    M, N = x.shape</span><br><span class="line">    x_max = x.max(dim=1)[0]  # 每行最大值（MN reads, M writes）</span><br><span class="line">    x = x - x_max[:, None]   # 减去最大值（MN+M reads, MN writes）</span><br><span class="line">    numerator = torch.exp(x) # 指数运算（MN reads, MN writes）</span><br><span class="line">    denominator = numerator.sum(dim=1)  # 每行求和（MN reads, M writes）</span><br><span class="line">    y = numerator / denominator[:, None]  # 归一化（MN reads, MN writes）</span><br><span class="line">    return y</span><br><span class="line"></span><br><span class="line"># 2. PyTorch原生版softmax</span><br><span class="line">def pytorch_softmax(x: torch.Tensor):</span><br><span class="line">    return torch.nn.functional.softmax(x, dim=-1)</span><br><span class="line"></span><br><span class="line"># 3. Triton版softmax（内核融合，性能优）</span><br><span class="line">def triton_softmax(x: torch.Tensor):</span><br><span class="line">    y = torch.empty_like(x)</span><br><span class="line">    M, N = x.shape  # M：行数，N：列数</span><br><span class="line">    block_size = triton.next_power_of_2(N)  # 块大小设为列数的下一个2的幂</span><br><span class="line">    num_blocks = M  # 每个块对应一行</span><br><span class="line">    # 启动Triton内核</span><br><span class="line">    triton_softmax_kernel[(M,)](</span><br><span class="line">        x_ptr=x, y_ptr=y,</span><br><span class="line">        x_row_stride=x.stride(0), y_row_stride=y.stride(0),</span><br><span class="line">        num_cols=N, BLOCK_SIZE=block_size</span><br><span class="line">    )</span><br><span class="line">    return y</span><br><span class="line"></span><br><span class="line"># Triton softmax内核函数</span><br><span class="line">@triton.jit</span><br><span class="line">def triton_softmax_kernel(x_ptr, y_ptr, x_row_stride, y_row_stride, num_cols, BLOCK_SIZE: tl.constexpr):</span><br><span class="line">    assert num_cols &lt;= BLOCK_SIZE</span><br><span class="line">    row_idx = tl.program_id(0)  # 每个块处理一行</span><br><span class="line">    col_offsets = tl.arange(0, BLOCK_SIZE)  # 块内列偏移量</span><br><span class="line">    # 计算当前行的起始地址</span><br><span class="line">    x_start_ptr = x_ptr + row_idx * x_row_stride</span><br><span class="line">    x_ptrs = x_start_ptr + col_offsets</span><br><span class="line">    # 加载当前行数据，掩码处理越界</span><br><span class="line">    x_row = tl.load(x_ptrs, mask=col_offsets &lt; num_cols, other=float(&quot;-inf&quot;))</span><br><span class="line">    # softmax核心计算</span><br><span class="line">    x_row = x_row - tl.max(x_row, axis=0)  # 数值稳定：减去每行最大值</span><br><span class="line">    numerator = tl.exp(x_row)              # 指数运算</span><br><span class="line">    denominator = tl.sum(numerator, axis=0)# 归约求和</span><br><span class="line">    y_row = numerator / denominator        # 归一化</span><br><span class="line">    # 写回结果</span><br><span class="line">    y_start_ptr = y_ptr + row_idx * y_row_stride</span><br><span class="line">    y_ptrs = y_start_ptr + col_offsets</span><br><span class="line">    tl.store(y_ptrs, y_row, mask=col_offsets &lt; num_cols)</span><br><span class="line"></span><br><span class="line"># 4. torch.compile优化版softmax</span><br><span class="line">compiled_softmax = torch.compile(manual_softmax)</span><br><span class="line"></span><br><span class="line"># 调用示例</span><br><span class="line">x = torch.randn(1024, 16384, device=&quot;cuda&quot;)</span><br><span class="line">y1 = manual_softmax(x)</span><br><span class="line">y2 = pytorch_softmax(x)</span><br><span class="line">y3 = triton_softmax(x)</span><br><span class="line">y4 = compiled_softmax(x)</span><br></pre></td></tr></table></figure>
+<h2 id="八、课程总结">八、课程总结</h2>
+<h3 id="8-1-核心知识点总结">8.1 核心知识点总结</h3>
+<ul>
+<li>工具：基准测试（测速度）、性能剖析（找瓶颈）、Nsight Systems（作业2必用，CPU/GPU时序可视化）。</li>
+<li>内核编写：CUDA（C++，高性能，需手动管理细节）、Triton（Python，易上手，作业2核心）；内核融合是性能关键。</li>
+<li>自动优化：torch.compile适合简单场景，复杂优化（如FlashAttention）需手动写内核。</li>
+</ul>
+<h3 id="8-2-作业2重点提示">8.2 作业2重点提示</h3>
+<ul>
+<li>必须使用Nsight Systems进行性能剖析，定位内核瓶颈。</li>
+<li>核心任务是实现FlashAttention-2的Triton内核，可直接参考本节课GELU和softmax的Triton实现思路（块设计、掩码处理、归约操作）。</li>
+<li>重点关注“内核融合”和“内存优化”，避免不必要的内存读写开销。</li>
+</ul>
+<p>本轮课程代码链接：</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//cs336.stanford.edu/spring2025-lectures/%3Ftrace%3Dvar%252Ftraces%252Flecture_06.json%26step%3D0">https://link.zhihu.com/?target=https%3A//cs336.stanford.edu/spring2025-lectures/%3Ftrace%3Dvar%252Ftraces%252Flecture_06.json%26step%3D0</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AF%BE%E7%A8%8B%E5%BC%95%E5%85%A5%E4%B8%8E%E4%BD%9C%E4%B8%9A%E8%AF%B4%E6%98%8E"><span class="toc-number">1.</span> <span class="toc-text">一、课程引入与作业说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81GPU%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%9B%9E%E9%A1%BE"><span class="toc-number">2.</span> <span class="toc-text">二、GPU基础知识回顾</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-GPU%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%86%85%E5%AD%98%E5%B1%82%E7%BA%A7"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 GPU核心组件与内存层级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-GPU%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 GPU执行模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E7%BA%BF%E7%A8%8B%E6%9D%9F%EF%BC%88Warp%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 线程束（Warp）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E8%AE%A1%E7%AE%97%E5%BC%BA%E5%BA%A6"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 计算强度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-Q-A"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 Q&amp;A</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%EF%BC%88Benchmarking%EF%BC%89%E2%80%94%E2%80%94-%E9%AB%98%E6%80%A7%E8%83%BD%E4%BB%A3%E7%A0%81%E7%9A%84%E5%89%8D%E6%8F%90"><span class="toc-number">3.</span> <span class="toc-text">三、基准测试（Benchmarking）—— 高性能代码的前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%953%E4%B8%AA%E5%85%B3%E9%94%AE%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 基准测试3个关键注意事项</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%A0%B8%E5%BF%83%E7%A4%BA%E4%BE%8B"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 核心示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-number">3.3.</span> <span class="toc-text">3.2.1 矩阵乘法基准测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-MLP%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-number">3.4.</span> <span class="toc-text">3.2.2 MLP基准测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">3.5.</span> <span class="toc-text">3.3 局限性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%A7%E8%83%BD%E5%89%96%E6%9E%90%EF%BC%88Profiling%EF%BC%89%E2%80%94%E2%80%94-%E5%AE%9A%E4%BD%8D%E7%93%B6%E9%A2%88%E7%9A%84%E6%A0%B8%E5%BF%83%E5%B7%A5%E5%85%B7"><span class="toc-number">4.</span> <span class="toc-text">四、性能剖析（Profiling）—— 定位瓶颈的核心工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-Profiling-%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7"><span class="toc-number">4.1.</span> <span class="toc-text">4.1  Profiling 常用工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-PyTorch%E5%86%85%E7%BD%AE-profile"><span class="toc-number">4.2.</span> <span class="toc-text">4.2.1 PyTorch内置 profile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-NVIDIA-Nsight-Systems%EF%BC%88%E4%BD%9C%E4%B8%9A2%E5%BF%85%E7%94%A8%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">4.2.2 NVIDIA Nsight Systems（作业2必用）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-Q-A"><span class="toc-number">4.4.</span> <span class="toc-text">4.3 Q&amp;A</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81GPU%E5%86%85%E6%A0%B8%E7%BC%96%E5%86%99%EF%BC%88%E4%BB%A5GELU%E4%B8%BA%E4%BE%8B%EF%BC%89%E2%80%94%E2%80%94-%E4%BD%9C%E4%B8%9A2%E6%A0%B8%E5%BF%83%E9%93%BA%E5%9E%AB"><span class="toc-number">5.</span> <span class="toc-text">五、GPU内核编写（以GELU为例）—— 作业2核心铺垫</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-4%E7%A7%8DGELU%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 4种GELU的实现方式+性能对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1-%E6%89%8B%E5%86%99PyTorch%E7%89%88%EF%BC%88%E5%8E%9F%E5%A7%8B%E6%96%B9%E6%B3%95%EF%BC%8C%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%BB%AD%E6%AF%94%E8%BE%83%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95%E7%9A%84%E6%A0%87%E5%87%86%EF%BC%89"><span class="toc-number">5.2.</span> <span class="toc-text">5.1.1 手写PyTorch版（原始方法，作为后续比较其他方法的标准）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2-PyTorch%E5%8E%9F%E7%94%9F%E7%89%88%EF%BC%88%E6%9C%80%E4%BC%98%E9%80%89%E6%8B%A9%EF%BC%8C%E7%AE%80%E5%8D%95%E9%AB%98%E6%95%88%EF%BC%89"><span class="toc-number">5.3.</span> <span class="toc-text">5.1.2 PyTorch原生版（最优选择，简单高效）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-3-CUDA%E7%89%88%EF%BC%88C-%E7%BC%96%E5%86%99%EF%BC%8C%E9%AB%98%E6%80%A7%E8%83%BD%EF%BC%89"><span class="toc-number">5.4.</span> <span class="toc-text">5.1.3 CUDA版（C++编写，高性能）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-4-Triton%E7%89%88%EF%BC%88Python%E7%BC%96%E5%86%99%EF%BC%8C%E4%BD%9C%E4%B8%9A2%E9%87%8D%E7%82%B9%EF%BC%89"><span class="toc-number">5.5.</span> <span class="toc-text">5.1.4 Triton版（Python编写，作业2重点）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Q-A"><span class="toc-number">5.6.</span> <span class="toc-text">5.2 Q&amp;A</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81torch-compile-%E8%87%AA%E5%8A%A8%E4%BC%98%E5%8C%96%E2%80%94%E2%80%94-%E6%87%92%E4%BA%BA%E7%A6%8F%E9%9F%B3"><span class="toc-number">6.</span> <span class="toc-text">六、torch.compile 自动优化—— 懒人福音</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 核心功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 性能对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%8E%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">6.3.</span> <span class="toc-text">6.3 适用场景与局限性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81Triton%E7%89%88softmax"><span class="toc-number">7.</span> <span class="toc-text">七、Triton版softmax</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="toc-number">7.1.</span> <span class="toc-text">7.1 设计思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">7.2.</span> <span class="toc-text">7.2 性能对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">八、课程总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93"><span class="toc-number">8.1.</span> <span class="toc-text">8.1 核心知识点总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E4%BD%9C%E4%B8%9A2%E9%87%8D%E7%82%B9%E6%8F%90%E7%A4%BA"><span class="toc-number">8.2.</span> <span class="toc-text">8.2 作业2重点提示</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记&body=Check out this article: https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/12/cs336-spring-2025-lecture-6-kernels-triton-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 6：Kernels, Triton》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

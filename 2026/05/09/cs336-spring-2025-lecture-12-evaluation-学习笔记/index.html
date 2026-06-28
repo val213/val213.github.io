@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.318Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Evaluation">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/04/11/cs336-spring-2025-lecture-9&11-scaling-laws-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记&body=Check out this article: https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%A1%8C%E4%B8%9A%E7%8E%B0%E7%8A%B6%EF%BC%9A%E6%88%91%E4%BB%AC%E7%9C%8B%E5%88%B0%E7%9A%84%EF%BC%8C%E5%92%8C%E6%88%91%E4%BB%AC%E7%9C%8B%E4%B8%8D%E5%88%B0%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">一、行业现状：我们看到的，和我们看不到的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%AF%84%E4%BC%B0%E7%9A%84%E6%9C%AC%E8%B4%A8%EF%BC%9A%E5%85%88%E9%97%AE%E6%B8%85%E6%A5%9A%E4%BD%A0%E8%A6%81%E5%9B%9E%E7%AD%94%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、评估的本质：先问清楚你要回答什么问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%BE%93%E5%85%A5%E8%AE%BE%E8%AE%A1%EF%BC%9A%E4%BD%A0%E7%9A%84%E6%8F%90%E7%A4%BA%E8%AF%8D%EF%BC%8C%E5%86%B3%E5%AE%9A%E4%BA%86%E4%BD%A0%E6%B5%8B%E7%9A%84%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.1.</span> <span class="toc-text">1. 输入设计：你的提示词，决定了你测的是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%EF%BC%9A%E4%BD%A0%E4%BB%A5%E4%BB%80%E4%B9%88%E6%96%B9%E5%BC%8F%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B%EF%BC%9F"><span class="toc-number">2.2.</span> <span class="toc-text">2. 模型调用：你以什么方式调用模型？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%BE%93%E5%87%BA%E8%AF%84%E4%BC%B0%EF%BC%9A%E6%A0%87%E5%87%86%E7%AD%94%E6%A1%88%E5%B9%B2%E5%87%80%E5%90%97%EF%BC%9F%E6%8C%87%E6%A0%87%E9%80%89%E5%AF%B9%E4%BA%86%E5%90%97%EF%BC%9F"><span class="toc-number">2.3.</span> <span class="toc-text">3. 输出评估：标准答案干净吗？指标选对了吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB%EF%BC%9A%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E6%9C%80%E7%BB%88%E7%9A%84%E5%88%86%E6%95%B0%EF%BC%9F"><span class="toc-number">2.4.</span> <span class="toc-text">4. 结果解读：如何理解最终的分数？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%9B%B0%E6%83%91%E5%BA%A6%EF%BC%9A%E8%A2%AB%E5%BF%BD%E8%A7%86%E7%9A%84%E5%9F%BA%E7%A1%80%E6%8C%87%E6%A0%87"><span class="toc-number">3.</span> <span class="toc-text">三、困惑度：被忽视的基础指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%9F%A5%E8%AF%86%E7%B1%BB%E5%9F%BA%E5%87%86%EF%BC%9A%E4%BB%8E-MMLU-%E5%88%B0%E4%BA%BA%E7%B1%BB%E7%9A%84%E7%BB%88%E6%9E%81%E8%80%83%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">五、知识类基准：从 MMLU 到人类的终极考试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E6%8C%87%E4%BB%A4%E9%81%B5%E5%BE%AA%E5%9F%BA%E5%87%86%EF%BC%9A%E5%A6%82%E4%BD%95%E8%AF%84%E4%BC%B0%E5%BC%80%E6%94%BE%E7%94%9F%E6%88%90%EF%BC%9F"><span class="toc-number">5.</span> <span class="toc-text">六、指令遵循基准：如何评估开放生成？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81Agent-%E7%B1%BB%E5%9F%BA%E5%87%86%EF%BC%9A%E8%84%9A%E6%89%8B%E6%9E%B6%E9%87%8C%E7%9A%84%E6%99%BA%E8%83%BD"><span class="toc-number">6.</span> <span class="toc-text">七、Agent 类基准：脚手架里的智能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E7%BA%AF%E6%8E%A8%E7%90%86%E8%83%BD%E5%8A%9B%EF%BC%9A%E5%89%A5%E7%A6%BB%E7%9F%A5%E8%AF%86%E7%9A%84%E9%80%9A%E7%94%A8%E6%99%BA%E8%83%BD"><span class="toc-number">7.</span> <span class="toc-text">八、纯推理能力：剥离知识的通用智能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E5%AE%89%E5%85%A8%E7%B1%BB%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-number">8.</span> <span class="toc-text">九、安全类基准测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81%E7%9C%9F%E5%AE%9E%E6%80%A7%EF%BC%9A%E8%B4%B4%E8%BF%91%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E5%9C%BA%E6%99%AF"><span class="toc-number">9.</span> <span class="toc-text">十、真实性：贴近真实用户场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E8%AF%84%E4%BC%B0%E6%9C%89%E6%95%88%E6%80%A7%EF%BC%9A%E6%95%B0%E6%8D%AE%E6%B1%A1%E6%9F%93%E4%B8%8E%E6%A0%87%E6%B3%A8%E5%99%AA%E5%A3%B0"><span class="toc-number">10.</span> <span class="toc-text">十一、评估有效性：数据污染与标注噪声</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E5%BD%93%E6%88%91%E4%BB%AC%E5%81%9A%E8%AF%84%E4%BC%B0%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E6%88%91%E4%BB%AC%E8%AF%84%E4%BC%B0%E7%9A%84%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">11.</span> <span class="toc-text">十二、当我们做评估的时候，我们评估的到底是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Takeaways"><span class="toc-number">12.</span> <span class="toc-text">Takeaways</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-05-08T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-05-09</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.318Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Evaluation/" rel="tag">Evaluation</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>拆解大模型评估的完整框架、主流基准、核心矛盾与行业现状，打破&quot;评估只是算分数&quot;的认知误区，直面当前大模型领域的&quot;评估危机&quot;</p>
+</blockquote>
+<hr>
+<h2 id="一、行业现状：我们看到的，和我们看不到的">一、行业现状：我们看到的，和我们看不到的</h2>
+<p>当我们谈论&quot;模型好坏&quot;时，看到的东西大致可以分为几类。</p>
+<p>最常见的是基准测试分数。每逢大模型发布，技术报告里总会附上一张图表，列出模型在 MMLU、MATH、GSM8K 等基准上的得分。这些数字看起来客观、可比，但值得追问的是：这些基准到底是什么？这些数字背后的含义是什么？不同基准之间为什么不完全一致？</p>
+<p>除了单纯的准确率，还有一些平台走得更远。Artificial Analysis 绘制了模型的帕累托前沿，把&quot;智能指数&quot;（多基准融合的综合指标）和&quot;每 token 使用成本&quot;放在一起对比。一些旗舰模型的性能确实很强，但使用成本也极高——如果另一个模型性能相当、价格却低得多，显然也很值得考虑。</p>
+<p>另一种思路是基于用户的使用数据。OpenRouter 统计了真实用户的模型选择数据，把流量分发给不同模型，看每个模型收到的 token 量来排名。其逻辑是：用户愿意付费使用的，就是他们认为好的模型。</p>
+<p>Chatbot Arena 走的也是类似路线，但更进一步——让用户在两两对话中投票偏好，基于 ELO 分数给模型排序。</p>
+<p>此外，X 等平台上也有大量用户分享模型能力案例，展示模型搞定了某个超难问题。这类案例能反映模型的能力，但本质上存在幸存者偏差。</p>
+<p>但是，Andrej Karpathy 曾做过一个判断：<strong>当前大模型正面临一场全面的评估危机。</strong> MMLU 等经典基准已经接近饱和，甚至被认为存在刷分问题；Chatbot Arena 也出现了流程不规范、刷分等情况。模型越来越多，分数越来越多，但行业始终没有形成统一、可信、贴合真实场景的评估标准。</p>
+<p>这并不意外。CS336里讨论的几乎所有话题都是如此——评估也不例外，它本质上充满了不确定性。</p>
+<hr>
+<h2 id="二、评估的本质：先问清楚你要回答什么问题">二、评估的本质：先问清楚你要回答什么问题</h2>
+<p>评估在操作层面很简单：给定一个固定模型，输入提示词，拿到输出，计算指标，求平均值。但正因为它看起来太简单了，反而容易让人忽略其中的复杂性。</p>
+<p><strong>评估的真正问题在于：没有唯一正确的评估方式。</strong> 你得到一个数字，但这个数字能告诉你什么？它真的回答了你最初的问题吗？</p>
+<p>不同角色对于评估的目标是完全不同的。</p>
+<p>个人或企业在做采购决策时，关心的是贴合自身业务场景的性价比；</p>
+<p>学术研究者想剥离一切场景干扰，测量模型的原生能力，看 AI 领域是否在科学意义上取得进步；</p>
+<p>政策制定者想客观了解模型带来的收益与风险；</p>
+<p>模型开发者则需要评估反馈来指导迭代，想知道哪个优化方案真的有效。</p>
+<p>这些完全不同的目标，对应着完全不同的评估方案，自然不存在用一套评估打天下的可能。</p>
+<p>一个简明的思考框架是把评估拆成四个环节：<strong>输入设计</strong>、<strong>模型调用</strong>、<strong>输出评估</strong>、<strong>结果解读</strong>。每个环节都有大量细节需要仔细考量，下面逐一展开。</p>
+<h3 id="1-输入设计：你的提示词，决定了你测的是什么">1. 输入设计：你的提示词，决定了你测的是什么</h3>
+<p><strong>第一个问题是：这些提示词从哪里来？它们覆盖了哪些使用场景？有没有长尾、高难度的边缘案例，还是只有简单题？</strong></p>
+<p><strong>第二个问题是：是否要让输入适配模型？</strong></p>
+<p>在多轮对话场景中，输入本身就是依赖模型的历史输出的，这就引入了额外的复杂性。</p>
+<p>即便在单轮场景里，你也可能想让输入适配特定模型——比如在红队测试中，适配模型能更高效地找到罕见的长尾风险，但代价是失去了不同模型之间的横向可比性。这是一种明确的权衡。</p>
+<h3 id="2-模型调用：你以什么方式调用模型？">2. 模型调用：你以什么方式调用模型？</h3>
+<p>你以什么方式调用模型，这个问题往往被低估。零样本、少样本、思维链——这些选择会极大地影响最终指标。大语言模型对提示词依然高度敏感，评估时必须对提示策略有清晰的说明和记录。</p>
+<p>更根本的问题是：<strong>你评估的到底是什么？</strong> 是语言模型本身，还是包含脚手架、工具调用的完整智能体系统？模型开发者关心前者，外围的脚手架只是获取指标的手段；但终端用户只关心整个系统能不能解决问题。这两者的评估方案设计逻辑完全不同。</p>
+<h3 id="3-输出评估：标准答案干净吗？指标选对了吗？">3. 输出评估：标准答案干净吗？指标选对了吗？</h3>
+<p>通常我们会有参考输出来评估结果。但这些参考答案本身是干净的吗？<strong>如果基准存在标注噪声甚至错误，这会直接影响评估的有效性。</strong></p>
+<p>**然后是指标选择。**代码生成用 pass@1 还是 pass@10？成本怎么纳入考量？大多数榜单完全忽略了成本因素，你根本不知道排名第一的模型是不是比第二名贵了十倍。这也是帕累托前沿更有参考价值的原因。</p>
+<p>还有一个问题：**不同错误的严重程度天差地别。**在医疗场景里的一次幻觉，和在娱乐场景里的一次幻觉，影响完全不同。至于没有标准答案的开放生成任务——怎么客观评估&quot;写一个关于斯坦福的精彩故事&quot;？这是一个至今没有良好解决方案的难题。</p>
+<h3 id="4-结果解读：如何理解最终的分数？">4. 结果解读：如何理解最终的分数？</h3>
+<p>假设你在评估中得到了一个 91% 的准确率，你想知道这个<strong>分数是否足够支撑模型上线部署</strong>。</p>
+<p>如果你是研究者，你想知道模型<strong>是否真的学会了某种泛化能力，还是训练集污染导致的分数虚高</strong>——这要求你直面训练集-测试集重叠的问题。</p>
+<p>如果你在评估的是方法本身，你需要问：<strong>这个分数反映的是模型效果，还是训练方法的有效性</strong>？</p>
+<hr>
+<h2 id="三、困惑度：被忽视的基础指标">三、困惑度：被忽视的基础指标</h2>
+<p>说完一般框架，有必要专门谈谈困惑度（Perplexity），因为它至今仍有不可替代的价值，却常常被忽视。</p>
+<p>困惑度的本质是：语言模型是 token 序列的概率分布，困惑度衡量模型给目标数据集分配的概率高低。数值越低，模型对数据的拟合能力越强。<strong>在预训练阶段，我们的目标就是最小化模型在训练集上的困惑度，因此它是大模型最原生的评估指标</strong>。</p>
+<p>2010 年代的语言建模研究，普遍采用同分布训练-测试的模式，在 Penn Treebank、WikiText-103、10 亿词基准等数据集上优化困惑度。</p>
+<p>GPT-2 是转折点。它在 40GB WebText 数据上训练，然后零样本在传统困惑度基准上评估——这明显是分布外评估，但 WebText 的覆盖范围足够广，模型展现了强泛化能力，在小数据集上超越了当时的 SOTA。GPT-2/GPT-3 之后，行业评估的核心从困惑度转向了下游任务准确率。</p>
+<p>困惑度有三个至今无法被替代的价值。</p>
+<p>**第一，它比下游任务准确率更平滑。**困惑度给你每个 token 的细粒度概率，而准确率只有&quot;对/错&quot;的二元结果。几乎所有缩放定律研究都用困惑度，因为它能更平滑地拟合曲线，避免下游指标的不连续性。</p>
+<p>**第二，它具备通用性。**困惑度关注数据集中的每一个 token，不会放过细微的能力差异。而任务准确率可能会漏掉这些细节——模型可能用错误的逻辑得到了正确答案，尤其当基准本身可以被刷分时，这个问题尤为突出。</p>
+<p>**第三，它适用范围广。**除了预训练语料，你也可以计算下游任务的条件困惑度，直接拟合针对特定任务的缩放定律。</p>
+<p>当然，困惑度也有局限。如果你在运营一个需要对外公布困惑度的榜单，你就必须在一定程度上信任模型提供方——因为困惑度需要模型输出每个 token 的概率，而黑盒模型可以轻易作弊（如果模型给所有序列都分配 0.8 的概率，看起来困惑度极低，但这根本不是合法的概率分布）。任务准确率评估只需要看模型的最终输出，可以完全独立完成验证，但困惑度做不到这一点。</p>
+<p>学界有一群被称为&quot;困惑度极致主义者&quot;的人，他们的逻辑是：真实分布是 t，模型分布是 p，最小化困惑度就是让 p 逼近 t，当 p=t 时，你能解决所有任务，实现 AGI。这个论证在理论上相当优雅，但反驳观点认为这可能不是最高效的路径——你可能在优化大量与核心任务无关的分布部分，而人类的学习模式显然不是这样的。</p>
+<p>不过有一点是成立的：在基准普遍可以被刷分的当下，只要训练集和测试集严格隔离，困惑度本身是难以被刷分的。</p>
+<hr>
+<h2 id="五、知识类基准：从-MMLU-到人类的终极考试">五、知识类基准：从 MMLU 到人类的终极考试</h2>
+<p>知识类基准的核心是测试模型的知识储备与学科能力，均为有标准答案的结构化题目，是当前大模型发布的核心标配。</p>
+<p><strong>MMLU</strong> 发布于 2020 年，当时让语言模型零样本或少样本完成大量不同任务是一件超出想象的事。它的设计是 57 个学科的多项选择题，题目来自互联网公开资源。尽管名字叫&quot;大规模多任务语言理解&quot;，实际上测的主要是知识储备，而非语言理解能力。</p>
+<p>GPT-3 当时用少样本提示在 MMLU 上取得了 45% 的准确率。现在主流模型的准确率已经达到 90%+，进入了性能饱和区。这也带来了一个问题：大家在 MMLU 上过拟合了。</p>
+<p>MMLU 最初是为基座模型设计的，但现在大家用它来评估指令微调后的模型。这里有一个值得注意的认知：如果一个模型没有针对 MMLU 做任何专门训练，仅凭预训练就能在 MMLU 上取得好成绩，那它大概率具备足够的通用智能，可以完成其他大量任务。但如果你专门针对这 57 个学科的选择题做了优化，即便分数很高，模型的通用能力可能也达不到分数所体现的水平。所以解读 MMLU 分数时，分数本身不是全部，还要看评估对象和训练数据的匹配关系。</p>
+<p><strong>MMLU-Pro</strong> 是 2024 年的改进版，移除了噪声和过于简单的题目，把选项从 4 个增加到 10 个，并采用思维链模式评估。结果是模型准确率普遍下降了 16%-33%，被主流大模型厂商广泛采用，成为新的标配知识基准。</p>
+<p><strong>GPQA</strong> 进一步把难度拉高到博士级别。它招募了 61 名 PhD 出题，经过多轮专家审核，确保非专家即使用谷歌搜索 30 分钟也找不到答案——这就是&quot;谷歌免疫&quot;。领域专家的准确率仅 65%，非专家用谷歌搜索 30 分钟准确率仅 34%。GPT-4 发布初期在这个基准上只有 39% 的准确率，现在 O3 已经达到了 75%，一年间的进步是显著的。</p>
+<p><strong>Humanity's Last Exam</strong>（人类的终极考试）号称是最后的考试。它用奖金池和共同作者激励吸引出题，用前沿大模型过滤简单题，做多轮专家审核，最终收集了 2500 道多模态题目。但它有一个根本性的设计缺陷：公开征集题目的方式，导致出题人群严重偏差——收到的是已经深度接触大模型、深知哪些题对模型简单或困难的研究者，题目极度偏向特定领域，完全不代表真实用户的提问分布。当前顶尖模型准确率仅 20%，是目前难度最高的知识类基准。</p>
+<hr>
+<h2 id="六、指令遵循基准：如何评估开放生成？">六、指令遵循基准：如何评估开放生成？</h2>
+<p>ChatGPT 带火了一种新的交互范式：直接让模型完成指令，没有明确的题目，模型需要自己理解和执行。这带来了一个核心难题：开放回复的评估，没有标准答案，至今没有令人满意的解决方案。</p>
+<p><strong>Chatbot Arena</strong> 是这个领域最热门的基准。机制是互联网用户输入提示词，收到两个匿名模型的回复，投票选择更好的一个，基于两两对比计算 ELO 分数。优点是输入来自真实用户，永远有新鲜数据，可以动态纳入新模型。</p>
+<p>但 Chatbot Arena 也引发了一场不小的争议。过去两年里，它的行业影响力越来越大，甚至谷歌 CEO Sundar Pichai 都会发推特说 Gemini 在上面的表现有多好。当一个指标成为全行业关注的目标，甚至成了 PR 工具，就触发了 Goodhart's law——当一个指标成了目标，它就不再是一个好的指标，必然会被刷分作弊。有一篇叫《榜单幻觉》（The Leaderboard Illusion）的论文就指出，有一些模型提供方拿到了特权访问权限，或是可以多次提交模型做测试，评估流程存在很多不规范的地方，希望后续能得到修正。</p>
+<p>更根本的问题是：这些来自互联网随机用户的评估，到底代表了谁的需求分布？这里的&quot;随机&quot;，指的是刚好访问这个网站的人，而不是真正的统计学意义上的随机。</p>
+<p><strong>IFEval</strong> 的思路是专门测试约束遵循能力——给指令添加合成的约束条件（字数限制、禁用词、格式要求），用脚本自动验证是否遵循。它的好处是完全自动化、可复现，但局限也非常明显：它只评估是否遵循约束，完全不评估生成内容的语义质量。里面的指令也不太符合真实使用场景，比如&quot;你的回复里不允许使用逗号&quot;或&quot;必须包含至少 12 个占位符 token&quot;。</p>
+<p><strong>AlpacaEval</strong> 基于 805 条指令，用 GPT-4 作为自动标注器，计算目标模型相对于基准模型（GPT-4 Preview）的胜率。它和 Chatbot Arena 的排名强相关，而且完全自动化、可复现。不过后来人们发现其原始版本存在长度偏差，更长的回复更容易被 GPT-4 偏好，所以后来推出了长度控制(LC)版本缓解这个问题。局限是指令偏简单，不覆盖工具使用等复杂场景；不做模型的安全评估；标注器的偏好偏差。</p>
+<p><strong>WildBench</strong> 的提示词来自 100 万条真实人机对话，提取了 1024 条示例，用 GPT-4 Turbo 带清单式评估框架做裁判。和 Chatbot Arena 的相关系数达到 0.95，成为行业内校验新基准有效性的参考标准。</p>
+<hr>
+<h2 id="七、Agent-类基准：脚手架里的智能">七、Agent 类基准：脚手架里的智能</h2>
+<p>有一类任务需要工具调用、多轮迭代、长周期规划——比如写代码需要运行测试，做安全渗透需要执行命令，完成 Kaggle 竞赛需要训练和调参。这类场景的评估对象是&quot;语言模型 + 脚手架逻辑&quot;的完整智能体系统，而非语言模型本身。</p>
+<p><strong>SWE-Bench</strong> 给模型一个代码库和 GitHub Issue 描述，要求提交能通过单元测试的 PR。这是当前智能体代码能力的核心标杆。</p>
+<p><strong>CyBench</strong> 专注于网络安全领域，任务是在 CTF 夺旗赛中入侵服务器获取密钥。当前顶尖模型准确率约 20%，但已经能解决人类需要 42 分钟才能完成的挑战。值得注意的是，这个基准既是能力评估，也是安全风险评估——能完成高难度渗透测试的智能体，既可以用于系统安全防护，也可以用于恶意攻击。</p>
+<p><strong>MLEBench</strong> 包含 75 个 Kaggle 竞赛任务，要求智能体完成数据处理、模型训练、调参、提交的全流程。当前顶尖模型的奖牌获得率不足 20%，是难度最高的 Agent 基准之一。</p>
+<hr>
+<h2 id="八、纯推理能力：剥离知识的通用智能">八、纯推理能力：剥离知识的通用智能</h2>
+<p>能不能把知识储备的因素剥离出去，只评估模型纯粹的推理能力？很多人认为推理能力才是更纯粹的智能体现——我们应该奖励模型的创造力和解决新问题的能力，而非&quot;因为在互联网上见过所以能做&quot;。</p>
+<p><strong>ARC-AGI</strong> 就是这个思路的产物，由 Francois Chollet 在 2019 年（大模型爆发前）提出。任务是无语言、无任务描述的图形规律题，传统大模型在这个基准上准确率接近零，但 O3 投入大量算力后取得了显著突破，每道题耗费可达数百美元。现在已经推出了更难的 ARC-AGI-2。这类基准捕捉了其他评估无法覆盖的纯粹推理与泛化能力。</p>
+<hr>
+<h2 id="九、安全类基准测试">九、安全类基准测试</h2>
+<p>安全评估的逻辑和其他行业是相通的——汽车做碰撞测试，食品做安全标准，AI 也需要安全评估。但问题是，&quot;安全&quot;在 AI 领域至今没有清晰的定义。</p>
+<p><strong>HarmBench</strong> 基于 510 种有害行为测试模型的拒绝率。<strong>AIR-Bench</strong> 参考全球监管框架和企业安全政策，构建了 314 个风险类别、5694 条提示词，把抽象的安全概念和真实合规要求绑定，更贴合实际落地需求。</p>
+<p>一个核心话题是&quot;越狱&quot;。大模型经过对齐训练会拒绝有害指令，但通过优化提示词可以绕过安全防护。Greedy Coordinate Gradient（GCG）可以自动优化提示词实现越狱，在开源 Llama 模型上优化的攻击甚至可以迁移到 GPT-4——这是当前大模型的核心安全隐患。</p>
+<p>部署前测试方面，美英等国的 AI 安全研究所与主流厂商建立了自愿协议，厂商在发布前提供提前访问权限，由研究所完成安全评估并出具报告，目前没有法律约束力。</p>
+<p>关于安全，有几个关键的认知需要建立。</p>
+<p><strong>第一，安全是强语境相关的，定义随政治、法律、社会规范、国家不同而变化，不存在全球统一的安全标准。</strong></p>
+<p>**第二，安全与能力不是绝对对立的。**减少医疗场景的幻觉等优化，能同时提升模型的能力与安全性。</p>
+<p>**第三，必须区分&quot;能力&quot;和&quot;倾向&quot;。**API 模型的核心风险是倾向（是否拒绝有害请求），开源模型的核心风险是能力（可以通过微调轻易关闭安全防护）。</p>
+<p>**第四，两用性是核心挑战。**能完成高难度渗透测试的智能体，既可以用于系统安全防护，也可以用于恶意攻击——这意味着我们无法简单通过能力评估来区分安全风险。</p>
+<hr>
+<h2 id="十、真实性：贴近真实用户场景">十、真实性：贴近真实用户场景</h2>
+<p>行业里有个根本的矛盾：标准化基准（如 MMLU）本质上是&quot;考模型&quot;，和真实用户的使用场景相差甚远；但真实用户流量里又有大量垃圾和娱乐内容，也不是模型的核心价值场景。</p>
+<p>这里的关键区分是两类提示词：&quot;考我&quot;类，用户已经知道答案，目的是测试模型；&quot;问我&quot;类，用户不知道答案，目的是解决问题。&quot;问我&quot;的提示词才是模型落地的真实场景，才是真正为用户创造价值的使用方式。</p>
+<p>Anthropic 的 Clio 项目用大模型分析真实用户对话数据，发现编码是最高频的使用场景。</p>
+<p>MedHELM 项目则找了 29 名临床医生，基于真实工作流整理了 121 个临床任务，构建了贴合真实医疗场景的评估基准。</p>
+<p>然而，真实性和隐私保护存在天然矛盾——很多真实场景数据涉及用户隐私，无法公开。</p>
+<hr>
+<h2 id="十一、评估有效性：数据污染与标注噪声">十一、评估有效性：数据污染与标注噪声</h2>
+<p>传统机器学习的核心准则是不在测试集上训练。但在当前大模型时代，模型用全网数据训练，几乎不公开训练细节，测试集污染几乎是无解的问题。</p>
+<p>一个方向是通过模型行为特征推断它是否在训练中见过测试集（比如对文本顺序的偏好和数据集顺序高度相关）。另一个方向是推动行业规范，要求模型厂商披露测试集与训练集的重叠情况，类似于论文必须报告置信区间和标准误差。</p>
+<p>大量基准还存在标注错误和噪声。比如 MATH、GSM8K 的准确率已经到了 90%+，但其中有相当比例的题目存在标注错误，修正后分数会显著提升。SWE-Bench Verified 就是修复原始数据集错误的改进版。</p>
+<hr>
+<h2 id="十二、当我们做评估的时候，我们评估的到底是什么">十二、当我们做评估的时候，我们评估的到底是什么</h2>
+<p><strong>传统小模型时代，我们评估的是&quot;方法&quot;</strong>——固定训练集、测试集、训练流程，只改变算法或架构，验证新方法的有效性。这种评估推动了算法创新，保证了公平性和可复现性。</p>
+<p><strong>当前大模型时代，评估的是&quot;系统&quot;</strong>——无固定规则，一切技术手段均可使用，只看最终效果。这种评估给终端用户提供了选型参考，但无法区分效果提升来自算法创新、数据规模还是算力投入，也推动了底层的刷分文化。</p>
+<p>例外是一些算法竞赛，比如 nanogpt 速通赛（固定数据，最小化达到指定验证损失的时间）和 DataComp-LM（固定原始数据与训练流程，优化数据筛选策略）。这些竞赛对推动算法创新有重要价值。</p>
+<p><strong>无论做任何评估，必须先明确并公开&quot;游戏规则&quot;，以及你希望通过评估回答什么问题。否则，分数毫无意义。</strong></p>
+<hr>
+<h2 id="Takeaways">Takeaways</h2>
+<ol>
+<li><strong>不存在唯一正确的通用评估</strong>，必须根据评估目标选择对应方案，脱离目标的分数没有任何意义。</li>
+<li><strong>不要只看榜单的最终分数</strong>，要深入查看单个样本、模型的预测细节与提示词策略，理解分数背后的真实逻辑。</li>
+<li>模型评估是多维度的，<strong>必须综合考虑能力、安全、成本、场景真实性</strong>，单一维度的分数会严重误导决策。</li>
+<li>做评估前，<strong>必须明确&quot;游戏规则&quot;</strong>：你要评估的是底层训练方法，还是最终模型/系统效果，两者的设计逻辑完全不同。</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%A1%8C%E4%B8%9A%E7%8E%B0%E7%8A%B6%EF%BC%9A%E6%88%91%E4%BB%AC%E7%9C%8B%E5%88%B0%E7%9A%84%EF%BC%8C%E5%92%8C%E6%88%91%E4%BB%AC%E7%9C%8B%E4%B8%8D%E5%88%B0%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">一、行业现状：我们看到的，和我们看不到的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%AF%84%E4%BC%B0%E7%9A%84%E6%9C%AC%E8%B4%A8%EF%BC%9A%E5%85%88%E9%97%AE%E6%B8%85%E6%A5%9A%E4%BD%A0%E8%A6%81%E5%9B%9E%E7%AD%94%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、评估的本质：先问清楚你要回答什么问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%BE%93%E5%85%A5%E8%AE%BE%E8%AE%A1%EF%BC%9A%E4%BD%A0%E7%9A%84%E6%8F%90%E7%A4%BA%E8%AF%8D%EF%BC%8C%E5%86%B3%E5%AE%9A%E4%BA%86%E4%BD%A0%E6%B5%8B%E7%9A%84%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.1.</span> <span class="toc-text">1. 输入设计：你的提示词，决定了你测的是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%A8%A1%E5%9E%8B%E8%B0%83%E7%94%A8%EF%BC%9A%E4%BD%A0%E4%BB%A5%E4%BB%80%E4%B9%88%E6%96%B9%E5%BC%8F%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B%EF%BC%9F"><span class="toc-number">2.2.</span> <span class="toc-text">2. 模型调用：你以什么方式调用模型？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%BE%93%E5%87%BA%E8%AF%84%E4%BC%B0%EF%BC%9A%E6%A0%87%E5%87%86%E7%AD%94%E6%A1%88%E5%B9%B2%E5%87%80%E5%90%97%EF%BC%9F%E6%8C%87%E6%A0%87%E9%80%89%E5%AF%B9%E4%BA%86%E5%90%97%EF%BC%9F"><span class="toc-number">2.3.</span> <span class="toc-text">3. 输出评估：标准答案干净吗？指标选对了吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB%EF%BC%9A%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E6%9C%80%E7%BB%88%E7%9A%84%E5%88%86%E6%95%B0%EF%BC%9F"><span class="toc-number">2.4.</span> <span class="toc-text">4. 结果解读：如何理解最终的分数？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%9B%B0%E6%83%91%E5%BA%A6%EF%BC%9A%E8%A2%AB%E5%BF%BD%E8%A7%86%E7%9A%84%E5%9F%BA%E7%A1%80%E6%8C%87%E6%A0%87"><span class="toc-number">3.</span> <span class="toc-text">三、困惑度：被忽视的基础指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%9F%A5%E8%AF%86%E7%B1%BB%E5%9F%BA%E5%87%86%EF%BC%9A%E4%BB%8E-MMLU-%E5%88%B0%E4%BA%BA%E7%B1%BB%E7%9A%84%E7%BB%88%E6%9E%81%E8%80%83%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">五、知识类基准：从 MMLU 到人类的终极考试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E6%8C%87%E4%BB%A4%E9%81%B5%E5%BE%AA%E5%9F%BA%E5%87%86%EF%BC%9A%E5%A6%82%E4%BD%95%E8%AF%84%E4%BC%B0%E5%BC%80%E6%94%BE%E7%94%9F%E6%88%90%EF%BC%9F"><span class="toc-number">5.</span> <span class="toc-text">六、指令遵循基准：如何评估开放生成？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81Agent-%E7%B1%BB%E5%9F%BA%E5%87%86%EF%BC%9A%E8%84%9A%E6%89%8B%E6%9E%B6%E9%87%8C%E7%9A%84%E6%99%BA%E8%83%BD"><span class="toc-number">6.</span> <span class="toc-text">七、Agent 类基准：脚手架里的智能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E7%BA%AF%E6%8E%A8%E7%90%86%E8%83%BD%E5%8A%9B%EF%BC%9A%E5%89%A5%E7%A6%BB%E7%9F%A5%E8%AF%86%E7%9A%84%E9%80%9A%E7%94%A8%E6%99%BA%E8%83%BD"><span class="toc-number">7.</span> <span class="toc-text">八、纯推理能力：剥离知识的通用智能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E5%AE%89%E5%85%A8%E7%B1%BB%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-number">8.</span> <span class="toc-text">九、安全类基准测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81%E7%9C%9F%E5%AE%9E%E6%80%A7%EF%BC%9A%E8%B4%B4%E8%BF%91%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E5%9C%BA%E6%99%AF"><span class="toc-number">9.</span> <span class="toc-text">十、真实性：贴近真实用户场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E8%AF%84%E4%BC%B0%E6%9C%89%E6%95%88%E6%80%A7%EF%BC%9A%E6%95%B0%E6%8D%AE%E6%B1%A1%E6%9F%93%E4%B8%8E%E6%A0%87%E6%B3%A8%E5%99%AA%E5%A3%B0"><span class="toc-number">10.</span> <span class="toc-text">十一、评估有效性：数据污染与标注噪声</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E5%BD%93%E6%88%91%E4%BB%AC%E5%81%9A%E8%AF%84%E4%BC%B0%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E6%88%91%E4%BB%AC%E8%AF%84%E4%BC%B0%E7%9A%84%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">11.</span> <span class="toc-text">十二、当我们做评估的时候，我们评估的到底是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Takeaways"><span class="toc-number">12.</span> <span class="toc-text">Takeaways</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记&body=Check out this article: https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/09/cs336-spring-2025-lecture-12-evaluation-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 12：Evaluation 评估》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

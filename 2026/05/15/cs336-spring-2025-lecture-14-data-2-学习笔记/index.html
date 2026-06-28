@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.319Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="Data">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/05/17/cs366-spring-2025-lecture-15-alignment-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/05/10/cs336-spring-2025-lecture-13-data-1-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记&body=Check out this article: https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95%E4%B8%89%E5%A4%A7%E6%B5%81%E6%B4%BE"><span class="toc-number">1.</span> <span class="toc-text">一、过滤算法三大流派</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%80%81%E5%BD%93%E7%9B%8A%E5%A3%AE%E7%9A%84n-gram%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1. 老当益壮的n-gram模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-fastText%EF%BC%9AFacebook%E7%9A%84%E5%8F%88%E4%B8%80%E4%B8%AA%E7%A5%9E%E5%99%A8"><span class="toc-number">1.2.</span> <span class="toc-text">2. fastText：Facebook的又一个神器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-DSIR%EF%BC%9A%E6%9B%B4%E6%9C%89%E5%8E%9F%E5%88%99%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7%E9%87%87%E6%A0%B7"><span class="toc-number">1.3.</span> <span class="toc-text">3. DSIR：更有原则的重要性采样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E8%BF%87%E6%BB%A4%E6%96%B9%E6%B3%95%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-number">1.4.</span> <span class="toc-text">所有过滤方法的本质</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%BF%87%E6%BB%A4%E6%8A%80%E6%9C%AF%E7%9A%84%E4%B8%89%E4%B8%AA%E5%BA%94%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">二、过滤技术的三个应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%AF%AD%E8%A8%80%E8%AF%86%E5%88%AB%EF%BC%9A%E6%88%91%E5%8F%AA%E8%A6%81%E8%8B%B1%E8%AF%AD"><span class="toc-number">2.1.</span> <span class="toc-text">1. 语言识别：我只要英语</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%B2%BE%E5%BD%A9%E7%9A%84%E6%A1%88%E4%BE%8B%EF%BC%9AOpenWebMath"><span class="toc-number">2.1.1.</span> <span class="toc-text">一个精彩的案例：OpenWebMath</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%B4%A8%E9%87%8F%E8%BF%87%E6%BB%A4%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF-%E5%A5%BD-%E6%95%B0%E6%8D%AE"><span class="toc-number">2.2.</span> <span class="toc-text">2. 质量过滤：什么是&quot;好&quot;数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%AF%92%E6%80%A7%E8%BF%87%E6%BB%A4%EF%BC%9A%E5%8E%BB%E6%8E%89%E4%B8%8D%E5%A5%BD%E7%9A%84%E4%B8%9C%E8%A5%BF"><span class="toc-number">2.3.</span> <span class="toc-text">3. 毒性过滤：去掉不好的东西</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E5%A6%82-Dolma-%E6%98%AF%E5%9C%A8-Jigsaw-Toxic-Comments-%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%8A-%E8%BF%99%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%9B%86%E6%98%AF%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91%E7%9A%84%E8%AE%A8%E8%AE%BA%E9%A1%B5%E8%AF%84%E8%AE%BA%EF%BC%8C%E7%94%B1%E4%BA%BA%E7%B1%BB%E6%A0%87%E6%B3%A8%E4%BA%86%E6%9C%89%E6%AF%92%E3%80%81%E4%B8%A5%E9%87%8D%E6%9C%89%E6%AF%92%E3%80%81%E6%B7%AB%E7%A7%BD%E3%80%81%E5%A8%81%E8%83%81%E3%80%81%E4%BE%AE%E8%BE%B1%E3%80%81%E8%BA%AB%E4%BB%BD%E4%BB%87%E6%81%A8%E8%BF%99%E5%87%A0%E4%B8%AA%E6%A0%87%E7%AD%BE-%E8%AE%AD%E7%BB%83%E4%BA%86%E4%B8%A4%E4%B8%AA-FastText-%E5%88%86%E7%B1%BB%E5%99%A8%EF%BC%8C%E4%B8%80%E4%B8%AA%E5%9F%BA%E6%9C%AC%E4%B8%8A%E5%AF%B9%E5%BA%94%E4%BB%87%E6%81%A8%EF%BC%8C%E5%8F%A6%E4%B8%80%E4%B8%AA%E5%AF%B9%E5%BA%94-NSFW%EF%BC%88%E4%B8%8D%E9%80%82%E5%90%88%E5%B7%A5%E4%BD%9C%E5%9C%BA%E5%90%88%EF%BC%89%E3%80%82"><span class="toc-number">3.</span> <span class="toc-text">例如 Dolma 是在 Jigsaw Toxic Comments 数据集上(这个数据集是维基百科的讨论页评论，由人类标注了有毒、严重有毒、淫秽、威胁、侮辱、身份仇恨这几个标签)训练了两个 FastText 分类器，一个基本上对应仇恨，另一个对应 NSFW（不适合工作场合）。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8E%BB%E9%87%8D"><span class="toc-number">4.</span> <span class="toc-text">三、去重</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E8%81%94%E7%BD%91%E6%9C%89%E5%A4%9A%E9%87%8D%E5%A4%8D"><span class="toc-number">4.1.</span> <span class="toc-text">互联网有多重复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%BB%E9%87%8D%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%A9%BA%E9%97%B4"><span class="toc-number">4.2.</span> <span class="toc-text">去重的设计空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B2%BE%E7%A1%AE%E5%8E%BB%E9%87%8D"><span class="toc-number">4.3.</span> <span class="toc-text">精确去重</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%91%E4%BC%BC%E5%8E%BB%E9%87%8D%EF%BC%9AMinHash-LSH"><span class="toc-number">4.4.</span> <span class="toc-text">近似去重：MinHash + LSH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">课程总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-05-14T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-05-15</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.319Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Data/" rel="tag">Data</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>这节课是数据专题的第二讲，很有老派大数据味道的一节课。</p>
+<p>上节课讲了&quot;有什么数据集&quot;，这节课则关注这些处理步骤的细节，会讲很多经典的大数据处理算法，还有一些挺有意思的数学，看看质量过滤和去重到底是怎么工作的。</p>
+<hr>
+<h2 id="一、过滤算法三大流派">一、过滤算法三大流派</h2>
+<p>所有过滤算法解决的都是同一个问题：我手里有一点点我想要的高质量数据T，还有一大堆乱七八糟的原始数据R（比如Common Crawl），我怎么从R里找出和T差不多的东西？</p>
+<p>这个问题有两个硬性要求，缺一不可：</p>
+<ol>
+<li><strong>必须能泛化</strong>：我已经有T了，再找一模一样的没有意义，我要的是和T相似但不同的新数据</li>
+<li><strong>必须快</strong>：R可能是整个互联网的数据，如果你用一个70B的Llama去给每个网页打分，那打分的成本比训练模型本身还高，不如直接用这些算力去训练</li>
+</ol>
+<p>我们将介绍三种实现这个高层抽象组件的方法。</p>
+<h3 id="1-老当益壮的n-gram模型">1. 老当益壮的n-gram模型</h3>
+<p>第一个方法简单到你可能不敢相信：用一个n-gram语言模型。</p>
+<p>就是那个在Transformer出现之前统治了NLP几十年的东西。我们用Kneser-Ney平滑训练一个n-gram模型，然后用它给每个文档打分，保留困惑度最低的那些。</p>
+<p>n-gram模型的核心思想特别朴素：一个句子出现的概率，等于每个词在前面n-1个词之后出现的概率的乘积。比如三元模型里，&quot;the cat in&quot;的概率就是&quot;in&quot;出现在&quot;the cat&quot;后面的次数，除以&quot;the cat&quot;总共出现的次数。</p>
+<p>但这个方法有个致命问题：<strong>稀疏性</strong>。当n变大的时候，绝大多数可能的n-gram在语料库里一次都没出现过，哪怕它们是完全合理的句子。所以我们需要Kneser-Ney平滑，简单来说就是：如果我没见过&quot;the cat in&quot;，那我就退一步看&quot;cat in&quot;的概率；如果也没见过，就再退一步看&quot;in&quot;本身的概率。即如果我没有足够的数据支持这个计数，我可以使用更低阶的 n 元语法，然后尝试对其进行插值或回退。</p>
+<p>在工业界人们倾向于使用一个名为 KenLM 的特定实现。这是一个专门为速度优化的n-gram库，最早是为机器翻译写的，现在成了数据过滤的标配。</p>
+<p>n-gram模型的问题是它根本不懂语义，只看相邻的词有没有一起出现过。比如&quot;the the&quot;在英语里虽然不常见，但比&quot;asdf asdf&quot;常见多了，所以它会觉得重复的&quot;the&quot;是高质量数据。</p>
+<p>但没关系，我们不需要一个完美的过滤器，我们只需要一个能把最垃圾的东西过滤掉的过滤器。CCNet就是这么做的：他们把Common Crawl里的所有段落按困惑度排序，只保留前1/3。就是这么简单粗暴的方法，成了第一个Llama数据集的基础。</p>
+<h3 id="2-fastText：Facebook的又一个神器">2. fastText：Facebook的又一个神器</h3>
+<p>第二个方法是fastText，也是Facebook做的。2016年的时候，所有人都在搞复杂的神经网络分类器，结果Facebook的人跳出来说：你们搞的那些花里胡哨的东西，还不如一个线性分类器好用，而且速度快100倍。</p>
+<p>传统的词袋分类器有个问题：参数太多了。如果你的词汇量是8000，要分64类，那你就需要一个8000×64的矩阵，也就是50多万个参数。这还只是一元语法，如果用二元语法，参数数量会爆炸。</p>
+<p>fastText的解决方法是<strong>先降维再分类</strong>，也就是先拿到词 Embedding，再用 Embedding 做分类。</p>
+<ul>
+<li>先把每个词映射到一个很小的隐藏维度（比如16维）</li>
+<li>把一个句子里所有词的向量取平均</li>
+<li>再用一个线性层从16维映射到类别数</li>
+</ul>
+<p>这样参数数量就从V×K变成了H×(V+K)，一下子少了两个数量级。其中V是词汇量，K是类别数，H是隐藏维度。</p>
+<p>然后为了解决n-gram数量爆炸的问题，他们用了一个技巧：<strong>哈希trick</strong>。不管有多少个二元语法，我都把它们哈希到固定数量的桶里（比如1000万个）。就算有碰撞也没关系，训练的时候模型自己会处理。</p>
+<p>对于质量过滤来说，我们只需要分两类：好文档和坏文档。所以fastText就退化成了一个最简单的线性分类器。</p>
+<p>当然，你也可以用BERT甚至Llama来做分类器，效果肯定更好。但如果你要过滤100倍的数据，最后只保留1%，那你的分类器的计算成本必须是训练模型的1%以下。</p>
+<h3 id="3-DSIR：更有原则的重要性采样">3. DSIR：更有原则的重要性采样</h3>
+<p>第三个方法叫DSIR，是2023年提出来的，全称是Data Selection via Importance Resampling（基于重要性重采样的语言模型数据选择）。</p>
+<p>这个方法的思路和前两个都不一样：前两个是在判断&quot;这个文档是不是好的&quot;，而DSIR是在问&quot;这个文档和我的目标数据分布有多像&quot;。</p>
+<p>首先，快速回顾一下重要性重采样。这在很多领域都有应用，比如粒子滤波和蒙特卡洛方法。假设我想从目标分布p里采样，但我只能从建议分布q里采样。那我可以：</p>
+<ol>
+<li>先从q里采样一堆样本</li>
+<li>给每个样本一个权重：w = p(x)/q(x)</li>
+<li>按照权重重新采样，这样得到的样本就近似服从p分布了</li>
+</ol>
+<p>放到数据选择的场景里：</p>
+<ul>
+<li>p就是我们的目标高质量数据的分布</li>
+<li>q就是原始数据的分布</li>
+</ul>
+<p>但这里有个问题：我们的目标数据通常很少，根本不足以训练一个好的分布模型。所以DSIR还是用了老办法：哈希n-gram。我们不用训练复杂的模型，就统计一下哈希后的n-gram的频率，用这个来估计分布。</p>
+<p>结果怎么样呢？在GLUE基准上，DSIR比fastText有小幅提升。更重要的是，它是一个更有原则的方法，能更好地保持数据的多样性，不会像分类器那样只挑最像目标数据的东西。</p>
+<h3 id="所有过滤方法的本质">所有过滤方法的本质</h3>
+<p>讲完这三个方法，你会发现它们其实都是同一个框架的不同实现：</p>
+<ol>
+<li>你有目标数据T和原始数据R</li>
+<li>你训练一个模型，得到一个评分函数score(x)</li>
+<li>你根据这个评分从R里挑东西</li>
+</ol>
+<ul>
+<li>KenLM：score(x)是x在T的n-gram模型下的概率，挑概率高的</li>
+<li>fastText：score(x)是x来自T而不是R的概率，挑概率高的</li>
+<li>DSIR：score(x)是p_T(x)/p_R(x)，按照这个概率重采样</li>
+</ul>
+<h2 id="二、过滤技术的三个应用">二、过滤技术的三个应用</h2>
+<p>同样的过滤流水线，换个训练数据，就能解决完全不同的问题。</p>
+<h3 id="1-语言识别：我只要英语">1. 语言识别：我只要英语</h3>
+<p>第一个应用是语言识别：我只想保留英语的文档，其他语言的都扔掉。</p>
+<p>你可能会问：现在的大模型不都是多语言的吗？为什么还要过滤？</p>
+<p>有两个原因：</p>
+<ol>
+<li><strong>数据问题</strong>：很多小语言的高质量数据非常难获取和处理</li>
+<li><strong>计算问题</strong>：在计算有限的情况下，如果你把30%的token分给其他语言，那你的英语性能肯定会下降。最典型的例子就是BLOOM，它只在30%的英语数据上训练，结果英语能力比同时期的纯英语模型差很多。</li>
+</ol>
+<p>当然，如果你有足够多的算力，多语言模型是很好的，语言之间还有正向迁移。现在所有的前沿模型都是多语言的，能处理100多种语言。</p>
+<p>工业界用fastText来做语言识别，他们有一个现成的语言识别模型，支持176种语言，是在维基百科、翻译网站和东南欧新闻上训练的。</p>
+<p>Dolma数据集的做法特别简单：运行这个fastText模型，只要英语概率大于0.5就保留。</p>
+<p>Percy 现场演示了这个模型，但是结果不太靠谱。这个所有人都在用的模型，其实有很多问题。它对短句、代码、混合语言的处理都很差。还有一个很严重的问题：它可能会把英语的方言（比如非裔美国人英语）识别为非英语，这会引入偏见。</p>
+<h4 id="一个精彩的案例：OpenWebMath">一个精彩的案例：OpenWebMath</h4>
+<p>三年前有一篇论文叫OpenWebMath，他们想从Common Crawl里筛选出数学文本。他们的方法是把数学当成一种&quot;语言&quot;来处理：</p>
+<ol>
+<li>先用规则过滤，比如包含LaTeX命令的页面</li>
+<li>在一个叫ProofPile的数学证明数据集上训练KenLM，保留困惑度低于15000的页面</li>
+<li>训练一个fastText分类器来预测一个页面是不是数学写作</li>
+</ol>
+<p>最有意思的是他们的阈值设置：如果一个页面已经被规则识别为数学，那分类器的阈值只要0.17就可以；如果没有被规则识别，那阈值就要0.8。</p>
+<p>结果怎么样？他们生成了147亿个token的数学语料库。用这个语料库训练的1.4B模型，比用20倍通用数据训练的模型数学能力还要强。这就是数据过滤的威力。</p>
+<h3 id="2-质量过滤：什么是-好-数据">2. 质量过滤：什么是&quot;好&quot;数据</h3>
+<p>质量过滤是最模糊的一个话题，因为没有人能准确定义什么是&quot;好&quot;数据。</p>
+<p>有意思的是，早期的很多数据集（比如C4、Gopher、RefinedWeb）都明确说他们没有用基于模型的质量过滤。但最近的论文基本上都投降了：没办法，基于模型的过滤就是效果好太多。</p>
+<p>我们来看几个经典的做法：</p>
+<ul>
+<li><strong>GPT-3</strong>：他们把非Common Crawl的数据（维基百科、书籍、WebText）作为正样本，Common Crawl作为负样本，训练了一个线性分类器。然后他们不是简单地保留高分文档，而是按照帕累托分布随机保留，这样能保留更多多样性。</li>
+<li><strong>LLaMA</strong>：他们用维基百科引用的页面作为正样本。注意，不是维基百科本身，而是维基百科里链接到的那些页面。他们认为能被维基百科引用的页面，质量应该不会太差。</li>
+<li><strong>phi-1</strong>：这是我最喜欢的一个例子，完全改变了大家对数据的看法。他们的目标是用教科书级别的高质量数据训练一个很小的模型（1.3B）。他们的做法是：
+<ol>
+<li>拿GitHub上的Python代码数据集The Stack</li>
+<li>抽10万个文件，用GPT-4给每个文件打分，评估它对一个想学编程的学生的教育价值</li>
+<li>用这10万个标注好的样本训练一个随机森林分类器</li>
+<li>用这个分类器去筛选整个The Stack数据集</li>
+</ol>
+</li>
+</ul>
+<p>结果太惊人了：用原来的数据集训练，96000步之后HumanEval只有12.19%；用过滤后的数据集训练，36000步之后就达到了17.68%。训练步数减少了62%，效果还更好。</p>
+<blockquote>
+<p>学生提问：为什么我们可以用GPT-4来标注数据，而不是直接用GPT-4来过滤所有数据？</p>
+<p>回答：因为贵啊。GPT-4标注10万个文件可能只要几千美元，但如果用它去标注几亿个文件，那就要几百万美元了。而我们用GPT-4标注10万个样本，然后蒸馏出一个几毫秒就能跑一个文件的分类器，这才是可扩展的方法。</p>
+<p>这也是未来的一个大趋势：以前我们是找人类来标注高质量数据，现在我们可以用大模型来生成我们想要的任何类型的高质量数据，然后蒸馏出快速的分类器。</p>
+</blockquote>
+<h3 id="3-毒性过滤：去掉不好的东西">3. 毒性过滤：去掉不好的东西</h3>
+<p>最后一个应用是毒性过滤，就是去掉那些仇恨言论、色情内容之类的不好的东西。</p>
+<h2 id="例如-Dolma-是在-Jigsaw-Toxic-Comments-数据集上-这个数据集是维基百科的讨论页评论，由人类标注了有毒、严重有毒、淫秽、威胁、侮辱、身份仇恨这几个标签-训练了两个-FastText-分类器，一个基本上对应仇恨，另一个对应-NSFW（不适合工作场合）。">例如 Dolma 是在 Jigsaw Toxic Comments 数据集上(这个数据集是维基百科的讨论页评论，由人类标注了有毒、严重有毒、淫秽、威胁、侮辱、身份仇恨这几个标签)训练了两个 FastText 分类器，一个基本上对应仇恨，另一个对应 NSFW（不适合工作场合）。</h2>
+<h2 id="三、去重">三、去重</h2>
+<p>过滤是这个东西我永远不想要，而去重是这个东西还不错，但有一个就够了，不需要其他的。</p>
+<h3 id="互联网有多重复">互联网有多重复</h3>
+<p>互联网天生就充满了重复。有两种重复：</p>
+<ol>
+<li><strong>精确重复</strong>：比如古腾堡计划的书籍被镜像到了几千个不同的网站上，Common Crawl不知道它们是一样的，会全部存下来。</li>
+<li><strong>近似重复</strong>：比如MIT许可证，在GitHub上出现了几百万次，可能有的地方少了一个逗号，有的地方改了一个名字。还有那些模板生成的内容，比如电商网站的产品描述，只是把国家名字从加拿大换成了美国。</li>
+</ol>
+<p>有一个很极端的例子：在C4数据集里，有一句话重复出现了<strong>61036次</strong>。这句话是：</p>
+<blockquote>
+<p>&quot;通过结合奇妙的创意、有趣的安排，并紧跟该领域的当前趋势，让你更有灵感，赋予艺术气息。如果您能在婚礼中应用其中的部分或全部设计，我们将不胜荣幸。相信我，精彩的创意如果能应用于现实，一定会让周围的人惊叹不已！&quot;</p>
+</blockquote>
+<p>这是亚马逊上一个卖涂鸦面具的产品的描述。我们不知道为什么它会出现在6万多个不同的页面上，但它就是在那里。</p>
+<p>没有人想让模型在这句话上训练61000个epoch。这纯粹是浪费算力，而且会导致模型记住这些内容，带来版权和隐私问题。</p>
+<h3 id="去重的设计空间">去重的设计空间</h3>
+<p>在做去重之前，你要先回答三个问题：</p>
+<ol>
+<li><strong>什么是一个&quot;项目&quot;</strong>：是一个句子？一个段落？还是整个文档？</li>
+<li><strong>什么是&quot;重复&quot;</strong>：是完全一样？还是99%一样？还是50%一样？</li>
+<li><strong>重复了怎么办</strong>：是全部删掉？还是保留一个？</li>
+</ol>
+<p>去重最大的挑战是：它本质上是一个成对比较的问题。如果你有1亿个文档，直接两两比较就是1e16次操作，这是不可能完成的。所以我们需要线性时间的算法。</p>
+<p>所有去重算法的基础都是：<strong>哈希函数</strong>。</p>
+<h3 id="精确去重">精确去重</h3>
+<p>精确去重最简单：计算每个项目的哈希值，然后保留每个哈希值的一个副本。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash_items = itertools.groupby(<span class="built_in">sorted</span>(items, key=mmh3.<span class="built_in">hash</span>), key=mmh3.<span class="built_in">hash</span>)</span><br><span class="line">deduped_items = [<span class="built_in">next</span>(group) <span class="keyword">for</span> h, group <span class="keyword">in</span> hash_items]</span><br></pre></td></tr></table></figure>
+<p>这个方法简单、快速、精确。C4数据集就是这么做的：他们把文档切成3个句子的跨度，然后做精确去重。</p>
+<p>如果你有特别多的数据，连存储所有哈希值的内存都没有，那你可以用布隆过滤器。</p>
+<p>布隆过滤器是一个特别巧妙的数据结构，它用一个位数组和多个哈希函数来表示一个集合。它的特点是：</p>
+<ul>
+<li>如果它说一个东西不在集合里，那它肯定不在</li>
+<li>如果它说一个东西在集合里，那它可能在，也可能不在（假阳性）</li>
+</ul>
+<p>你可以通过调整位数组的大小和哈希函数的数量，把假阳性率降到任意低。比如Dolma数据集就把假阳性率设到了1e-15，几乎不可能出错。</p>
+<h3 id="近似去重：MinHash-LSH">近似去重：MinHash + LSH</h3>
+<p>精确去重只能处理完全一样的内容，但我们还需要处理近似重复。</p>
+<p>首先我们需要一个衡量两个文档相似度的指标：<strong>杰卡德相似度</strong>。两个集合A和B的杰卡德相似度等于它们的交集大小除以并集大小。如果两个文档有99%的词是一样的，那它们的杰卡德相似度就是0.99。</p>
+<p>但直接计算所有文档对的杰卡德相似度还是O(n²)的。所以我们需要一个魔法：<strong>MinHash</strong>。</p>
+<p>MinHash是一个哈希函数，它有一个神奇的性质：两个集合的MinHash值相等的概率，正好等于它们的杰卡德相似度。</p>
+<p>这怎么可能？其实道理很简单。想象一下，我们把所有可能的词随机打乱顺序。对于集合A来说，MinHash(A)就是这个打乱后的列表里第一个出现在A中的词。</p>
+<p>如果两个集合A和B的交集是3个词，并集是5个词，那么第一个出现的词在交集中的概率就是3/5，也就是0.6。这正好就是它们的杰卡德相似度。</p>
+<p>太妙了，对不对？但这还不够。因为单个MinHash的碰撞概率等于杰卡德相似度，随机性太强了。我们想要的是：如果相似度大于0.99，就几乎一定碰撞；如果小于0.99，就几乎不碰撞。</p>
+<p>这时候就需要**局部敏感哈希（LSH）**了。</p>
+<p>LSH的想法是：我们用很多个MinHash函数，然后把它们分成b个&quot;带&quot;，每个带有r个函数。两个文档只要有任意一个带的所有r个哈希值都相同，我们就认为它们是重复的。</p>
+<p>这个&quot;与或&quot;结构会产生一个非常锐利的阈值效应。通过调整b和r，你可以精确控制你想要的阈值。比如用b=20，r=450，你就可以得到一个大约0.99的阈值。也就是说，两个文档只要有超过99%的内容是一样的，就几乎一定会被检测为重复；如果低于99%，就几乎不会被检测到。</p>
+<blockquote>
+<p>学生提问：现在合成数据越来越多，很多内容是释义出来的，不是简单的复制粘贴。这些方法检测不出来怎么办？</p>
+<p>讲师回答：你说的对。这些基于n-gram的方法对释义完全无能为力。现在有一些新的研究，用语义嵌入来做去重，这样就能检测出语义上相似的内容。但这样做成本高很多，而且你要非常小心，不要把本来就应该多样化的内容也过滤掉了。</p>
+<p>另一个学生提问：有没有什么情况我们其实想要重复数据？</p>
+<p>讲师回答：当然有。如果一个文档质量特别高，那你其实想要在它上面多训练几个epoch。很多论文在中期训练的时候，都会对高质量数据进行多轮训练。</p>
+<p>我觉得最优的做法可能不是完全去重，而是根据一个文档出现的次数来调整它的采样权重。比如取出现次数的平方根或者对数，这样重要的文档会出现更多次，但不会出现61000次这么夸张。</p>
+</blockquote>
+<hr>
+<h2 id="课程总结">课程总结</h2>
+<p>这节课提到了很多算法工具：</p>
+<ul>
+<li>过滤：KenLM、fastText、DSIR</li>
+<li>应用：语言识别、质量过滤、毒性过滤</li>
+<li>去重：哈希、布隆过滤器、MinHash、LSH</li>
+</ul>
+<p>但<strong>这些都只是工具而已</strong>。知道这些算法怎么工作只是第一步，真正重要的是花时间和数据打交道。要去看你过滤掉了什么，留下了什么，然后训练一个小模型看看效果，再回来调整你的阈值和参数。这个过程没有捷径，只能靠经验。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%BF%87%E6%BB%A4%E7%AE%97%E6%B3%95%E4%B8%89%E5%A4%A7%E6%B5%81%E6%B4%BE"><span class="toc-number">1.</span> <span class="toc-text">一、过滤算法三大流派</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%80%81%E5%BD%93%E7%9B%8A%E5%A3%AE%E7%9A%84n-gram%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1. 老当益壮的n-gram模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-fastText%EF%BC%9AFacebook%E7%9A%84%E5%8F%88%E4%B8%80%E4%B8%AA%E7%A5%9E%E5%99%A8"><span class="toc-number">1.2.</span> <span class="toc-text">2. fastText：Facebook的又一个神器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-DSIR%EF%BC%9A%E6%9B%B4%E6%9C%89%E5%8E%9F%E5%88%99%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7%E9%87%87%E6%A0%B7"><span class="toc-number">1.3.</span> <span class="toc-text">3. DSIR：更有原则的重要性采样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E8%BF%87%E6%BB%A4%E6%96%B9%E6%B3%95%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-number">1.4.</span> <span class="toc-text">所有过滤方法的本质</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%BF%87%E6%BB%A4%E6%8A%80%E6%9C%AF%E7%9A%84%E4%B8%89%E4%B8%AA%E5%BA%94%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">二、过滤技术的三个应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%AF%AD%E8%A8%80%E8%AF%86%E5%88%AB%EF%BC%9A%E6%88%91%E5%8F%AA%E8%A6%81%E8%8B%B1%E8%AF%AD"><span class="toc-number">2.1.</span> <span class="toc-text">1. 语言识别：我只要英语</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%B2%BE%E5%BD%A9%E7%9A%84%E6%A1%88%E4%BE%8B%EF%BC%9AOpenWebMath"><span class="toc-number">2.1.1.</span> <span class="toc-text">一个精彩的案例：OpenWebMath</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%B4%A8%E9%87%8F%E8%BF%87%E6%BB%A4%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF-%E5%A5%BD-%E6%95%B0%E6%8D%AE"><span class="toc-number">2.2.</span> <span class="toc-text">2. 质量过滤：什么是&quot;好&quot;数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%AF%92%E6%80%A7%E8%BF%87%E6%BB%A4%EF%BC%9A%E5%8E%BB%E6%8E%89%E4%B8%8D%E5%A5%BD%E7%9A%84%E4%B8%9C%E8%A5%BF"><span class="toc-number">2.3.</span> <span class="toc-text">3. 毒性过滤：去掉不好的东西</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E5%A6%82-Dolma-%E6%98%AF%E5%9C%A8-Jigsaw-Toxic-Comments-%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%8A-%E8%BF%99%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%9B%86%E6%98%AF%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91%E7%9A%84%E8%AE%A8%E8%AE%BA%E9%A1%B5%E8%AF%84%E8%AE%BA%EF%BC%8C%E7%94%B1%E4%BA%BA%E7%B1%BB%E6%A0%87%E6%B3%A8%E4%BA%86%E6%9C%89%E6%AF%92%E3%80%81%E4%B8%A5%E9%87%8D%E6%9C%89%E6%AF%92%E3%80%81%E6%B7%AB%E7%A7%BD%E3%80%81%E5%A8%81%E8%83%81%E3%80%81%E4%BE%AE%E8%BE%B1%E3%80%81%E8%BA%AB%E4%BB%BD%E4%BB%87%E6%81%A8%E8%BF%99%E5%87%A0%E4%B8%AA%E6%A0%87%E7%AD%BE-%E8%AE%AD%E7%BB%83%E4%BA%86%E4%B8%A4%E4%B8%AA-FastText-%E5%88%86%E7%B1%BB%E5%99%A8%EF%BC%8C%E4%B8%80%E4%B8%AA%E5%9F%BA%E6%9C%AC%E4%B8%8A%E5%AF%B9%E5%BA%94%E4%BB%87%E6%81%A8%EF%BC%8C%E5%8F%A6%E4%B8%80%E4%B8%AA%E5%AF%B9%E5%BA%94-NSFW%EF%BC%88%E4%B8%8D%E9%80%82%E5%90%88%E5%B7%A5%E4%BD%9C%E5%9C%BA%E5%90%88%EF%BC%89%E3%80%82"><span class="toc-number">3.</span> <span class="toc-text">例如 Dolma 是在 Jigsaw Toxic Comments 数据集上(这个数据集是维基百科的讨论页评论，由人类标注了有毒、严重有毒、淫秽、威胁、侮辱、身份仇恨这几个标签)训练了两个 FastText 分类器，一个基本上对应仇恨，另一个对应 NSFW（不适合工作场合）。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8E%BB%E9%87%8D"><span class="toc-number">4.</span> <span class="toc-text">三、去重</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E8%81%94%E7%BD%91%E6%9C%89%E5%A4%9A%E9%87%8D%E5%A4%8D"><span class="toc-number">4.1.</span> <span class="toc-text">互联网有多重复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%BB%E9%87%8D%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%A9%BA%E9%97%B4"><span class="toc-number">4.2.</span> <span class="toc-text">去重的设计空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B2%BE%E7%A1%AE%E5%8E%BB%E9%87%8D"><span class="toc-number">4.3.</span> <span class="toc-text">精确去重</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%91%E4%BC%BC%E5%8E%BB%E9%87%8D%EF%BC%9AMinHash-LSH"><span class="toc-number">4.4.</span> <span class="toc-text">近似去重：MinHash + LSH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">课程总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记&body=Check out this article: https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/15/cs336-spring-2025-lecture-14-data-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 14：Data 2 数据》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

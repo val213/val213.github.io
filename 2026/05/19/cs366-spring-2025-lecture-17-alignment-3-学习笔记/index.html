@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.321Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/06/28/DSpark&DSpec/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/05/18/cs366-spring-2025-lecture-16-alignment-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记&body=Check out this article: https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%B8%AD%E7%9A%84%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E8%AE%BE%E5%AE%9A"><span class="toc-number">1.</span> <span class="toc-text">语言模型中的强化学习设定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6%E7%AE%97%E6%B3%95%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">策略梯度算法的核心原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E5%9F%BA%E7%BA%BF%E9%99%8D%E4%BD%8E%E6%96%B9%E5%B7%AE"><span class="toc-number">3.</span> <span class="toc-text">用基线降低方差</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GRPO%EF%BC%9A%E5%88%86%E7%BB%84%E7%9B%B8%E5%AF%B9%E7%AD%96%E7%95%A5%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">GRPO：分组相对策略优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E5%AE%9A%E4%B9%89%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%A5%96%E5%8A%B1%E5%87%BD%E6%95%B0"><span class="toc-number">4.1.</span> <span class="toc-text">第一步：定义任务与奖励函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E7%94%9F%E6%88%90%E5%9B%9E%E5%A4%8D%E4%B8%8E%E8%AE%A1%E7%AE%97%E4%BC%98%E5%8A%BF"><span class="toc-number">4.2.</span> <span class="toc-text">第二步：生成回复与计算优势</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E8%AE%A1%E7%AE%97%E6%8D%9F%E5%A4%B1%E4%B8%8E%E5%8F%82%E6%95%B0%E6%9B%B4%E6%96%B0"><span class="toc-number">4.3.</span> <span class="toc-text">第三步：计算损失与参数更新</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E8%AE%AD%E7%BB%83%E5%BF%83%E5%BE%97"><span class="toc-number">5.</span> <span class="toc-text">实验结果与训练心得</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-05-18T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-05-19</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.321Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>这节课是上一节基于可验证奖励的强化学习的延续，没有引入太多全新的概念，而是沉下心来把策略梯度的底层机制讲透，结合完整的可运行代码和数学推导，拆解GRPO这个现在工业界广泛使用的算法到底是怎么工作的。这也是最后一节正课，后面两节课邀请了当时还在阿里通义千问的Junyang Lin（林俊旸）和Llama团队的Mike Lewis，来分享他们在工业界做大模型对齐的一手经验。</p>
+<p>强化学习之所以让人兴奋，核心在于它是让模型真正超越人类能力的关键。监督学习的天花板永远是标注数据的质量，你最多只能让模型模仿人类的行为；但只要你能定义一个可测量、可验证的奖励函数，模型就可以通过不断的试错和优化，在这个任务上迭代到远超人类的水平。当然这也带来了两个巨大的挑战：一个是强化学习本身的优化过程非常不稳定，另一个是如何设计出不会被模型钻空子、又能泛化到通用场景的奖励函数，这两个问题至今都是领域内的研究热点。</p>
+<h2 id="语言模型中的强化学习设定">语言模型中的强化学习设定</h2>
+<p>在正式讲算法之前，我们先把LLM场景下的强化学习基本概念理清楚。它和传统机器人领域的强化学习有非常多本质的不同，很多在传统RL里形成的直觉在这里都不适用，这也是很多人刚接触大模型RL时容易困惑的地方。</p>
+<p>最核心的三个基本概念：</p>
+<ul>
+<li><strong>状态s</strong>：提示词(prompt) + 模型到目前为止已经生成的所有回复</li>
+<li><strong>动作a</strong>：生成下一个token</li>
+<li><strong>奖励R</strong>：整个回复质量的量化评分</li>
+</ul>
+<p>和传统RL最大的区别体现在两个方面：</p>
+<ol>
+<li><strong>状态的本质不同</strong>：传统RL的状态是真实世界的物理量，比如机器人的关节角度、位置，或者摄像头拍到的图像，这些都是客观存在且受物理定律限制的；而语言模型的状态完全是人为定义的token序列，这给了模型极大的灵活性——它可以在token空间里自由构建自己的&quot;草稿本&quot;，用任何它觉得有用的方式来推理最终的答案，没有任何物理世界的限制。</li>
+<li><strong>转移动态（transition dynamics）完全可知</strong>：在机器人RL里，你永远不知道执行一个动作后世界会变成什么样，转移动态是未知且复杂的；但在语言模型里，转移动态就是最简单的字符串拼接：<code>s' = s + a</code>，完全确定且可知。这意味着我们可以在语言模型里做规划，也就是大家常说的测试时计算，这是机器人研究者梦寐以求的能力，我们在语言建模里天然就拥有了。</li>
+</ol>
+<p>这门课聚焦在两种特定的奖励上：一种是<strong>结果奖励</strong>，也就是奖励只依赖于最终生成的完整回复，而不是中间过程；另一种是<strong>可验证奖励</strong>，奖励的计算是完全确定性的，比如检查数学题的答案是否正确，不需要人工打分。在这种设定下，传统RL里的折扣因子和自举（bootstrapping）这些概念基本用不上，因为我们没有中间奖励，只有生成完整个回复后才能得到一个最终的分数。</p>
+<p>这显然会带来一些困难，因为奖励非常稀疏且延迟，但同时也简化了一些概念上的思考。</p>
+<p>我们的策略π(a|s)其实就是一个语言模型，通常是在预训练模型的基础上微调得到的。一次完整的 rollout（采样），也叫轨迹（trajectory）或者回合（episode）就是从一个初始状态（提示词）开始，模型不断生成token，直到生成结束，然后得到一个最终的奖励值。我们的最终目标，就是最大化期望奖励，这个期望同时是对环境给出的提示词分布，以及模型自己生成的回复分布取的。</p>
+<h2 id="策略梯度算法的核心原理">策略梯度算法的核心原理</h2>
+<p>策略梯度是一类非常直观的强化学习算法，它的核心思想简单到一句话就能说清：哪个动作能带来更高的奖励，我们就提高这个动作出现的概率。</p>
+<p>我们先从最基础的数学推导开始。我们的目标是最大化期望奖励：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mo stretchy="false">[</mo><mi>R</mi><mo stretchy="false">]</mo><mo>=</mo><mo>∫</mo><mi>p</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo><mi>R</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mi>d</mi><mi>s</mi><mi>d</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">E[R] = \int p(s) \pi(a|s) R(s,a) dsda
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2222em;vertical-align:-0.8622em;"></span><span class="mop op-symbol large-op" style="margin-right:0.4445em;position:relative;top:-0.0011em;">∫</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mord mathnormal">d</span><span class="mord mathnormal">s</span><span class="mord mathnormal">d</span><span class="mord mathnormal">a</span></span></span></span></span></p>
+<p>既然要优化一个函数，最直接的想法就是对它求梯度。这里用到了一个非常关键的技巧，叫做<strong>对数导数技巧</strong>：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∇</mi><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∇</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\nabla \pi(a|s) = \pi(a|s) \nabla \log \pi(a|s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∇</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mord">∇</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span>。把这个代入进去，我们就能把期望奖励的梯度重写成一个非常简洁的形式：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mi>E</mi><mo stretchy="false">[</mo><mi>R</mi><mo stretchy="false">]</mo><mo>=</mo><mi>E</mi><mrow><mo fence="true">[</mo><mi mathvariant="normal">∇</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>R</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\nabla E[R] = E\left[\nabla \log \pi(a|s) \cdot R(s,a)\right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∇</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">[</span><span class="mord">∇</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;">]</span></span></span></span></span></span></p>
+<p>这个式子就是朴素策略梯度的核心。它告诉我们，只需要采样一个提示词，再从当前策略采样一个回复，然后按照<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∇</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\nabla \log \pi(a|s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span>乘以这个回复的奖励来更新参数就可以了。你会发现这和监督微调（SFT）几乎一模一样，唯一的区别就是在SFT里，每个样本的权重都是1，而在这里，每个样本的梯度被它的奖励加权了。</p>
+<p>如果奖励只有0和1两种情况，也就是答案要么对要么错，那朴素策略梯度就等价于只在正确的回复上做SFT，错误的回复完全不参与更新。这看起来很合理，但它有一个致命的问题：<strong>高噪声和高方差</strong>。</p>
+<p>在稀疏奖励的场景下，比如解一道很难的数学题，初始阶段模型几乎不可能生成正确的答案，大部分回复的奖励都是0。这意味着梯度更新也几乎是0，模型会完全陷入停滞，什么也学不到。而且即使有一些正样本，梯度估计的波动也会非常大，收敛极其缓慢。和监督学习不同，监督学习里你至少每次都能朝着标注的方向更新一点；但在稀疏奖励的强化学习里，你可能很长时间都得不到任何有效的梯度信号。</p>
+<h2 id="用基线降低方差">用基线降低方差</h2>
+<p>解决策略梯度高方差问题的核心方法，就是引入<strong>基线（baseline）</strong>。</p>
+<p>基线的思想非常简单：我们不直接用原始奖励来加权梯度，而是用奖励减去一个只依赖于状态的基线函数b(s)，也就是优化<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">[</mo><mi>R</mi><mo>−</mo><mi>b</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">E[R - b(s)]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">b</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)]</span></span></span></span>。这个方法在数学上是完全严谨的，因为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">[</mo><mi>b</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">E[b(s)]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">[</span><span class="mord mathnormal">b</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)]</span></span></span></span>是一个不依赖于策略的常数，所以最大化原始期望奖励和最大化减去基线后的期望奖励是完全等价的，不会改变最终的最优解。</p>
+<p>用一个非常直观的例子来说明基线是怎么降低方差的。假设我们有两个状态：</p>
+<ul>
+<li>s1是一个很简单的问题：动作a1得11分，动作a2得9分</li>
+<li>s2是一个很难的问题：动作a1得0分，动作a2得2分</li>
+</ul>
+<p>显然最优策略是在s1选a1，在s2选a2。但如果不用基线，朴素策略梯度会看到s1→a2得到了9分的高奖励，就会大力更新这个方向；而s2→a2只得到2分，更新力度就小很多。这显然是错的，因为s1→a2其实是一个坏动作，只是因为s1本身简单所以奖励高；而s2→a2才是那个状态下唯一正确的选择。这时候梯度的方差是5.323，非常大。</p>
+<p>如果我们给s1设置基线为10，给s2设置基线为1，那么调整后的奖励就变成了11-10=1、9-10=-1、0-1=-1、2-1=1。这时候梯度的方差一下子降到了1.155，降低了80%。而且现在模型会正确地增加s1→a1和s2→a2的概率，降低另外两个坏动作的概率。</p>
+<p>理论上存在一个最优的基线函数，但对于高维的语言模型来说根本无法计算。所以在实际中我们用一个非常简单的启发式：把基线设置为给定状态下的期望奖励<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">[</mo><mi>R</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">E[R|s]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">]</span></span></span></span>。</p>
+<p>这个选择刚好和强化学习里的<strong>优势函数</strong>对应了起来。优势函数<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(s,a)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span></span></span></span>的定义是动作价值函数<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">Q(s,a)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">Q</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span></span></span></span>（给定状态S和动作A下的期望奖励）减去状态价值函数<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">V(s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span>（给定状态S下的期望奖励），它衡量的是&quot;在状态s下，采取动作a比平均水平好多少&quot;。当我们把基线设置为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">[</mo><mi>R</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">E[R|s]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">]</span></span></span></span>时，我们优化的目标就正好是优势函数。</p>
+<p>所以所有的策略梯度算法，本质上都可以写成一个通用的形式：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mi>log</mi><mo>⁡</mo><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo><mo>⋅</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\nabla \log \pi(a|s) \cdot \delta
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord">∣</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span></span></p>
+<p>其中δ就是某种形式的优势估计。不同的算法，区别只在于这个δ是怎么计算的。</p>
+<h2 id="GRPO：分组相对策略优化">GRPO：分组相对策略优化</h2>
+<p>讲完了理论基础，我们来看现在工业界最常用的GRPO算法。GRPO是2024年提出的，它是PPO的一个简化版本，专门针对语言模型的场景做了设计，最大的改进就是去掉了PPO里那个非常难训练的评论家（价值函数）网络。</p>
+<p>GRPO的核心洞察非常巧妙：在语言模型里，我们可以对同一个提示词生成多个回复，这些回复天然就构成了一个&quot;组&quot;。我们不需要单独训练一个价值网络来估计基线，直接用同一个提示词下所有回复的平均奖励作为基线就可以了。这个方法不仅大幅简化了算法实现，还避免了训练价值函数带来的不稳定性，效果反而比PPO更好。</p>
+<p>接下来我们通过一个完整的数字排序任务，一步一步走一遍GRPO的训练流程。这个任务足够简单，我们可以在笔记本电脑上完整运行，同时又能展示强化学习训练的所有关键环节。</p>
+<h3 id="第一步：定义任务与奖励函数">第一步：定义任务与奖励函数</h3>
+<p>任务很简单：输入n个未排序的数字，输出排序后的结果。最直接的奖励是完全正确得1分，否则得0分，但这会遇到我们之前说的稀疏奖励问题，初始阶段模型根本学不会。所以我们需要设计一个能给出部分学分的奖励函数。</p>
+<p>我们用的奖励函数由两部分组成：</p>
+<ul>
+<li>包含分：回复中每出现一个输入里的数字就得1分，避免模型生成无关的数字</li>
+<li>顺序分：回复中每有一对相邻的数字是升序排列就得1分</li>
+</ul>
+<p>总奖励就是这两部分的和。这个奖励函数能给那些&quot;正在往正确方向走&quot;的回复提供梯度信号，让模型能一步步学习。</p>
+<h3 id="第二步：生成回复与计算优势">第二步：生成回复与计算优势</h3>
+<p>训练的第一步是生成回复。对于每一个提示词，我们让模型生成10个不同的回复，这就是GRPO里的&quot;组&quot;。然后我们用刚才定义的奖励函数，给每一个回复打分。</p>
+<p>接下来是最核心的一步：计算优势估计δ。提供了四种不同的计算方式，我们可以在代码里切换：</p>
+<ul>
+<li><code>原始奖励</code>：直接用原始奖励，也就是朴素策略梯度，方差最高</li>
+<li><code>中心化奖励</code>：用每个回复的奖励减去同组所有回复的平均奖励，效果最好，也是GRPO的默认选择</li>
+<li><code>标准化奖励</code>：在中心化的基础上再除以标准差，奖励尺度不变</li>
+<li><code>最大值奖励</code>：只保留每个组里奖励最高的样本，其他样本的δ设为0，避免沉迷低悬果实</li>
+</ul>
+<p>这里有一个非常有意思的现象：如果同一个提示词下的所有回复得到的奖励都一样，那么中心化后的δ会全变成0，模型不会进行任何更新。这其实是合理的，如果所有回复都一样好，那确实没有理由偏向任何一个，模型会跳过这个样本，等待其他能提供有效信号的样本。</p>
+<h3 id="第三步：计算损失与参数更新">第三步：计算损失与参数更新</h3>
+<p>然后我们需要计算这些回复在当前模型下的对数概率，再计算损失函数。GRPO用的是<strong>裁剪的重要性采样损失</strong>：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mi>o</mi><mi>s</mi><mi>s</mi><mo>=</mo><mo>−</mo><mi>E</mi><mrow><mo fence="true">[</mo><mi>min</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>⋅</mo><msub><mi>δ</mi><mi>t</mi></msub><mo separator="true">,</mo><mtext>clip</mtext><mo stretchy="false">(</mo><msub><mi>r</mi><mi>t</mi></msub><mo separator="true">,</mo><mn>1</mn><mo>−</mo><mi>ϵ</mi><mo separator="true">,</mo><mn>1</mn><mo>+</mo><mi>ϵ</mi><mo stretchy="false">)</mo><mo>⋅</mo><msub><mi>δ</mi><mi>t</mi></msub><mo fence="true">)</mo></mrow><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">loss = -E\left[\min\left(r_t \cdot \delta_t, \text{clip}(r_t, 1-\epsilon, 1+\epsilon) \cdot \delta_t\right)\right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">oss</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">[</span><span class="mop">min</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0379em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">clip</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ϵ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ϵ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0379em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mclose delimcenter" style="top:0em;">]</span></span></span></span></span></span></p>
+<p>其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>=</mo><mfrac><mrow><mi>π</mi><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo></mrow><mrow><msub><mi>π</mi><mrow><mi>o</mi><mi>l</mi><mi>d</mi></mrow></msub><mo stretchy="false">(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">r_t = \frac{\pi(a|s)}{\pi_{old}(a|s)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0359em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">a</span><span class="mord mtight">∣</span><span class="mord mathnormal mtight">s</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">a</span><span class="mord mtight">∣</span><span class="mord mathnormal mtight">s</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>是重要性采样比率。</p>
+<p>裁剪的作用是限制单次更新的步长，防止策略发生剧烈变化，保证训练的稳定性。这里有一个非常容易踩的坑：计算旧策略的概率时，一定要把旧模型的参数冻结，用<code>torch.no_grad()</code>把它包起来。如果忘了这么做，梯度会通过旧模型反向传播，最终得到的梯度会是0，模型完全不学习。这是很多人第一次实现RL算法时都会犯的错误。</p>
+<p>为了防止模型在RL训练中遗忘预训练的通用能力，我们通常还会加一个<strong>KL散度惩罚项</strong>，让当前策略不要偏离参考模型太远。我们用了一个方差更低的KL估计公式，比标准的KL公式在训练中更稳定。</p>
+<p>最后就是完整的训练循环了。我们会定期冻结一个参考模型用来计算KL惩罚，然后不断重复&quot;生成回复-计算奖励和优势-多次梯度更新&quot;这个过程。注意我们会用同一批生成的回复做多次梯度更新，这是为了提高效率，因为生成回复的推理开销通常比梯度更新大得多。</p>
+<h2 id="实验结果与训练心得">实验结果与训练心得</h2>
+<p>课程上演示跑了三组实验，分别用原始奖励、中心化奖励和标准化奖励来训练模型，结果非常符合我们的预期：</p>
+<ul>
+<li>用原始奖励的朴素策略梯度效果最差，模型几乎学不会排序</li>
+<li>用中心化奖励的模型效果提升非常明显，能很快学会生成包含所有输入数字且大致有序的序列</li>
+<li>标准化奖励在这个任务里和中心化奖励效果差不多，没有明显优势，实际上现在很多改进版的GRPO都已经去掉了标准化这一步，因为它可能会引入长度偏差</li>
+</ul>
+<p>这里有一个很重要的观察：<strong>在强化学习里，损失曲线几乎是没有意义的</strong>。</p>
+<p>和监督学习不同，监督学习的训练集是固定的，损失下降就代表模型在这个任务上做得更好了。但在强化学习里，训练数据是模型自己生成的，而且在不断变化。损失下降只代表模型更擅长生成当前这一批回复了，不代表它的任务能力真的提升了。有时候你会看到损失一直在降，但奖励曲线反而在平着走甚至下降，这就是典型的&quot;模型在给自己刷分&quot;。在RL训练里，<strong>唯一可靠的指标就是奖励曲线</strong>。</p>
+<p>另外，强化学习非常容易陷入局部最优。在我们的排序任务里，很多时候模型会学会生成包含所有输入数字的序列，能拿到不错的部分学分，但永远学不会完全正确的排序。它会沉迷于这些&quot;低悬的果实&quot;，而不去探索能拿到满分的正确行为。这也是为什么奖励函数设计这么重要的原因。</p>
+<p>最后说说工程上的挑战。构建和扩展一个大模型的RL系统，比预训练一个语言模型要复杂得多。预训练你只需要管理一个模型，而RL里你需要同时管理当前策略、旧策略和参考模型三个模型；你需要处理大规模的分布式推理，每次更新都要生成几十万甚至上百万个回复；你还要协调推理节点和训练节点的工作，让整个流水线高效运转。这些工程上的挑战，很多时候比算法本身还要难。</p>
+<h2 id="总结">总结</h2>
+<p>这节课深入拆解了策略梯度和GRPO算法的完整机制，核心要点可以总结为这几点：</p>
+<ul>
+<li>语言模型中的强化学习有其独特性，转移动态完全可知，状态是人为定义的token序列，很多传统RL的直觉在这里不适用</li>
+<li>策略梯度的框架概念清晰：目标是最大化期望奖励，通过引入基线来降低梯度估计的方差</li>
+<li>GRPO巧妙地利用了语言模型同提示多回复的天然组结构，用组内平均作为基线，去掉了复杂的评论家网络，让算法变得简单、稳定且高效</li>
+<li>奖励函数设计是RL成功的关键，密集的部分奖励能显著缓解稀疏奖励问题</li>
+<li>RL训练比预训练复杂得多，不要迷信损失曲线，奖励才是唯一的金标准</li>
+</ul>
+<p>当然，强化学习还有很多未解的问题，从优化的稳定性到奖励函数的设计，再到大规模系统的构建，都还有大量的工作要做。但它的潜力是巨大的，只要我们能解决这些问题，就能让模型在越来越多的任务上超越人类的水平。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%B8%AD%E7%9A%84%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E8%AE%BE%E5%AE%9A"><span class="toc-number">1.</span> <span class="toc-text">语言模型中的强化学习设定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6%E7%AE%97%E6%B3%95%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">策略梯度算法的核心原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E5%9F%BA%E7%BA%BF%E9%99%8D%E4%BD%8E%E6%96%B9%E5%B7%AE"><span class="toc-number">3.</span> <span class="toc-text">用基线降低方差</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GRPO%EF%BC%9A%E5%88%86%E7%BB%84%E7%9B%B8%E5%AF%B9%E7%AD%96%E7%95%A5%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">GRPO：分组相对策略优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E5%AE%9A%E4%B9%89%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%A5%96%E5%8A%B1%E5%87%BD%E6%95%B0"><span class="toc-number">4.1.</span> <span class="toc-text">第一步：定义任务与奖励函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E7%94%9F%E6%88%90%E5%9B%9E%E5%A4%8D%E4%B8%8E%E8%AE%A1%E7%AE%97%E4%BC%98%E5%8A%BF"><span class="toc-number">4.2.</span> <span class="toc-text">第二步：生成回复与计算优势</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E8%AE%A1%E7%AE%97%E6%8D%9F%E5%A4%B1%E4%B8%8E%E5%8F%82%E6%95%B0%E6%9B%B4%E6%96%B0"><span class="toc-number">4.3.</span> <span class="toc-text">第三步：计算损失与参数更新</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E8%AE%AD%E7%BB%83%E5%BF%83%E5%BE%97"><span class="toc-number">5.</span> <span class="toc-text">实验结果与训练心得</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记&body=Check out this article: https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 17 RLVR 下》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

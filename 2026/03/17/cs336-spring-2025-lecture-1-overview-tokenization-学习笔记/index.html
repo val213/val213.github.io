@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+<meta property="article:published_time" content="2026-03-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.318Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="Tokenization">
+<meta property="article:tag" content="学习笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/03/22/cs336-spring-2025-lecture-2-pytorch-resource-accounting-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/15/cs336-spring-2025-lecture-8-parallelism-2-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记&body=Check out this article: https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81cs336-%E5%BC%80%E8%AE%BE%E5%88%9D%E8%A1%B7"><span class="toc-number">1.</span> <span class="toc-text">一、cs336 开设初衷</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%89%8D%E6%B2%BF%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%A0%B8%E5%BF%83%E5%B7%AE%E5%BC%82"><span class="toc-number">1.1.</span> <span class="toc-text">小模型与前沿大模型的核心差异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CS336%E8%83%BD%E6%95%99%E7%BB%99%E4%BD%A0%E7%9A%84%E4%B8%89%E7%B1%BB%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.</span> <span class="toc-text">CS336能教给你的三类知识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E2%80%9CBitter-Lesson%EF%BC%88%E6%83%A8%E7%97%9B%E6%95%99%E8%AE%AD%EF%BC%89%E2%80%9D"><span class="toc-number">1.3.</span> <span class="toc-text">关于“Bitter Lesson（惨痛教训）”</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E6%8A%80%E6%9C%AF%E5%8F%91%E5%B1%95%E6%A0%BC%E5%B1%80"><span class="toc-number">2.</span> <span class="toc-text">二、语言模型技术发展格局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%AF%BE%E7%A8%8B%E4%B8%8E%E4%BD%9C%E4%B8%9A%E4%BB%8B%E7%BB%8D"><span class="toc-number">3.</span> <span class="toc-text">三、课程与作业介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%AF%BE%E7%A8%8B%E7%9A%84%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97"><span class="toc-number">4.</span> <span class="toc-text">四、课程的五大模块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Basics%EF%BC%88%E5%9F%BA%E7%A1%80%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.1.</span> <span class="toc-text">1. Basics（基础单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Systems%EF%BC%88%E7%B3%BB%E7%BB%9F%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.2.</span> <span class="toc-text">2. Systems（系统单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Scaling-Laws%EF%BC%88%E7%BC%A9%E6%94%BE%E5%AE%9A%E5%BE%8B%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">3. Scaling Laws（缩放定律单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Data%EF%BC%88%E6%95%B0%E6%8D%AE%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.4.</span> <span class="toc-text">4. Data（数据单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-Alignment%EF%BC%88%E5%AF%B9%E9%BD%90%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.5.</span> <span class="toc-text">5. Alignment（对齐单元）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%88%86%E8%AF%8D%EF%BC%88Tokenization%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">五、分词（Tokenization）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%AF%8D%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-number">5.1.</span> <span class="toc-text">分词的基础概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E7%A7%8D%E5%9F%BA%E7%A1%80%E5%88%86%E8%AF%8D%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="toc-number">5.2.</span> <span class="toc-text">四种基础分词方案对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BPE-%E7%9A%84%E5%AE%8C%E6%95%B4%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">5.3.</span> <span class="toc-text">BPE 的完整算法流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E7%90%86%E9%98%B6%E6%AE%B5%EF%BC%88%E7%BC%96%E7%A0%81%E4%B8%8E%E8%A7%A3%E7%A0%81%EF%BC%89"><span class="toc-number">5.4.</span> <span class="toc-text">推理阶段（编码与解码）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Assignment-1-%E7%9A%84-BPE-%E5%AE%9E%E7%8E%B0%E8%A6%81%E6%B1%82"><span class="toc-number">5.5.</span> <span class="toc-text">Assignment 1 的 BPE 实现要求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%AF%8D%E6%80%BB%E7%BB%93"><span class="toc-number">5.6.</span> <span class="toc-text">分词总结</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-16T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-03-17</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.318Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/Tokenization/" rel="tag">Tokenization</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2016971396929053870">知乎</a>，现迁移至个人博客。</p>
+</blockquote>
+<p>目录</p>
+<p>笔记整理自斯坦福大学 2025 年春季学期《CS336: Language Modeling from Scratch（从零搭建语言模型）》第一讲的课程内容，适合所有对大语言模型底层原理、全流程构建感兴趣的读者。</p>
+<h2 id="一、cs336-开设初衷">一、cs336 开设初衷</h2>
+<p>这门课的核心理念是 <strong>To understand it, you have to build it（要理解它，就亲手搭建它）</strong>。讲师团队开设这门课的核心原因，是当下 AI 领域的研究者正在与大模型的底层技术逐渐脱节：</p>
+<ul>
+<li>8 年前，AI 研究者会亲自实现、训练完整的模型；</li>
+<li>6 年前，大家至少会下载 BERT 这类开源模型完成微调；</li>
+<li>而现在，很多研究者只需要会调用闭源模型的提示词接口，就能完成相关工作。</li>
+</ul>
+<p>抽象层级的提升确实提高了生产力，但这些 abstraction（抽象）是“有漏洞的”——和编程语言、操作系统的抽象不同，我们很难真正理解语言模型“字符串输入、字符串输出”的黑箱内部逻辑。而大量的基础研究，需要我们拆开整个技术栈，协同设计数据、系统、模型的各个环节，对技术的完整理解，是做基础研究的必要前提。</p>
+<h3 id="小模型与前沿大模型的核心差异">小模型与前沿大模型的核心差异</h3>
+<p>工业化的前沿大模型对学术场景是遥不可及的：GPT-4 据传有 1.8 万亿参数，训练成本 1 亿美元；xAI 用 20 万张 H100 搭建训练集群；前沿模型的核心构建细节也完全不对外公开。</p>
+<p>我们在课程里只能搭建小语言模型（小于 10 亿参数），而小模型的结论不一定能迁移到大模型上，最典型的两个例子：</p>
+<ol>
+<li><strong>FLOPs（浮点运算数）分布差异</strong>：小模型里，Transformer 的 attention（注意力）层和 MLP（多层感知机）层的 FLOPs 占比大致相当；但到了 1750 亿参数的大模型，MLP 层会占据绝对主导。如果只在小模型上优化注意力，很可能优化错了方向。</li>
+<li><strong>emergent behavior（涌现行为）</strong>：模型的很多能力，比如 in-context learning（上下文学习），只会在模型规模、训练算力达到一定阈值后突然出现，小模型上完全观察不到对应的效果。</li>
+</ol>
+<p>如果你只在小尺度上研究，你会得出结论：这些语言模型根本不好用。但事实上，你必须把规模扩上去，才能出现这些行为。</p>
+<h3 id="CS336能教给你的三类知识">CS336能教给你的三类知识</h3>
+<p>不过大家不要灰心，这门课我们仍然能学到很多东西，只是要非常清楚我们学的是什么。</p>
+<p>知识分为三类：</p>
+<ol>
+<li><strong>运行机制（mechanics）</strong>：这部分我们可以教。我们会教你 Transformer 是什么，如何实现 Transformer，模型并行如何高效利用 GPU 等。这些是最基础的组件和原理。</li>
+<li><strong>思维模式（mindset）</strong>：这部分更微妙、更模糊，但其实更重要。我们要传递的思维是：<strong>尽可能榨干硬件性能，严肃对待规模化</strong>。这些基础组件其实已经存在很久了，但真正推动下一代 AI 模型的，是 OpenAI 开创的规模化思维。</li>
+<li><strong>直觉（intuitions）</strong>：也就是什么样的数据和建模决策能造出好模型。这部分很遗憾，我们只能部分教会。因为在小规模上有效的架构和数据集，在大规模上不一定有效。</li>
+</ol>
+<p>但能学到前两项再加半项，已经性价比很高了。</p>
+<p>说到直觉，有一个有点无奈的现实：很多时候你能讲出一堆 Transformer 设计的道理，但最后往往是实验说了算。</p>
+<p>比如 Shazeer 那篇提出 <strong>SwiGLU</strong> 的论文，这是一种非线性激活函数，这门课会详细讲。它效果很好，被广泛采用，但论文结论里非常诚实地写着：我们<strong>没有任何解释</strong>，只能说是 “神的恩赐”。</p>
+<table>
+<thead>
+<tr>
+<th>知识类型</th>
+<th>核心内容</th>
+<th>可迁移性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mechanics（运行机制）</td>
+<td>事物的底层运作原理，比如Transformer是什么、模型并行如何高效利用GPU</td>
+<td>完全可迁移</td>
+</tr>
+<tr>
+<td>Mindset（思维模式）</td>
+<td>榨干硬件的全部性能、严肃对待规模化（scaling），这也是OpenAI开创规模化路线的核心思维</td>
+<td>完全可迁移</td>
+</tr>
+<tr>
+<td>Intuitions（直觉）</td>
+<td>什么样的数据、建模决策能得到效果更好的模型</td>
+<td>仅能部分传授，小模型上的直觉不一定适用于大模型</td>
+</tr>
+</tbody>
+</table>
+<h3 id="关于“Bitter-Lesson（惨痛教训）”">关于“Bitter Lesson（惨痛教训）”</h3>
+<p>很多人对 AI 领域的“惨痛教训”有误解，认为“规模就是一切，算法不重要”。但课程强调，<strong>正确的理解是：能规模化的算法，才是真正关键的</strong>。</p>
+<p>模型的最终效果，本质是「效率 × 投入的资源」。而且规模越大，效率反而越重要——当你花费数亿美元做训练时，根本承担不起资源的浪费。2012 到 2019 年，ImageNet 训练的算法效率提升了 44 倍，远超同期摩尔定律的进度，这就是算法的核心价值。</p>
+<p>因此，这门课贯穿始终的核心问题是：<strong>在给定的算力和数据预算下，如何搭建出最好的模型？</strong> 换句话说，就是最大化效率。</p>
+<h2 id="二、语言模型技术发展格局">二、语言模型技术发展格局</h2>
+<p>语言模型从诞生到现在的完整发展脉络，关键里程碑如下：</p>
+<ol>
+<li><strong>Pre-neural（前神经时代，2010 年代前）</strong></li>
+</ol>
+<p>语言模型最早被香农用来测量英文的 entropy（熵），这个阶段的主流方案是 n-gram language model（n-gram 语言模型），主要用于机器翻译、语音识别的组件。比如 2007 年 Google 就训练过超 2 万亿 token 的 5-gram 模型，token 规模甚至超过了 GPT-3，但 n-gram 模型不具备现代语言模型的复杂能力。</p>
+<ol start="2">
+<li><strong>Neural ingredients（神经组件时代，2010 年代）</strong></li>
+</ol>
+<p>深度学习革命带来了后续大模型的所有核心基础组件，包括：</p>
+<ul>
+<li>首个神经语言模型（Bengio 团队，2003）</li>
+<li>seq-to-seq（序列到序列）建模</li>
+<li>Adam optimizer（Adam 优化器）</li>
+<li>attention mechanism（注意力机制）</li>
+<li>Transformer architecture（Transformer 架构，2017）</li>
+<li>Mixture of Experts（MoE，混合专家模型）</li>
+<li>model parallelism（模型并行）</li>
+</ul>
+<ol start="3">
+<li><strong>Early foundation models（早期基础模型时代，2010 年代末）</strong></li>
+</ol>
+<p>这个阶段确立了“预训练+微调”的范式，核心里程碑包括 ELMo、BERT、Google 的 T5，证明了在大规模文本上预训练的模型，可以适配大量下游任务。</p>
+<ol start="4">
+<li><strong>Embracing scaling, more closed（拥抱规模化，走向闭源）</strong></li>
+</ol>
+<p>OpenAI 是这个阶段的核心推动者：GPT-2 展现了流畅的文本生成和零样本能力；scaling laws（缩放定律）的论文，给模型规模化提供了可预测性；GPT-3 验证了 in-context learning（上下文学习）的能力，但也开启了闭源路线。同期还有 Google 的 PaLM、DeepMind 的 Chinchilla（提出了计算最优的缩放定律）。</p>
+<ol start="5">
+<li><strong>Open models（开源模型时代）</strong></li>
+</ol>
+<p>闭源之外，开源社区也在快速推进，包括 EleutherAI 的 The Pile 数据集和 GPT-J 模型、Meta 的 OPT 和 Llama 系列、BLOOM、阿里巴巴的 Qwen 系列、DeepSeek 的系列模型、AI2 的 OLMo 2 等。
+课程也明确了模型开放程度的几个层级：</p>
+<ul>
+<li><strong>Closed models（闭源模型）</strong>：比如 GPT-4o，只能通过 API 访问，无权重、无实现细节；</li>
+<li><strong>Open-weight models（开源权重模型）</strong>：比如 DeepSeek，公开模型权重，论文会披露架构和部分训练细节，但通常不公开训练数据细节；</li>
+<li><strong>Open-source models（完全开源模型）</strong>：比如 OLMo，公开权重、训练数据，论文会披露尽可能多的实现细节。</li>
+</ul>
+<h2 id="三、课程与作业介绍">三、课程与作业介绍</h2>
+<p>这门课<strong>适合</strong>：</p>
+<ul>
+<li>有强迫症般的执念，想把语言模型的底层原理从最基础的环节彻底搞懂；</li>
+<li>想锻炼自己的研究工程能力，深入大模型全流程的实现细节。</li>
+</ul>
+<p><strong>不适合</strong>：</p>
+<ul>
+<li>只想了解 AI 领域最新最热的技术（比如多模态、RAG），而非底层实现；</li>
+<li>只想在自己的应用场景里拿到好结果，直接用提示词、微调现有模型就能满足需求。</li>
+</ul>
+<p>课程一共设置 5 次作业，覆盖大模型搭建的全流程。这门课的作业工作量极大。上一期的学生评价里提到：“仅第一次作业的工作量，就约等于 CS224n 的 5 次作业加期末项目的总和”。</p>
+<ul>
+<li>不提供脚手架代码，只会给单元测试和适配器接口，用来验证你实现的正确性，代码设计、函数命名、工程组织完全由自己决定；</li>
+<li>建议先在本地 CPU 上验证实现的正确性，再到 GPU 集群上跑基准测试和训练，不要用大模型在集群上调试代码；</li>
+<li>部分作业会设置排行榜，目标是在给定的训练预算下，最小化模型的 perplexity（困惑度）；</li>
+<li>允许谨慎使用 AI 工具，但要自担风险——AI 自动生成代码会让你失去深入理解底层原理的机会。</li>
+</ul>
+<h2 id="四、课程的五大模块">四、课程的五大模块</h2>
+<p><img src="/images/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg" alt=""></p>
+<p>课程的所有内容，都围绕“效率”这个核心原则展开，分为五大模块单元，分别对应 5 次作业，覆盖了从零搭建语言模型的全流程。</p>
+<h3 id="1-Basics（基础单元）">1. Basics（基础单元）</h3>
+<p><strong>核心目标</strong>：把语言模型完整流程的基础版本跑通。
+<strong>核心内容</strong>：分为三个核心组件——tokenization（分词）、model architecture（模型架构）、training（训练）。</p>
+<ul>
+<li><strong>分词</strong>：课程会重点讲 BPE（Byte Pair Encoding，字节对编码）分词器，这也是目前主流大模型采用的方案；</li>
+<li><strong>模型架构</strong>：以原始 Transformer 为起点，讲解后续的核心优化，包括激活函数（SwiGLU）、位置编码（RoPE，旋转位置编码）、归一化（RMSNorm）、注意力变体（GQA 组查询注意力、MLA 多头潜在注意力、滑动窗口注意力等）、MoE 混合专家、状态空间模型等；</li>
+<li><strong>训练</strong>：讲解优化器（AdamW、Muon、SOAP）、学习率调度、批次大小、正则化、超参数调优等核心内容。</li>
+</ul>
+<p><strong>Assignment 1</strong>：</p>
+<ul>
+<li>实现 BPE 分词器；</li>
+<li>实现 Transformer、交叉熵损失、AdamW 优化器、完整训练循环；</li>
+<li>在 TinyStories 和 OpenWebText 数据集上完成训练；</li>
+<li>排行榜任务：在 H100 上 90 分钟的训练预算内，最小化 OpenWebText 的困惑度。</li>
+</ul>
+<h3 id="2-Systems（系统单元）">2. Systems（系统单元）</h3>
+<p><strong>核心目标</strong>：榨干硬件的全部性能，解决大模型训练和推理的效率问题。
+<strong>核心内容</strong>：分为三个部分——kernels（算子内核）、parallelism（并行）、inference（推理）。</p>
+<ul>
+<li><strong>算子内核</strong>：讲解 GPU 的核心架构、数据移动的瓶颈，以及如何通过算子融合、分块等技术最大化 GPU 利用率，会教大家用 Triton 实现自定义算子内核；</li>
+<li><strong>并行</strong>：讲解多 GPU 场景下的分布式训练方案，包括 data parallelism（数据并行）、tensor parallelism（张量并行）、pipeline parallelism（流水线并行）等，核心目标还是最小化跨 GPU 的数据移动；</li>
+<li><strong>推理</strong>：这是 2025 年课程新增的重点内容，讲解推理的两个核心阶段 prefill（预填充）和 decode（解码），以及推理加速的核心方案，包括 KV 缓存、speculative decoding（推测解码）、量化、蒸馏等。课程也提到，全球范围内，大模型推理的总计算成本已经超过了训练成本——训练是一次性成本，而推理成本会随着使用次数线性增长。</li>
+</ul>
+<p><strong>Assignment 2</strong>：</p>
+<ul>
+<li>用 Triton 实现融合的 RMSNorm 算子内核；</li>
+<li>实现分布式数据并行训练；</li>
+<li>实现优化器状态分片；</li>
+<li>对自己的实现做基准测试和性能剖析。</li>
+</ul>
+<h3 id="3-Scaling-Laws（缩放定律单元）">3. Scaling Laws（缩放定律单元）</h3>
+<p><strong>核心目标</strong>：在小尺度上做实验，预测大尺度下的最优超参数和模型损失。
+<strong>核心内容</strong>：讲解 OpenAI 和 DeepMind 提出的缩放定律，回答一个核心问题：给定固定的 FLOPs 预算，我们应该用更大的模型，还是在更多的 token 上训练？
+课程会讲解 Chinchilla 最优的核心结论，以及非常实用的经验法则：<strong>最优训练 token 数 = 20 × 模型参数量</strong>，比如 14 亿参数的模型，应该在 280 亿 token 上完成训练。同时也会说明，这个结论没有考虑推理成本，实际落地需要做权衡。</p>
+<p><strong>Assignment 3</strong>：</p>
+<ul>
+<li>课程会提供一个“训练 API”，输入超参数会返回对应的模型损失；</li>
+<li>你需要在固定的 FLOPs 预算内，提交训练任务、收集数据点；</li>
+<li>基于数据拟合缩放定律，预测更大规模下的最优超参数；</li>
+<li>排行榜任务：在 FLOPs 预算内，最小化模型损失。</li>
+</ul>
+<h3 id="4-Data（数据单元）">4. Data（数据单元）</h3>
+<p><strong>核心目标</strong>：完成大模型预训练数据的全流程处理，理解“数据决定了模型的能力上限”。
+<strong>核心内容</strong>分为两大部分：</p>
+<ul>
+<li><strong>Evaluation（评估）</strong>：讲解语言模型的核心评估方法，包括困惑度、标准化知识测试（MMLU 等）、指令跟随能力评估、LM-as-a-judge（用语言模型做生成结果的评估）、智能体系统的评估等；</li>
+<li><strong>Data Curation &amp; Processing（数据治理与处理）</strong>：课程会用真实的 Common Crawl 数据展示，原始网页数据里大部分都是低质量的垃圾内容，而高质量的数据是训练好模型的核心。会讲解数据的全流程处理：从 HTML、PDF 等格式里提取文本的转换操作、基于分类器的高质量数据过滤、去重（MinHash、Bloom 过滤器），也会提及数据相关的法律合规问题。</li>
+</ul>
+<p><strong>Assignment 4</strong>：</p>
+<ul>
+<li>把原始 Common Crawl 的 HTML 数据转换成可用的文本；</li>
+<li>训练分类器，完成数据的质量过滤和有害内容过滤；</li>
+<li>用 MinHash 实现数据去重；</li>
+<li>排行榜任务：在固定的 token 预算内，最小化模型困惑度。</li>
+</ul>
+<h3 id="5-Alignment（对齐单元）">5. Alignment（对齐单元）</h3>
+<p><strong>核心目标</strong>：把只擅长补全下一个 token 的基座模型，变成真正有用、能遵循指令、符合安全要求的对齐模型。
+<strong>核心内容</strong>分为两个阶段：</p>
+<ul>
+<li><strong>Supervised Fine-Tuning（SFT，监督微调）</strong>：基于（用户提示，助手响应）的成对数据，做监督学习，让基座模型学会遵循人类的指令。核心直觉是：基座模型已经具备了对应的知识和能力，只需要少量的示例，就能把这些能力激发出来。</li>
+<li><strong>Learning from Feedback（从反馈中学习）</strong>：基于更轻量的人类反馈，进一步优化模型，包括基于偏好数据的优化、基于形式化验证器/模型打分的优化。会讲解核心的对齐算法，包括 PPO（Proximal Policy Optimization，近端策略优化）、DPO（Direct Preference Optimization，直接偏好优化）、GRPO（Group Relative Preference Optimization，组相对偏好优化）。</li>
+</ul>
+<p><strong>Assignment 5</strong>：</p>
+<ul>
+<li>实现监督微调（SFT）；</li>
+<li>实现直接偏好优化（DPO）；</li>
+<li>实现组相对偏好优化（GRPO）。</li>
+</ul>
+<h2 id="五、分词（Tokenization）">五、分词（Tokenization）</h2>
+<p>这是第一课的核心技术内容，也是作业 1 的第一个核心任务，课程完整讲解了分词的基础概念、不同分词方案的优劣，以及 BPE 分词器的完整原理和实现。</p>
+<h3 id="分词的基础概念">分词的基础概念</h3>
+<p>语言模型无法直接理解文本，它只能处理整数序列（也就是 tokens）。<strong>Tokenizer（分词器）</strong> 就是实现「字符串 ↔ 整数序列」互相转换的工具，它需要满足两个核心能力：</p>
+<ul>
+<li>encode（编码）：把输入的字符串，转换成 token 的整数序列；</li>
+<li>decode（解码）：把 token 的整数序列，无损还原成原始的字符串。</li>
+</ul>
+<p>而 <strong>vocabulary size（词汇表大小）</strong>，就是 token 可以取的整数的数量范围。</p>
+<p>我们可以用 OpenAI 开源的 tiktoken 库，直观看到 GPT-2 分词器的效果，比如输入“Hello, 🌍! 你好!”，分词器会输出对应的整数序列，并且可以完美还原原始字符串，同时还能实现一定的压缩效果。</p>
+<h3 id="四种基础分词方案对比">四种基础分词方案对比</h3>
+<p>四种基础的分词思路以及各自的核心缺陷：
+<strong>1. Character-based tokenization（基于字符的分词）</strong>
+核心思路：把每个 Unicode 字符转换成对应的 Unicode code point（码点，整数），比如“a”对应 97，“🌍”对应 127757。</p>
+<ul>
+<li>优点：实现简单，能完美无损还原；</li>
+<li>核心缺陷：Unicode 有大约 15 万个字符，词汇表太大；大量字符非常稀有，对词汇表空间的利用效率极低；压缩率也很差。</li>
+</ul>
+<p><strong>2. Byte-based tokenization（基于字节的分词）</strong>
+核心思路：把字符串先转成 UTF-8 编码的字节序列，每个字节对应 0-255 的整数。</p>
+<ul>
+<li>优点：词汇表固定只有 256，非常小；能处理任何文本，不会出现未登录词；</li>
+<li>核心缺陷：压缩率固定为 1，也就是 1 个 token 对应 1 个字节，会导致输入序列变得非常长。而 Transformer 的注意力计算复杂度是序列长度的二次方，过长的序列会让计算效率变得极差。</li>
+</ul>
+<p><strong>3. Word-based tokenization（基于词的分词）</strong>
+核心思路：用正则表达式把文本拆分成单词/片段，再给每个片段分配一个整数 id，这也是经典 NLP 里的常用方案。</p>
+<ul>
+<li>优点：压缩率高，符合人类的语言直觉；</li>
+<li>核心缺陷：词汇表大小不固定，自然语言里的词数量是无限的；会出现大量稀有词和未登录词，需要用 UNK token 处理，会影响模型效果和困惑度计算。</li>
+</ul>
+<p><strong>4. BPE（Byte Pair Encoding，字节对编码）</strong>
+这是目前主流大模型普遍采用的方案，也是课程要求大家实现的方案。</p>
+<ul>
+<li>起源：1994 年 Philip Gage 为数据压缩发明的算法，2015 年被引入神经机器翻译，之后被 GPT-2 采用，成为 NLP 领域的主流分词方案。</li>
+<li>核心思想：在原始文本上训练分词器，自动决定词汇表的内容——频繁出现的字符/字节序列，合并成一个 token；稀有的序列，拆分成多个 token。</li>
+<li>GPT-2 的补充优化：先用正则表达式做预分词，把文本拆分成初始的片段，再在每个片段内部运行 BPE 算法，避免跨词的合并。</li>
+</ul>
+<h3 id="BPE-的完整算法流程">BPE 的完整算法流程</h3>
+<p>训练阶段（学习合并规则）</p>
+<ol>
+<li>把训练文本全部转成 UTF-8 的字节序列，每个字节作为初始的 token，初始词汇表就是 0-255；</li>
+<li>统计所有相邻 token 对的出现频率，找到出现次数最多的那一对；</li>
+<li>把这个最频繁的 token 对，合并成一个新的 token，分配一个新的 id（从 256 开始递增），记录这个合并规则；</li>
+<li>用新的 token 序列替换原来的序列，重复步骤 2-3，直到完成预设的合并次数（决定了最终的词汇表大小）。</li>
+</ol>
+<p>举个简单的例子，用“the cat in the hat”做训练，做 3 次合并：</p>
+<ul>
+<li>初始字节序列里，“th”出现的次数最多，先合并成一个新 token；</li>
+<li>第二次合并，把新的“th”和后面的“e”合并成“the”对应的 token；</li>
+<li>第三次再合并下一个最频繁的对，最终序列长度会不断缩短，压缩率提升。</li>
+</ul>
+<h3 id="推理阶段（编码与解码）">推理阶段（编码与解码）</h3>
+<ul>
+<li><strong>编码（encode）</strong>：把输入字符串转成 UTF-8 字节序列，然后按照训练时学到的合并规则，按顺序合并对应的 token 对，最终输出整数序列。</li>
+<li><strong>解码（decode）</strong>：把每个整数 token，映射回它对应的字节序列，把所有字节拼起来，再用 UTF-8 解码成原始字符串，全程是无损的。</li>
+</ul>
+<h3 id="Assignment-1-的-BPE-实现要求">Assignment 1 的 BPE 实现要求</h3>
+<p>课程里给的是最基础、但效率很低的 BPE 实现，作业里需要大家做优化，包括：</p>
+<ul>
+<li>优化编码流程，不要循环所有合并规则，只循环会影响当前序列的合并；</li>
+<li>支持特殊 token 的检测和保留（比如&lt;|endoftext|&gt;）；</li>
+<li>实现预分词步骤（比如 GPT-2 的正则表达式）；</li>
+<li>尽可能提升实现的运行速度。</li>
+</ul>
+<h3 id="分词总结">分词总结</h3>
+<ul>
+<li>分词器的核心作用，是在字符串和模型能处理的整数 token 序列之间做无损转换；</li>
+<li>基于字符、字节、词的分词方案，都有各自的致命缺陷；</li>
+<li>BPE 是经过工业界验证的、高效的启发式分词方案，它基于语料的统计信息，自适应地分配词汇表空间；</li>
+<li>分词目前是大模型流程里“必要的恶”，行业也在探索无分词的、直接基于字节建模的方案，但目前还没有规模化应用到前沿大模型上。</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81cs336-%E5%BC%80%E8%AE%BE%E5%88%9D%E8%A1%B7"><span class="toc-number">1.</span> <span class="toc-text">一、cs336 开设初衷</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%89%8D%E6%B2%BF%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%A0%B8%E5%BF%83%E5%B7%AE%E5%BC%82"><span class="toc-number">1.1.</span> <span class="toc-text">小模型与前沿大模型的核心差异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CS336%E8%83%BD%E6%95%99%E7%BB%99%E4%BD%A0%E7%9A%84%E4%B8%89%E7%B1%BB%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.</span> <span class="toc-text">CS336能教给你的三类知识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E2%80%9CBitter-Lesson%EF%BC%88%E6%83%A8%E7%97%9B%E6%95%99%E8%AE%AD%EF%BC%89%E2%80%9D"><span class="toc-number">1.3.</span> <span class="toc-text">关于“Bitter Lesson（惨痛教训）”</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E6%8A%80%E6%9C%AF%E5%8F%91%E5%B1%95%E6%A0%BC%E5%B1%80"><span class="toc-number">2.</span> <span class="toc-text">二、语言模型技术发展格局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%AF%BE%E7%A8%8B%E4%B8%8E%E4%BD%9C%E4%B8%9A%E4%BB%8B%E7%BB%8D"><span class="toc-number">3.</span> <span class="toc-text">三、课程与作业介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%AF%BE%E7%A8%8B%E7%9A%84%E4%BA%94%E5%A4%A7%E6%A8%A1%E5%9D%97"><span class="toc-number">4.</span> <span class="toc-text">四、课程的五大模块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Basics%EF%BC%88%E5%9F%BA%E7%A1%80%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.1.</span> <span class="toc-text">1. Basics（基础单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Systems%EF%BC%88%E7%B3%BB%E7%BB%9F%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.2.</span> <span class="toc-text">2. Systems（系统单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Scaling-Laws%EF%BC%88%E7%BC%A9%E6%94%BE%E5%AE%9A%E5%BE%8B%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">3. Scaling Laws（缩放定律单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Data%EF%BC%88%E6%95%B0%E6%8D%AE%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.4.</span> <span class="toc-text">4. Data（数据单元）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-Alignment%EF%BC%88%E5%AF%B9%E9%BD%90%E5%8D%95%E5%85%83%EF%BC%89"><span class="toc-number">4.5.</span> <span class="toc-text">5. Alignment（对齐单元）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%88%86%E8%AF%8D%EF%BC%88Tokenization%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">五、分词（Tokenization）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%AF%8D%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-number">5.1.</span> <span class="toc-text">分词的基础概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E7%A7%8D%E5%9F%BA%E7%A1%80%E5%88%86%E8%AF%8D%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94"><span class="toc-number">5.2.</span> <span class="toc-text">四种基础分词方案对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BPE-%E7%9A%84%E5%AE%8C%E6%95%B4%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">5.3.</span> <span class="toc-text">BPE 的完整算法流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E7%90%86%E9%98%B6%E6%AE%B5%EF%BC%88%E7%BC%96%E7%A0%81%E4%B8%8E%E8%A7%A3%E7%A0%81%EF%BC%89"><span class="toc-number">5.4.</span> <span class="toc-text">推理阶段（编码与解码）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Assignment-1-%E7%9A%84-BPE-%E5%AE%9E%E7%8E%B0%E8%A6%81%E6%B1%82"><span class="toc-number">5.5.</span> <span class="toc-text">Assignment 1 的 BPE 实现要求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%AF%8D%E6%80%BB%E7%BB%93"><span class="toc-number">5.6.</span> <span class="toc-text">分词总结</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记&body=Check out this article: https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/17/cs336-spring-2025-lecture-1-overview-tokenization-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 1：Overview, tokenization》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

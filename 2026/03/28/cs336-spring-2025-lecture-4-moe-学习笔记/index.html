@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《CS336 Spring 2025 Lecture 4：MoE》学习笔记">
+<meta property="og:url" content="https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="Stanford CS336 课程学习笔记系列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig10.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig11.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig12.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig13.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig14.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig15.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig16.jpg">
+<meta property="og:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig17.jpg">
+<meta property="article:published_time" content="2026-03-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T13:53:52.319Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="学习笔记">
+<meta property="article:tag" content="MoE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>《CS336 Spring 2025 Lecture 4：MoE》学习笔记</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/04/04/cs336-spring-2025-lecture-10-inference-%E6%8E%A8%E7%90%86-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/25/cs336-spring-2025-lecture-3-%E4%BD%A0%E4%B8%8D%E6%83%B3%E4%BA%86%E8%A7%A3%E7%9A%84%E6%9E%B6%E6%9E%84%E5%92%8C%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 4：MoE》学习笔记&body=Check out this article: https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 4：MoE》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81MoE-%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">一、MoE 的定义与基础架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81MoE-%E6%88%90%E4%B8%BA%E8%A1%8C%E4%B8%9A%E4%B8%BB%E6%B5%81%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8E%9F%E5%9B%A0"><span class="toc-number">2.</span> <span class="toc-text">二、MoE 成为行业主流的主要原因</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E5%90%8C%E7%AD%89FLOPs%E4%B8%8B%EF%BC%8C%E6%95%88%E6%9E%9C%E8%BF%9C%E8%B6%85%E7%A8%A0%E5%AF%86%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.</span> <span class="toc-text">（1）同等FLOPs下，效果远超稠密模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E8%AE%AD%E7%BB%83%E6%95%88%E7%8E%87%E4%B8%8E%E8%90%BD%E5%9C%B0%E6%80%A7%E4%BB%B7%E6%AF%94%E9%AB%98"><span class="toc-number">2.2.</span> <span class="toc-text">（2）训练效率与落地性价比高</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%883%EF%BC%89%E5%A4%A9%E7%84%B6%E9%80%82%E9%85%8D%E8%B6%85%E5%A4%A7%E8%A7%84%E6%A8%A1%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%AD%E7%BB%83"><span class="toc-number">2.3.</span> <span class="toc-text">（3）天然适配超大规模模型的分布式训练</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81MoE-%E7%9A%84%E9%80%9A%E7%94%A8%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1%E7%BB%B4%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">三、MoE 的通用架构与设计维度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E5%87%BD%E6%95%B0%EF%BC%88Routing-function%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">路由函数（Routing function）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E5%AE%B6%E8%A7%84%E6%A8%A1%E8%AE%BE%E8%AE%A1%EF%BC%88Expert-sizes%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">专家规模设计（Expert sizes）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E7%BB%86%E7%B2%92%E5%BA%A6%E4%B8%93%E5%AE%B6%EF%BC%88Fine-grained-Experts%EF%BC%89"><span class="toc-number">3.3.</span> <span class="toc-text">（1）细粒度专家（Fine-grained Experts）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E5%85%B1%E4%BA%AB%E4%B8%93%E5%AE%B6%EF%BC%88Shared-Experts%EF%BC%89"><span class="toc-number">3.4.</span> <span class="toc-text">（2）共享专家（Shared Experts）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81MoE-%E8%AE%AD%E7%BB%83%E7%9A%84%E6%8C%91%E6%88%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-number">4.</span> <span class="toc-text">四、MoE 训练的挑战与解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E6%96%B9%E6%A1%88%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="toc-number">4.1.</span> <span class="toc-text">训练方案的演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88RL%EF%BC%89%E4%BC%98%E5%8C%96%E8%B7%AF%E7%94%B1%EF%BC%88Reinforcment-learning-to-optimize-gating-policies%EF%BC%89"><span class="toc-number">4.2.</span> <span class="toc-text">（1）强化学习（RL）优化路由（Reinforcment learning to optimize gating policies）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E9%9A%8F%E6%9C%BA%E6%89%B0%E5%8A%A8%E8%BF%91%E4%BC%BC%EF%BC%88Stochastic-perturbations%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">（2）随机扰动近似（Stochastic perturbations）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%883%EF%BC%89%E5%90%AF%E5%8F%91%E5%BC%8F%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E6%8D%9F%E5%A4%B1%EF%BC%88Heuristic-%E2%80%98balancing%E2%80%99-losses%EF%BC%89"><span class="toc-number">4.4.</span> <span class="toc-text">（3）启发式负载均衡损失（Heuristic ‘balancing’ losses）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MoE-%E8%AE%AD%E7%BB%83%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">4.5.</span> <span class="toc-text">MoE 训练稳定性的优化方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81MoE-%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%B3%BB%E7%BB%9F%E4%BE%A7%E8%AE%BE%E8%AE%A1"><span class="toc-number">5.</span> <span class="toc-text">五、MoE 的工程系统侧设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E5%AE%B6%E5%B9%B6%E8%A1%8C%EF%BC%9AMoE-%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E5%B9%B6%E8%A1%8C%E6%96%B9%E6%A1%88"><span class="toc-number">5.1.</span> <span class="toc-text">专家并行：MoE 的分布式并行方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E8%AE%BE%E5%A4%87%E7%A8%80%E7%96%8F%E8%AE%A1%E7%AE%97%E4%BC%98%E5%8C%96"><span class="toc-number">5.2.</span> <span class="toc-text">单设备稀疏计算优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MoE-%E6%8E%A8%E7%90%86%E4%BE%A7%E7%89%B9%E6%80%A7"><span class="toc-number">6.</span> <span class="toc-text">MoE 推理侧特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%8E%A8%E7%90%86%E9%9D%9E%E7%A1%AE%E5%AE%9A%E6%80%A7%EF%BC%9Atoken-dropping"><span class="toc-number">6.1.</span> <span class="toc-text">（1）推理非确定性：token dropping</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89MoE-%E6%8E%A8%E7%90%86%E6%88%90%E6%9C%AC%E7%9A%84%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA"><span class="toc-number">6.2.</span> <span class="toc-text">（2）MoE 推理成本的常见误区</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81MoE-%E8%90%BD%E5%9C%B0%E7%97%9B%E7%82%B9%E4%B8%8E%E5%AE%9E%E6%93%8D%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7"><span class="toc-number">7.</span> <span class="toc-text">六、MoE  落地痛点与实操优化技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MoE-%E5%BE%AE%E8%B0%83%E8%BF%87%E6%8B%9F%E5%90%88"><span class="toc-number">7.1.</span> <span class="toc-text">MoE 微调过拟合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E5%B0%8F%E5%9B%A2%E9%98%9F-MoE-%E8%90%BD%E5%9C%B0%E6%9C%80%E4%BC%98%E6%96%B9%E6%A1%88%EF%BC%9A%E7%A8%A0%E5%AF%86%E6%A8%A1%E5%9E%8B-Upcycling"><span class="toc-number">7.2.</span> <span class="toc-text">中小团队 MoE 落地最优方案：稠密模型 Upcycling</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81DeepSeek-MoE-%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B"><span class="toc-number">8.</span> <span class="toc-text">七、DeepSeek MoE 架构演进</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">9.</span> <span class="toc-text">八、课程总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        《CS336 Spring 2025 Lecture 4：MoE》学习笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-27T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-03-28</time>
+        
+        (Updated: <time datetime="2026-06-28T13:53:52.319Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/MoE/" rel="tag">MoE</a>, <a class="p-category" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2020886269647962478">知乎</a>，现迁移至个人博客。</p>
+</blockquote>
+<p>目录</p>
+<h2 id="一、MoE-的定义与基础架构">一、MoE 的定义与基础架构</h2>
+<p>MoE 是对 Transformer 的 FFN 层做稀疏化改造，用<strong>路由选择层 + 多个稀疏激活（sparsely activated）的 FFN 专家模块，替换 Transformer Block 中单一的稠密 FFN 层</strong>。</p>
+<ul>
+<li>MoE 与稠密 Transformer 的唯一区别，仅在 FFN 层，自注意力层完全无改动；</li>
+<li>工业界 99% 的落地 MoE 都只改造 FFN，对注意力头做 MoE 稀疏化的方案仅停留在论文阶段，无大规模落地 —— 这类方案训练稳定性极差，收益无法覆盖研发成本。</li>
+<li>MoE 在不增加前向传播浮点运算量（FLOPs）的前提下，大幅提升模型总参数量，让模型获得更强的知识记忆与特征拟合能力。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig1.jpg" alt=""></p>
+<h2 id="二、MoE-成为行业主流的主要原因">二、MoE 成为行业主流的主要原因</h2>
+<h3 id="（1）同等FLOPs下，效果远超稠密模型">（1）同等FLOPs下，效果远超稠密模型</h3>
+<ul>
+<li>Fedus et al. 2022 的对照实验显示，在训练算力完全一致的前提下，随着专家数量增加，语言模型的训练损失持续下降，128 专家的 Switch-Base 模型，困惑度下降速度远超同算力的稠密 T5-Base 模型；</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig2.jpg" alt=""></p>
+<ul>
+<li>OlMoE 也复现验证了 MoE 模型达到同等下游效果，所需FLOPs比稠密模型少3倍，训练速度快2倍，算力效率优势很明显。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig3.jpg" alt=""></p>
+<blockquote>
+<p><strong>实际上哪怕不用任何可学习的智能路由，纯哈希随机分配 Token 的MoE，效果也比同FLOPs的稠密模型好</strong>。
+MoE 的效果收益，不完全来自“把 token 分给合适的专家”，更大程度来自「稀疏架构本身带来的参数扩容收益」。哪怕路由完全没有语义匹配能力，只要能让模型用上更多参数，就会有确定性收益。具体的路由方法介绍见后文。</p>
+</blockquote>
+<h3 id="（2）训练效率与落地性价比高">（2）训练效率与落地性价比高</h3>
+<ul>
+<li>128专家的Switch-Base模型，相比稠密T5-Base实现了7倍的训练加速，大幅缩短超大规模模型的训练周期。</li>
+<li>当下所有顶尖开源模型（DeepSeek-V2/V3、Mixtral、Llama 4、Grok、Qwen等）均采用MoE架构，在激活参数量远低于稠密模型的前提下，实现了SOTA的下游任务效果。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig4.jpg" alt=""></p>
+<ul>
+<li>很多厂商的效果曲线横轴只标注“激活参数量”，刻意隐去总参数量。比如DeepSeek-V3用37B激活参数量对标70B稠密模型，但它的总参数量是671B——这不是“用更少参数做到更好效果”，而是“用更少的计算量，调动更大的参数容量”，二者的研发成本、部署门槛完全不是一个量级，评估MoE必须同时看总参和激活参。</li>
+</ul>
+<h3 id="（3）天然适配超大规模模型的分布式训练">（3）天然适配超大规模模型的分布式训练</h3>
+<p>专家的存在，让<strong>专家并行（expert parallelism）</strong> 成为非常自然的并行方式。MoE 有多个独立的前馈模块，可以把每个专家部署在不同设备上；由于专家是稀疏激活的，只需要把 token 路由到对应设备，计算就在该设备完成。这是模型分片到多设备的天然切分点，这也是 MoE 流行的另一大原因。想要并行化超大规模模型，这是必经之路。</p>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig5.jpg" alt=""></p>
+<h2 id="三、MoE-的通用架构与设计维度">三、MoE 的通用架构与设计维度</h2>
+<p>不同 MoE 的设计差异主要体现在三个维度：</p>
+<ol>
+<li>路由方式（Routing function）如何设计？</li>
+<li>专家数量与单个专家规模（Expert sizes）如何设定？</li>
+<li>不可微的路由模块训练（Training objectives）怎么进行？</li>
+</ol>
+<h3 id="路由函数（Routing-function）">路由函数（Routing function）</h3>
+<p>路由决策主要分为三类：</p>
+<ul>
+<li><strong>token choice</strong>：每个 token 对不同专家计算偏好度，选择 Top-K 个专家；</li>
+<li><strong>expert choice</strong>：每个专家对 token 排序，选择 Top-K 个 token 处理，优势是专家负载更均衡；</li>
+<li><strong>global assignment</strong>：通过复杂优化问题，实现专家与 token 的均衡匹配。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig6.jpg" alt=""></p>
+<p>当前几乎所有落地MoE均采用<strong>Token 选择Top-K路由</strong>。MoE 发展早期，出现过各类路由方案，但主流模型最终都收敛到这一机制：每个 token 对专家按亲和度排序，选择 Top-K 个专家激活。核心计算流程如下：</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>h</mi><mi>t</mi><mi>l</mi></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msubsup><mrow><mo fence="true">(</mo><msub><mi>g</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub><mi>F</mi><mi>F</mi><msub><mi>N</mi><mi>i</mi></msub><mrow><mo fence="true">(</mo><msubsup><mi>u</mi><mi>t</mi><mi>l</mi></msubsup><mo fence="true">)</mo></mrow><mo fence="true">)</mo></mrow><mo>+</mo><msubsup><mi>u</mi><mi>t</mi><mi>l</mi></msubsup></mrow><annotation encoding="application/x-tex">h_{t}^{l}=\sum_{i=1}^{N}\left(g_{i, t} FFN_{i}\left(u_{t}^{l}\right)\right)+u_{t}^{l}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0961em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3312em;vertical-align:-0.35em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9812em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0961em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span></p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>u</mi><mi>t</mi><mi>l</mi></msubsup></mrow><annotation encoding="application/x-tex">u_{t}^{l}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0961em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span> ：第 l 层输入的残差流隐状态</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>F</mi><msub><mi>N</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">FFN_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> ：第 i 个专家的前馈网络</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">g_{i,t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> ：门控权重，仅Top-K个专家非零，其余置0，定义为： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub><mo>∈</mo><mi>T</mi><mi>o</mi><mi>p</mi><mi>k</mi><mrow><mo fence="true">(</mo><mrow><mo fence="true">{</mo><msub><mi>s</mi><mrow><mi>j</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub><mi mathvariant="normal">∣</mi><mn>1</mn><mo>≤</mo><mi>j</mi><mo>≤</mo><mi>N</mi><mo fence="true">}</mo></mrow><mo separator="true">,</mo><mi>K</mi><mo fence="true">)</mo></mrow><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>0</mn><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>o</mi><mi>t</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>w</mi><mi>i</mi><mi>s</mi><mi>e</mi><mo separator="true">,</mo></mrow></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">g_{i, t}= \begin{cases}s_{i, t}, &amp; s_{i, t} \in Topk\left(\left\{s_{j, t} | 1 \leq j \leq N\right\}, K\right), \\ 0, &amp; otherwise, \end{cases}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mpunct">,</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">0</span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord mathnormal">o</span><span class="mord mathnormal">p</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="minner"><span class="mopen delimcenter" style="top:0em;">{</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord">∣1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose delimcenter" style="top:0em;">}</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">o</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mord mathnormal" style="margin-right:0.0278em;">er</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mord mathnormal">i</span><span class="mord mathnormal">se</span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">s_{i,t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> ：token 与专家的亲和度评分，经典实现为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>o</mi><mi>f</mi><mi>t</mi><mi>m</mi><mi>a</mi><msub><mi>x</mi><mi>i</mi></msub><mrow><mo fence="true">(</mo><msubsup><mi>u</mi><mi>t</mi><msup><mi>l</mi><mi>T</mi></msup></msubsup><msubsup><mi>e</mi><mi>i</mi><mi>l</mi></msubsup><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">Softmax_{i}\left(u_{t}^{l^{T}} e_{i}^{l}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.8em;vertical-align:-0.65em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord mathnormal">t</span><span class="mord mathnormal">ma</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size2">(</span></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0064em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9191em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.4413em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2587em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size2">)</span></span></span></span></span></span> ，其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>e</mi><mi>i</mi><mi>l</mi></msubsup></mrow><annotation encoding="application/x-tex">e_i^l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1078em;vertical-align:-0.2587em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.4413em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2587em;"><span></span></span></span></span></span></span></span></span></span> 为第 i 个专家的可学习路由向量。</li>
+</ul>
+<blockquote>
+<p>【Q&amp;A】
+Q1：路由决策是基于 token 本身，还是它的位置？
+A1：基于 token 的隐层状态（hidden state）。token 会经过位置编码等完整处理，生成隐层状态后，再输入路由模块与专家层，位置信息已经被编码在隐状态中了。
+Q2：为什么这里要先做 Softmax 再取 Top-K？Softmax 会倾向于突出单一最大值，和 Top-K 选多个专家的逻辑不是矛盾吗？
+A2：不要把这里的 Softmax 当成“概率选择”，它的核心作用只是<strong>归一化到1</strong>，保证后续加权求和的权重和为1。如果去掉 Top-K、直接用 Softmax 门控所有专家，就会完全丧失稀疏性，丢掉MoE的系统效率优势——Top-K才是保证稀疏性的核心，Softmax只是数值归一化的工具。</p>
+</blockquote>
+<p><strong>Top-K 路由的主流变体与设计细节</strong></p>
+<ul>
+<li><strong>K 值选型</strong>：不同模型的 K 值设计不同，Switch Transformer (k=1)、GShard/Grok/Mixtral (k=2)、Qwen/DBRX (k=4)、DeepSeek 系列 (k=6~8)。关于 K 值设计，有一个很重要的设计思路：Top-K 选 K=2，核心目的不是增加计算量，是为了训练时的探索。很多人以为 K=2 是为了双专家提升拟合能力，但真实初衷是解决路由的探索 - 利用困境：如果 K=1，模型会永远只选当前最优的专家，陷入 “强者恒强” 的局部最优，其他专家永远拿不到训练信号，直接 “死掉”；K=2 相当于给了模型探索的机会，让第二名的专家也能拿到梯度信号，学习差异化特征。</li>
+<li><strong>Softmax 位置调整</strong>：DeepSeek-V3、Mixtral、DBRX 等模型，将 Softmax 从 Top-K 选择之前，调整到了 Top-K 选择之后，仅对选中的 K 个专家做 Softmax 归一化，进一步提升训练稳定性。</li>
+<li><strong>哈希路由</strong>：无学习过程，通过哈希函数将 token 映射到对应专家，是 MoE 的最低成本基线方案，仅用于效果对照，无工业落地价值。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig7.jpg" alt=""></p>
+<p><strong>已弃用的小众路由方案</strong>：</p>
+<ul>
+<li>强化学习（RL）路由：早期 Bengio 2013 提出，用 RL 优化离散路由决策，是理论上最适配的方案，但梯度方差大、训练复杂度高，无收益优势，工业界已完全弃用；</li>
+<li>BASE 线性分配路由：通过线性匹配优化全局 token - 专家分配，目前仅停留在论文阶段，尚无大规模落地。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig8.jpg" alt=""></p>
+<blockquote>
+<p>【Q&amp;A】
+Q3：路由是MoE的核心，为什么路由模块设计得这么简单？为什么不用更复杂的MLP做路由？
+A3：有两个核心原因。第一是系统开销，路由的每一点FLOPs开销，都是纯额外成本，不会带来模型效果的直接提升，必须保证路由足够轻量化。第二是路由的梯度信号本身就非常间接，哪怕把路由模块做复杂，也无法保证能学到最优的路由策略，反而会加剧训练不稳定性。早期谷歌论文做过MLP路由的消融，没有拿到确定性的正向收益，工业界自然不会用。</p>
+</blockquote>
+<h3 id="专家规模设计（Expert-sizes）">专家规模设计（Expert sizes）</h3>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig9.jpg" alt=""></p>
+<h3 id="（1）细粒度专家（Fine-grained-Experts）"><strong>（1）细粒度专家（Fine-grained Experts）</strong></h3>
+<ul>
+<li>设计思路：将标准 Transformer 的 FFN 按比例缩小（如 DeepSeek v1 为 1/4、v3 为 1/14），在激活参数量不变的前提下，大幅增加专家总数，提升专家的特征特异性。</li>
+<li>实验验证：OlMoE 的消融实验显示，细粒度专家从 8 个增加到 32、64 个，模型损失持续下降，收益极为显著。</li>
+<li>架构设计的通用经验：细粒度专家是几乎无成本的正向优化，只要显存能装下，专家越细，效果越好，当前已成为所有工业级 MoE 的标配设计。</li>
+</ul>
+<h3 id="（2）共享专家（Shared-Experts）"><strong>（2）共享专家（Shared Experts）</strong></h3>
+<ul>
+<li>设计思路：设置 1~4 个始终激活的专家，处理所有 token 的通用语义特征，避免通用信息走稀疏路由造成的算力与参数浪费。</li>
+<li>实验验证：DeepSeek 论文的消融实验显示，共享专家 + 细粒度专家的组合，能全面提升下游任务效果；但 OlMoE 的实验中，共享专家收益并不稳定，甚至出现负向效果，OlMoE 最终未采用共享专家。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig10.jpg" alt=""></p>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig11.jpg" alt=""></p>
+<h2 id="四、MoE-训练的挑战与解决方案">四、MoE 训练的挑战与解决方案</h2>
+<p>MoE 训练的困境是<strong>效率与可微性的矛盾</strong>：</p>
+<ul>
+<li>必须保持训练时的稀疏性，否则需要承担所有专家的 FLOPs 成本，完全丧失 MoE 的效率优势；</li>
+<li>但稀疏门控的路由决策是离散、不可微的，无法直接通过梯度下降优化，同时极易出现专家负载不均衡，导致多数专家完全失效。</li>
+</ul>
+<h3 id="训练方案的演进">训练方案的演进</h3>
+<p>工业界最终放弃了 RL、随机扰动等复杂方案，收敛到了<strong>Top-K 路由 + 启发式负载均衡损失</strong>的朴素方案，用最低的成本解决了核心矛盾。</p>
+<h3 id="（1）强化学习（RL）优化路由（Reinforcment-learning-to-optimize-gating-policies）">（1）强化学习（RL）优化路由（Reinforcment learning to optimize gating policies）</h3>
+<ul>
+<li>原理：将离散路由决策视为 RL 的动作，通过 REINFORCE 算法优化路由策略，是理论上最适配离散决策的方案；</li>
+<li>工业界结论：梯度方差大、训练复杂度高、调试成本极高，收益完全覆盖不了成本，已完全弃用，无大规模落地案例。</li>
+</ul>
+<h3 id="（2）随机扰动近似（Stochastic-perturbations）">（2）随机扰动近似（Stochastic perturbations）</h3>
+<ul>
+<li>原理：给路由 logits 添加高斯噪声 / 均匀乘性扰动，提升路由的探索性，避免模型陷入局部最优；</li>
+<li>工业界结论：随机扰动会降低专家的特征特异性，对训练稳定性与效果无正向帮助，后续论文已验证其无效性，工业界已完全弃用。</li>
+</ul>
+<h3 id="（3）启发式负载均衡损失（Heuristic-‘balancing’-losses）">（3）启发式负载均衡损失（Heuristic ‘balancing’ losses）</h3>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig12.jpg" alt=""></p>
+<p>这是当前所有工业级 MoE 的训练核心，通过辅助损失强制各专家的 token 分配均匀，避免少数专家接管所有 token、其余专家失效。
+<strong>① Switch Transformer 基础均衡损失</strong>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>s</mi><mi>s</mi><mo>=</mo><mi>α</mi><mo>⋅</mo><mi>N</mi><mo>⋅</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msubsup><msub><mi>f</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi>P</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">loss=\alpha \cdot N \cdot \sum_{i=1}^{N} f_{i} \cdot P_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">oss</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2809em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9812em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">f_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> ：第 i 个专家实际分配的 token 占比；</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">P_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> ：路由模块预测的第 i 个专家的概率占比；</li>
+<li>核心特性：对分配 token 越多的专家，惩罚力度越强，强制模型均衡使用所有专家。</li>
+</ul>
+<p><strong>② DeepSeek v1-v2 双维度均衡优化</strong>
+针对分布式训练场景，新增双维度均衡损失：</p>
+<ul>
+<li>专家级均衡损失：保证单个专家之间的 token 负载均匀，和 Switch Transformer 基础损失一致；</li>
+<li>设备级均衡损失：按 GPU/TPU 设备聚合统计，保证多机多卡间的计算负载均匀，适配分布式训练。</li>
+</ul>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig13.jpg" alt=""></p>
+<p><strong>③ DeepSeek-V3 创新：无辅助损失均衡</strong>
+为每个专家设置可在线学习的偏置bi，根据每批次的 token 负载动态调整：专家分配 token 过少则上调bi，提升路由优先级；分配过多则下调bi，降低优先级。大幅提升了训练稳定性，避免辅助损失对主任务的干扰；并且新增序列级辅助损失，避免单条推理序列内出现极端专家负载不均衡。</p>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig14.jpg" alt=""></p>
+<p>关于负载均衡损失，有一个很重要的认知纠偏：它的本质不是为了系统效率，而是为了不浪费参数。绝大多数资料会把负载均衡损失解释为 “让多机多卡负载更均匀，提升训练效率”，但它的第一优先级根本不是系统优化 —— 哪怕你单卡跑 MoE，不做任何分布式训练，也必须加负载均衡损失。没有约束的路由，一定会在训练初期就把所有 token 分给 1-2 个专家，剩下的所有专家完全收不到任何 token，永远不会被更新，相当于你花了大量显存存了一堆完全没用的参数，模型直接退化成了比稠密模型还差的小模型。<strong>负载均衡损失的首要作用，是保证所有专家都能被用到，不浪费参数容量，其次才是系统层面的负载均衡。</strong></p>
+<p>OlMoE 的对照实验验证了去掉负载均衡损失后，训练初期 1-2 个专家就会接管几乎所有 token，其余 6 个专家完全失效，模型退化为 2 专家 MoE，验证损失大幅上升，参数利用率极低。</p>
+<h3 id="MoE-训练稳定性的优化方案">MoE 训练稳定性的优化方案</h3>
+<p>根据实践经验，MoE 训练 90% 的崩溃问题，都出在路由模块的 Softmax 数值精度上。路由模块的 Softmax 对数值精度极度敏感，bfloat16 下 0.5 的舍入误差，就会导致门控权重出现 36% 的波动，引发训练损失剧烈 spike，甚至训练崩溃；工业界解决方案：</p>
+<h2 id="五、MoE-的工程系统侧设计">五、MoE 的工程系统侧设计</h2>
+<p>MoE 的理论非常简单，就是 “路由 + 多 FFN”，但它之所以没有像 Transformer 一样成为  NLP入门课的标准内容，是因为<strong>要让 MoE 高效跑起来，需要解决的工程基础设施问题，比理论难 10 倍都不止</strong>。它的优势只有在多节点、大规模分布式训练的场景下才能完全释放，单卡小模型用 MoE，不仅没有收益，还会因为路由、通信的额外开销变得更慢、效果更差。</p>
+<h3 id="专家并行：MoE-的分布式并行方案">专家并行：MoE 的分布式并行方案</h3>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig15.jpg" alt=""></p>
+<p>MoE 提供了独立于数据并行、张量并行、流水线并行的全新并行维度——将不同专家独立部署在不同 GPU/TPU 设备上，路由模块将 token 分发到对应设备完成计算，再通过 All-to-All 通信回收结果；</p>
+<p>大模型分布式训练的核心就是在数据并行、张量并行、流水线并行之间做权衡，找到适配集群硬件的最优切分方式。而专家并行，给了我们一个全新的、完全独立的切分维度，可以和其他并行方式灵活组合，适配不同的集群网络、显存规格，这才是它在超大规模模型训练中不可替代的原因。</p>
+<h3 id="单设备稀疏计算优化">单设备稀疏计算优化</h3>
+<p>现代稀疏计算库（如 MegaBlocks，被多数开源 MoE 采用），利用 GPU 的块稀疏矩阵乘法引擎，优化单设备上多专家的稀疏计算，避免无效的零值运算，最大化算力利用率。</p>
+<blockquote>
+<p>【Q&amp;A】
+Q4：上节课（Lecture 3）你提到，哪怕是可忽略的 FLOPs 操作，也可能带来极高的实际耗时，MoE 里有没有这种情况？
+A4：这正是 MoE 最大的落地痛点。很多人算 MoE 的收益，只看理论上的 FLOPs，但真正决定 MoE 能不能跑起来、跑的快不快的，是那些不计入 FLOPs 的开销 —— 比如 token 路由的 All-to-All 通信开销、专家分片的调度开销、负载不均衡导致的设备空等开销、稀疏矩阵乘法的调度开销。工业界做 MoE，80% 的工作量都在优化这些 “非 FLOPs 开销”，而非优化模型架构本身。</p>
+</blockquote>
+<h2 id="MoE-推理侧特性">MoE 推理侧特性</h2>
+<h3 id="（1）推理非确定性：token-dropping">（1）推理非确定性：<strong>token dropping</strong></h3>
+<p>MoE 有一个有趣的随机特性：推理时如果批量 token 大量路由到同一专家，会触发<strong>token dropping 。<strong>这是因为推理时为了保证系统稳定性，每个专家都有一个容量上限，如果同一个批次里，大量 token 都被路由到了同一个专家，超出容量的 token 会被直接丢弃，MLP 层直接走残差连接，输出结果就会变； token 会不会被丢弃，完全取决于同批次里其他的请求会不会把专家占满 —— 这是一个完全不可控的、跨请求的随机因素。
+所以触发 token dropping 的时候即使 temperature 设为 0 ，输出依旧是不确定的，这也是 GPT-4 早期推理非确定性的潜在原因之一（此前英伟达有一则有趣的泄密信息显示，GPT-4 可能是</strong>GPT-MoE-1 BT</strong>架构）。</p>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig16.jpg" alt=""></p>
+<h3 id="（2）MoE-推理成本的常见误区">（2）MoE 推理成本的常见误区</h3>
+<p>很多人以为 MoE 的激活参数量小，推理成本就一定低，但真实落地中：如果 MoE 的专家被分散在多台机器上，每次推理都要跨机器做 token 路由和结果回收，通信延迟带来的成本，会完全覆盖激活参数量小带来的收益。工业界部署 MoE，往往会把多个专家打包放到同一张卡上，尽量减少跨机通信，甚至很多团队会为了降低推理延迟，直接把 MoE 改成稠密模型部署 —— 这也是很多论文里的推理速度，在真实线上场景里完全复现不出来的原因。</p>
+<h2 id="六、MoE-落地痛点与实操优化技巧">六、MoE  落地痛点与实操优化技巧</h2>
+<h3 id="MoE-微调过拟合">MoE 微调过拟合</h3>
+<p>MoE 的总参数量极大，哪怕激活参数量很小，总参也往往是同级别稠密模型的几倍甚至十几倍，在小数据集上微调，必然会严重过拟合。工业界验证有效的解决方案有两个：</p>
+<h3 id="中小团队-MoE-落地最优方案：稠密模型-Upcycling">中小团队 MoE 落地最优方案：稠密模型 Upcycling</h3>
+<p><img src="/images/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/fig17.jpg" alt=""></p>
+<p>用预训练稠密模型的 FFN 权重，初始化 MoE 的多个专家，仅路由模块从头训练，无需从零开始预训练 MoE，大幅降低训练成本；这是中小团队落地 MoE 性价比最高的方式，没有之一。绝大多数团队不需要从零开始预训练一个 MoE，最优方案是拿一个已经训好的稠密模型，把它的 FFN 层复制多份初始化专家，只训练路由模块，用不到原稠密模型 10% 的预训练算力，就能得到效果远超原模型的 MoE。
+案例：</p>
+<h2 id="七、DeepSeek-MoE-架构演进">七、DeepSeek MoE 架构演进</h2>
+<p>最后我们梳理下 DeepSeek MoE 的架构演进：
+<strong>DeepSeek MoE V1</strong>：160 亿总参数，28 亿激活参数，2 个共享专家 + 64 个细粒度专家，激活 4-6 个，标准 Top-K 路由 + 专家 / 设备均衡损失；
+<strong>DeepSeek MoE V2</strong>：2360 亿总参数，210 亿激活参数，架构基本不变，新增 Top-M 设备筛选：先选 Top-M 个设备，再在设备内选 Top-K 专家，降低通信成本，同时添加通信均衡损失；
+<strong>DeepSeek-V3</strong>：6710 亿总参数，370 亿激活参数，保留核心 MoE 架构，将门控值归一化、改用 Sigmoid 替代 Softmax，采用无辅助损失均衡 + 序列级均衡，保留 Top-M 设备优化。
+此外，DeepSeek-V3 还做了两处非 MoE 架构优化：</p>
+<ul>
+<li>MLA（多隐层注意力）：压缩 KV 缓存，将隐层状态投影到低维向量缓存，需用时再上投影为 K/V，合并矩阵乘法保证运算量不变，同时适配 RoPE 位置编码；</li>
+<li>MTP（多 token 预测）：通过轻量级单层 Transformer，并行预测未来多个token（实际仅预测下一个），提升训练效率。</li>
+</ul>
+<h2 id="八、课程总结">八、课程总结</h2>
+<p>整体来说，MoE 已成为高性能大规模大模型的核心架构，依托稀疏激活机制，在同等算力下实现更优效果。离散路由是其核心挑战，但启发式优化方案已被验证有效。在算力受限的场景下，MoE 是性价比极高的选择，值得深入学习。</p>
+<ol>
+<li>认知层面：MoE 的核心价值是利用稀疏性，实现<strong>同等 FLOPs 下更高的参数量与更优的模型效果</strong>。2025 年MoE 对稠密模型的优势已无争议，是超大规模大模型的工业级主流架构。</li>
+<li>架构层面：工业界已完全收敛到 <strong>token 选择 Top-K 路由 + 细粒度专家</strong>的成熟范式，共享专家需结合场景做消融验证，复杂路由方案尚无落地价值。</li>
+<li>训练层面：离散路由是 MoE 的主要优化挑战，工业界最终选择了<strong>Top-K 路由 + 启发式负载均衡损失</strong>的朴素方案，负载均衡的首要目的是保证参数利用率，而非单纯的系统效率。</li>
+<li>工程层面：MoE 的落地瓶颈是工程系统复杂度。专家并行给分布式训练提供了全新的灵活维度，而决定落地成败的是通信、调度等系统开销。</li>
+<li>落地层面：中小团队最高效的 MoE 落地方式，是基于稠密模型做 Upcycling 升级，而非从零预训练；MoE 微调的核心是解决过拟合，只能通过冻结专家或海量数据实现，无捷径可走。</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81MoE-%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">一、MoE 的定义与基础架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81MoE-%E6%88%90%E4%B8%BA%E8%A1%8C%E4%B8%9A%E4%B8%BB%E6%B5%81%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8E%9F%E5%9B%A0"><span class="toc-number">2.</span> <span class="toc-text">二、MoE 成为行业主流的主要原因</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E5%90%8C%E7%AD%89FLOPs%E4%B8%8B%EF%BC%8C%E6%95%88%E6%9E%9C%E8%BF%9C%E8%B6%85%E7%A8%A0%E5%AF%86%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.1.</span> <span class="toc-text">（1）同等FLOPs下，效果远超稠密模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E8%AE%AD%E7%BB%83%E6%95%88%E7%8E%87%E4%B8%8E%E8%90%BD%E5%9C%B0%E6%80%A7%E4%BB%B7%E6%AF%94%E9%AB%98"><span class="toc-number">2.2.</span> <span class="toc-text">（2）训练效率与落地性价比高</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%883%EF%BC%89%E5%A4%A9%E7%84%B6%E9%80%82%E9%85%8D%E8%B6%85%E5%A4%A7%E8%A7%84%E6%A8%A1%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%AD%E7%BB%83"><span class="toc-number">2.3.</span> <span class="toc-text">（3）天然适配超大规模模型的分布式训练</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81MoE-%E7%9A%84%E9%80%9A%E7%94%A8%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1%E7%BB%B4%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">三、MoE 的通用架构与设计维度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E5%87%BD%E6%95%B0%EF%BC%88Routing-function%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">路由函数（Routing function）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E5%AE%B6%E8%A7%84%E6%A8%A1%E8%AE%BE%E8%AE%A1%EF%BC%88Expert-sizes%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">专家规模设计（Expert sizes）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E7%BB%86%E7%B2%92%E5%BA%A6%E4%B8%93%E5%AE%B6%EF%BC%88Fine-grained-Experts%EF%BC%89"><span class="toc-number">3.3.</span> <span class="toc-text">（1）细粒度专家（Fine-grained Experts）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E5%85%B1%E4%BA%AB%E4%B8%93%E5%AE%B6%EF%BC%88Shared-Experts%EF%BC%89"><span class="toc-number">3.4.</span> <span class="toc-text">（2）共享专家（Shared Experts）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81MoE-%E8%AE%AD%E7%BB%83%E7%9A%84%E6%8C%91%E6%88%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-number">4.</span> <span class="toc-text">四、MoE 训练的挑战与解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E6%96%B9%E6%A1%88%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="toc-number">4.1.</span> <span class="toc-text">训练方案的演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88RL%EF%BC%89%E4%BC%98%E5%8C%96%E8%B7%AF%E7%94%B1%EF%BC%88Reinforcment-learning-to-optimize-gating-policies%EF%BC%89"><span class="toc-number">4.2.</span> <span class="toc-text">（1）强化学习（RL）优化路由（Reinforcment learning to optimize gating policies）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E9%9A%8F%E6%9C%BA%E6%89%B0%E5%8A%A8%E8%BF%91%E4%BC%BC%EF%BC%88Stochastic-perturbations%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">（2）随机扰动近似（Stochastic perturbations）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%883%EF%BC%89%E5%90%AF%E5%8F%91%E5%BC%8F%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E6%8D%9F%E5%A4%B1%EF%BC%88Heuristic-%E2%80%98balancing%E2%80%99-losses%EF%BC%89"><span class="toc-number">4.4.</span> <span class="toc-text">（3）启发式负载均衡损失（Heuristic ‘balancing’ losses）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MoE-%E8%AE%AD%E7%BB%83%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">4.5.</span> <span class="toc-text">MoE 训练稳定性的优化方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81MoE-%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%B3%BB%E7%BB%9F%E4%BE%A7%E8%AE%BE%E8%AE%A1"><span class="toc-number">5.</span> <span class="toc-text">五、MoE 的工程系统侧设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E5%AE%B6%E5%B9%B6%E8%A1%8C%EF%BC%9AMoE-%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E5%B9%B6%E8%A1%8C%E6%96%B9%E6%A1%88"><span class="toc-number">5.1.</span> <span class="toc-text">专家并行：MoE 的分布式并行方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E8%AE%BE%E5%A4%87%E7%A8%80%E7%96%8F%E8%AE%A1%E7%AE%97%E4%BC%98%E5%8C%96"><span class="toc-number">5.2.</span> <span class="toc-text">单设备稀疏计算优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MoE-%E6%8E%A8%E7%90%86%E4%BE%A7%E7%89%B9%E6%80%A7"><span class="toc-number">6.</span> <span class="toc-text">MoE 推理侧特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%8E%A8%E7%90%86%E9%9D%9E%E7%A1%AE%E5%AE%9A%E6%80%A7%EF%BC%9Atoken-dropping"><span class="toc-number">6.1.</span> <span class="toc-text">（1）推理非确定性：token dropping</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%882%EF%BC%89MoE-%E6%8E%A8%E7%90%86%E6%88%90%E6%9C%AC%E7%9A%84%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA"><span class="toc-number">6.2.</span> <span class="toc-text">（2）MoE 推理成本的常见误区</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81MoE-%E8%90%BD%E5%9C%B0%E7%97%9B%E7%82%B9%E4%B8%8E%E5%AE%9E%E6%93%8D%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7"><span class="toc-number">7.</span> <span class="toc-text">六、MoE  落地痛点与实操优化技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MoE-%E5%BE%AE%E8%B0%83%E8%BF%87%E6%8B%9F%E5%90%88"><span class="toc-number">7.1.</span> <span class="toc-text">MoE 微调过拟合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E5%B0%8F%E5%9B%A2%E9%98%9F-MoE-%E8%90%BD%E5%9C%B0%E6%9C%80%E4%BC%98%E6%96%B9%E6%A1%88%EF%BC%9A%E7%A8%A0%E5%AF%86%E6%A8%A1%E5%9E%8B-Upcycling"><span class="toc-number">7.2.</span> <span class="toc-text">中小团队 MoE 落地最优方案：稠密模型 Upcycling</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81DeepSeek-MoE-%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B"><span class="toc-number">8.</span> <span class="toc-text">七、DeepSeek MoE 架构演进</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%AF%BE%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-number">9.</span> <span class="toc-text">八、课程总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&text=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&is_video=false&description=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=《CS336 Spring 2025 Lecture 4：MoE》学习笔记&body=Check out this article: https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&name=《CS336 Spring 2025 Lecture 4：MoE》学习笔记&description=Stanford CS336 课程学习笔记系列"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/03/28/cs336-spring-2025-lecture-4-moe-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&t=《CS336 Spring 2025 Lecture 4：MoE》学习笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

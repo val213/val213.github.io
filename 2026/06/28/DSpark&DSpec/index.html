@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="结合技术报告硬核细节，扒一扒 DeepSeek 全栈开源投机采样方案 DeepSpec 与 DSpark 是如何让 V4 推理速度飙升 60%-85% 的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark">
+<meta property="og:url" content="https://val213.github.io/2026/06/28/DSpark&DSpec/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="结合技术报告硬核细节，扒一扒 DeepSeek 全栈开源投机采样方案 DeepSpec 与 DSpark 是如何让 V4 推理速度飙升 60%-85% 的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig1.png">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig2.png">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig3.png">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig4.png">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig5.png">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig6.png">
+<meta property="og:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig7.png">
+<meta property="article:published_time" content="2026-06-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-28T14:03:25.819Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="投机采样">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="推理优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://val213.github.io/images/DSpark&amp;DSpec/fig1.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/05/19/cs366-spring-2025-lecture-17-alignment-3-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&text=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&is_video=false&description=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark&body=Check out this article: https://val213.github.io/2026/06/28/DSpark&amp;DSpec/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&name=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark&description=结合技术报告硬核细节，扒一扒 DeepSeek 全栈开源投机采样方案 DeepSpec 与 DSpark 是如何让 V4 推理速度飙升 60%-85% 的。"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&t=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9F%9B%E7%9B%BE%E4%B8%80%EF%BC%9A%E5%B0%8F%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%8C%9C%E5%BE%97%E6%9B%B4%E5%87%86%EF%BC%9F%EF%BC%88%E4%BB%8E-DFlash-%E5%88%B0-Domino-%E7%9A%84%E5%8D%8A%E8%87%AA%E5%9B%9E%E5%BD%92%E6%BC%94%E8%BF%9B%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">矛盾一：小模型怎么猜得更准？（从 DFlash 到 Domino 的半自回归演进）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E5%B8%A6%E6%9D%A5%E7%9A%84%E2%80%9C%E5%A4%9A%E6%A8%A1%E6%80%81%E5%86%B2%E7%AA%81%E2%80%9D"><span class="toc-number">1.1.</span> <span class="toc-text">并行带来的“多模态冲突”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DSpark-%E7%9A%84%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%8D%8A%E8%87%AA%E5%9B%9E%E5%BD%92%E6%9E%B6%E6%9E%84%E4%B8%8E%E4%BD%8E%E7%A7%A9%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E5%A4%B4%EF%BC%88Markov-Head%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">DSpark 的解法：半自回归架构与低秩马尔可夫头（Markov Head）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9F%9B%E7%9B%BE%E4%BA%8C%EF%BC%9A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E9%AA%8C%E5%BE%97%E6%9B%B4%E9%AB%98%E6%95%88%EF%BC%9F%EF%BC%88%E7%A1%AC%E4%BB%B6%E6%84%9F%E7%9F%A5%E5%89%8D%E7%BC%80%E8%B0%83%E5%BA%A6%E5%99%A8%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">矛盾二：大模型怎么验得更高效？（硬件感知前缀调度器）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E6%84%9F%E7%9F%A5%E5%89%8D%E7%BC%80%E8%B0%83%E5%BA%A6%E5%99%A8%EF%BC%88Hardware-aware-Prefix-Scheduler%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">硬件感知前缀调度器（Hardware-aware Prefix Scheduler）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A8%E6%A0%88%E7%9A%84%E8%83%9C%E5%88%A9%EF%BC%9A%E4%BB%8E%E5%BC%80%E6%BA%90%E5%BA%93-DeepSpec-%E5%88%B0%E8%90%BD%E5%9C%B0-DSpark"><span class="toc-number">3.</span> <span class="toc-text">全栈的胜利：从开源库 DeepSpec 到落地 DSpark</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-06-27T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-06-28</time>
+        
+        (Updated: <time datetime="2026-06-28T14:03:25.819Z" class="dt-updated" itemprop="dateModified">2026-06-28</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/LLM-%E7%B3%BB%E7%BB%9F/">LLM 系统</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/DeepSeek/" rel="tag">DeepSeek</a>, <a class="p-category" href="/tags/LLM/" rel="tag">LLM</a>, <a class="p-category" href="/tags/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/" rel="tag">投机采样</a>, <a class="p-category" href="/tags/%E6%8E%A8%E7%90%86%E4%BC%98%E5%8C%96/" rel="tag">推理优化</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>如果你关注大模型系统工程（LLM Sys），你一定知道<strong>投机解码（Speculative Decoding）</strong>。为了打破大模型自回归（Decode）阶段受限于显存带宽（Memory-Bound）的物理枷锁，让轻量的小模型（Draft）先“猜”、大模型（Target）再并行“验”，已经成了行业共识。</p>
+<p>但在实际落地的万卡生产环境里，投机解码长期面临着两个尴尬的硬伤：</p>
+<ol>
+<li><strong>小模型“盲猜”不准</strong>：为了快，有些小模型采用并行生成，字与字之间缺乏因果逻辑，导致大模型频繁拒收，偷鸡不成蚀把米。</li>
+<li><strong>大模型“硬验”极费</strong>：不管小模型猜得有多烂，系统都死板地把固定长度的 Token 塞给大模型验证，导致高并发时算力空转、严重浪费。</li>
+</ol>
+<p><img src="/images/DSpark&amp;DSpec/fig1.png" alt=""></p>
+<p>近日，DeepSeek 扔出了一套全栈软硬件协同的开源投机采样方案：<strong>DeepSpec（全栈开发库）与 DSpark（高性能加速框架及模型）</strong>。在保证模型输出完全无损的前提下，直接将 DeepSeek-V4 系列模型的每用户推理速度飙升了 <strong>60% 到 85%</strong>。</p>
+<p>今天这篇博客，我们就结合技术报告的硬核细节，由浅入深地扒一扒 DeepSeek 是如何解决这两个终极矛盾的。</p>
+<hr>
+<h2 id="矛盾一：小模型怎么猜得更准？（从-DFlash-到-Domino-的半自回归演进）">矛盾一：小模型怎么猜得更准？（从 DFlash 到 Domino 的半自回归演进）</h2>
+<p>要让草稿模型快，串行生成（生成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi></mrow><annotation encoding="application/x-tex">K</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 个词需要走 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi></mrow><annotation encoding="application/x-tex">K</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 次前向传播）是不可接受的。于是学术界提出了 <strong>DFlash（块扩散模型）</strong>。它在输入端将未来的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi></mrow><annotation encoding="application/x-tex">K</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 个位置全部用特殊的 <code>[MASK]</code> 占位，然后只需经历<strong>一次</strong> GPU 的前向传播，利用双向注意力机制（Bidirectional Attention）一次性将这 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi></mrow><annotation encoding="application/x-tex">K</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 个位置的特征全部并行计算出来。</p>
+<p>这种 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 的常数级常驻延迟极具诱惑力，但它带出了一个经典的学术问题：<strong>多模态冲突（Multi-modal Conflict）</strong>。</p>
+<h3 id="并行带来的“多模态冲突”">并行带来的“多模态冲突”</h3>
+<p>在概率论中，模型的输出往往是多峰分布（Multi-modal Distribution）。比如输入 <code>我喜欢去</code>，接下来既可以是 <code>北京</code> 也可以是 <code>上海</code>。
+DFlash 一口气同时预测未来多个位置。因为第 2 个位置在预测时，根本不知道第 1 个位置最终采样的结果，它可能在第一个位置采样了 <code>北</code>，在第二个位置独立采样了 <code>海</code>（来自“上海”的概率峰值），拼接起来就变成了荒谬的 <code>北海</code>。这种缺乏因果联合概率建模的缺陷，导致大模型的平均接受长度（Average Acceptance Length）惨不忍睹。</p>
+<p><img src="/images/DSpark&amp;DSpec/fig2.png" alt=""></p>
+<h3 id="DSpark-的解法：半自回归架构与低秩马尔可夫头（Markov-Head）">DSpark 的解法：半自回归架构与低秩马尔可夫头（Markov Head）</h3>
+<p>为了在享受 DFlash 并行速度的同时找回因果逻辑，DSpark 吸收了 <strong>Domino</strong> 框架的精髓，演进为了<strong>半自回归架构（Semi-autoregressive Architecture）</strong>。</p>
+<p>它的核心巧思是：在 DFlash 并行网络刷出初步的特征（Logits）后，在上面叠加一个极轻量的<strong>马尔可夫头（Markov Head）</strong>。</p>
+<p>这个马尔可夫头采用一阶马尔可夫假设（当前词只与前一个词相关）。为了不让词表大小（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>≈</mo><mn>100</mn><mi>k</mi><mo>+</mo></mrow><annotation encoding="application/x-tex">V \approx 100k+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">100</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord">+</span></span></span></span>）导致的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">V \times V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 转移矩阵撑爆显存，DSpark 巧妙引入了<strong>低秩分解（Low-rank Approximation）</strong>。它维护了两个低秩矩阵 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mi>r</mi><mo>×</mo><mi>V</mi></mrow></msup></mrow><annotation encoding="application/x-tex">A \in \mathbb{R}^{r \times V}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8413em;"></span><span class="mord"><span class="mord mathbb">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span><span class="mbin mtight">×</span><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mrow><mi>V</mi><mo>×</mo><mi>r</mi></mrow></msup></mrow><annotation encoding="application/x-tex">B \in \mathbb{R}^{V \times r}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8413em;"></span><span class="mord"><span class="mord mathbb">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span><span class="mbin mtight">×</span><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span></span></span></span></span></span></span></span></span>（秩 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>≪</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">r \ll V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≪</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span>，如 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>128</mn></mrow><annotation encoding="application/x-tex">r=128</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">128</span></span></span></span>）：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>Logits</mtext><mtext>adjusted</mtext></msub><mo>=</mo><msub><mtext>Logits</mtext><mtext>parallel</mtext></msub><mo>+</mo><mi>B</mi><mo>⋅</mo><mo stretchy="false">(</mo><mi>A</mi><mo>⋅</mo><msub><mi>e</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\text{Logits}_{\text{adjusted}} = \text{Logits}_{\text{parallel}} + B \cdot (A \cdot e_{t-1})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0636em;vertical-align:-0.3802em;"></span><span class="mord"><span class="mord text"><span class="mord">Logits</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.242em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">adjusted</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3802em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0636em;vertical-align:-0.3802em;"></span><span class="mord"><span class="mord text"><span class="mord">Logits</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.242em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">parallel</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3802em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>当前一个位置采样出真实的 Token <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>e</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">e_{t-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span> 时，通过矩阵 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> 压缩降维检索出语义，再通过 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> 重新投影回 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 维空间，得到一个<strong>偏置向量（Bias Vector）</strong>。</p>
+<p>根据信息论，在 Logits 空间做加法，等价于在概率空间做乘法（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mi>P</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>+</mo><mtext>Bias</mtext></mrow><annotation encoding="application/x-tex">\log P(x) + \text{Bias}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Bias</span></span></span></span></span>）。它强制把前一个词的条件概率，乘到了并行盲猜的概率上。这种在局部注入依赖的精细对齐，让 DSpark 的平均接纳长度比业界前代标杆（如 Eagle3）再次暴涨了 <strong>26.7% 到 30.9%</strong>。</p>
+<p><img src="/images/DSpark&amp;DSpec/fig3.png" alt=""></p>
+<hr>
+<h2 id="矛盾二：大模型怎么验得更高效？（硬件感知前缀调度器）">矛盾二：大模型怎么验得更高效？（硬件感知前缀调度器）</h2>
+<p>解决了“猜”的问题，接下来要解决“验”的问题。</p>
+<p>传统投机采样采用<strong>固定长度验证（Fixed-length Verification）</strong>，设定好验 5 个词，就雷打不动送 5 个。但实验表明，随着位置变远，小模型猜对的概率呈指数级<strong>后缀衰减</strong>。在高并发、大 Batch Size 的真实生产环境（吞吐量拉满）下，计算核心（ALU）极度宝贵，把注定会被大模型“拒收”的垃圾后缀 Token 强行送去验证，会造成严重的<strong>高并发验证浪费</strong>。</p>
+<p><img src="/images/DSpark&amp;DSpec/fig4.png" alt=""></p>
+<h3 id="硬件感知前缀调度器（Hardware-aware-Prefix-Scheduler）">硬件感知前缀调度器（Hardware-aware Prefix Scheduler）</h3>
+<p>DSpark 引入了类似 <strong>D-Cut</strong> 的动态剪枝思想，在系统层做到了“硬件感知”。</p>
+<p>在服务启动时，调度器会首先对当前硬件（如 NVIDIA B200 节点）进行 Profile，测绘出不同并发下大模型验证不同长度 Token 的绝对硬件开销，构建出一个<strong>开销模型（Cost Model）</strong>。</p>
+<p>在线上运行时，小模型（经过 Domino 头修正后）在输出块的每个位置都会吐出一个置信度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">p_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。由于大模型的验证是链式截断的（前面错了后面全作废），调度器会计算每个位置的<strong>联合存活概率（Survival Probability）</strong>：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>Survival_Prob</mtext><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover><msub><mi>p</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\text{Survival\_Prob}(k) = \prod_{i=1}^{k} p_i
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord">Survival_Prob</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.1138em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8361em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∏</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>调度器会设定一个动态阈值。一旦某一步的累乘存活概率跌破安全线，调度器判定后续的验证期望收益已经低于硬件计算开销，就会立刻在此处<strong>截断（Cut）</strong>，不让大模型去验证后面的垃圾 Token。把算力省在刀刃上，从而实现了真正的自适应验证深度。</p>
+<p><img src="/images/DSpark&amp;DSpec/fig5.png" alt=""></p>
+<hr>
+<h2 id="全栈的胜利：从开源库-DeepSpec-到落地-DSpark">全栈的胜利：从开源库 DeepSpec 到落地 DSpark</h2>
+<p>在 LLM 领域，在玩具模型上跑通算法发论文，与在数千亿参数、工业级并发的生产线上落地，中间隔着一万个工程大坑。DeepSeek 令人惊叹的地方，正在于其恐怖的<strong>工程化整合能力</strong>。</p>
+<p>为了喂饱这个高精度的小模型，DeepSeek 推出了 <strong>DeepSpec 全栈开发库</strong>。它不仅定义了投机采样的全生命周期，还公开了其极具工业价值的“训练配方”：在数据准备阶段，让大模型离线生成标准答案，构建了高达 <strong>38 TB 的 Target Cache 离线缓存</strong>！用海量的高质量大模型“思考轨迹”去强监督对齐小模型。</p>
+<p><img src="/images/DSpark&amp;DSpec/fig6.png" alt=""></p>
+<p>同时，DeepSpec 内置了包括 GSM8K、MATH500、LiveCodeBench 在内的 9 大核心基准，并使用宏平均接受长度（Macro-average Acceptance Length）作为天平——先算出每个垂直任务的平均接受长度，再做算术平均，确保每个技术场景在成绩单上权重平等，拒绝刷榜，死磕全场景泛化。</p>
+<hr>
+<h2 id="总结">总结</h2>
+<p>梳理完这条前沿脉络，我们可以清晰地看到这套方案的演进闭环：</p>
+<ul>
+<li><strong>DFlash</strong> 贡献了速度的骨架（让草稿延迟从 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(K)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mclose">)</span></span></span></span> 变为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>）；</li>
+<li><strong>Domino 思想</strong> 贡献了准度的灵魂（用低秩马尔可夫头抹平多模态冲突）；</li>
+<li><strong>D-Cut 思想</strong> 贡献了系统的弹性（用硬件感知与存活概率拒绝验证浪费）；</li>
+<li><strong>DeepSeek</strong> 用 <strong>DeepSpec</strong> 把散落的学术明珠组装成了 38TB 级别的工业流水线，并最终结出了 <strong>DSpark</strong> 这一颗无缝适配其最新 V4 大模型的全栈硕果。</li>
+</ul>
+<p><img src="/images/DSpark&amp;DSpec/fig7.png" alt=""></p>
+<p>这正是当前大模型推理系统（LLM Inference Optimization）最前沿、最硬核的演进方向。有了这套开源全栈方案，整个开源社区距离“天下武功，唯快不破”的终极推理体验，又向前跨出了一大步。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9F%9B%E7%9B%BE%E4%B8%80%EF%BC%9A%E5%B0%8F%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%8C%9C%E5%BE%97%E6%9B%B4%E5%87%86%EF%BC%9F%EF%BC%88%E4%BB%8E-DFlash-%E5%88%B0-Domino-%E7%9A%84%E5%8D%8A%E8%87%AA%E5%9B%9E%E5%BD%92%E6%BC%94%E8%BF%9B%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">矛盾一：小模型怎么猜得更准？（从 DFlash 到 Domino 的半自回归演进）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E5%B8%A6%E6%9D%A5%E7%9A%84%E2%80%9C%E5%A4%9A%E6%A8%A1%E6%80%81%E5%86%B2%E7%AA%81%E2%80%9D"><span class="toc-number">1.1.</span> <span class="toc-text">并行带来的“多模态冲突”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DSpark-%E7%9A%84%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%8D%8A%E8%87%AA%E5%9B%9E%E5%BD%92%E6%9E%B6%E6%9E%84%E4%B8%8E%E4%BD%8E%E7%A7%A9%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E5%A4%B4%EF%BC%88Markov-Head%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">DSpark 的解法：半自回归架构与低秩马尔可夫头（Markov Head）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9F%9B%E7%9B%BE%E4%BA%8C%EF%BC%9A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E9%AA%8C%E5%BE%97%E6%9B%B4%E9%AB%98%E6%95%88%EF%BC%9F%EF%BC%88%E7%A1%AC%E4%BB%B6%E6%84%9F%E7%9F%A5%E5%89%8D%E7%BC%80%E8%B0%83%E5%BA%A6%E5%99%A8%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">矛盾二：大模型怎么验得更高效？（硬件感知前缀调度器）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E6%84%9F%E7%9F%A5%E5%89%8D%E7%BC%80%E8%B0%83%E5%BA%A6%E5%99%A8%EF%BC%88Hardware-aware-Prefix-Scheduler%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">硬件感知前缀调度器（Hardware-aware Prefix Scheduler）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A8%E6%A0%88%E7%9A%84%E8%83%9C%E5%88%A9%EF%BC%9A%E4%BB%8E%E5%BC%80%E6%BA%90%E5%BA%93-DeepSpec-%E5%88%B0%E8%90%BD%E5%9C%B0-DSpark"><span class="toc-number">3.</span> <span class="toc-text">全栈的胜利：从开源库 DeepSpec 到落地 DSpark</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&text=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&is_video=false&description=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark&body=Check out this article: https://val213.github.io/2026/06/28/DSpark&amp;DSpec/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&title=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&name=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark&description=结合技术报告硬核细节，扒一扒 DeepSeek 全栈开源投机采样方案 DeepSpec 与 DSpark 是如何让 V4 推理速度飙升 60%-85% 的。"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/06/28/DSpark&amp;DSpec/&t=拒绝盲猜与算力空转：深度拆解 DeepSeek 开源投机采样方案 DeepSpec &amp; DSpark"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
