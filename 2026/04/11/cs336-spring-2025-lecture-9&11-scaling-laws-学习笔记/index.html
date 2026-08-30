@@ -185,6 +185,20 @@
   </header>
   
 
+  <style>
+    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
+    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
+    body.code-wrap .highlight pre,
+    body.code-wrap .highlight .code,
+    body.code-wrap .article-entry pre{
+      white-space:pre-wrap !important;
+      word-break:break-word !important;
+      overflow-wrap:break-word !important;
+    }
+  </style>
+  <div class="code-wrap-toggle">
+    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
+  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>整理自 CS336 的 Lecture 9 和 Lecture 11。两讲都在回答同一个工程问题——给定有限算力，怎么精准预测超大模型的训练效果，避免无谓的试错浪费。</p>
 <p>假设你有 100,000 块 H100，一个月。你要训一个最好的开源 LM，架构、数据集、分布式框架全都备好了。问题是超参数怎么选，参数量和数据量怎么分配，哪个架构值得押注。传统做法是挨个训大模型试，新的做法是先在小模型上建立定量关系，然后一次到位。Scaling Laws 讲的就是后者。</p>
@@ -288,6 +302,18 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <p><strong>不同路径殊途同归</strong>：Cerebras/MiniCPM 用 muP，DeepSeek 用直接拟合，Llama 3/Hunyuan 做 isoflop 分析。底层逻辑是一样的：small-scale experiments → extrapolate → nail it once。</p>
 
   </div>
+  <script>
+    (function(){
+      var t=document.getElementById('codeWrapToggle');
+      if(!t)return;
+      var k='code-wrap';
+      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
+      t.addEventListener('change',function(){
+        document.body.classList.toggle('code-wrap',t.checked);
+        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
+      });
+    })();
+  </script>
 </article>
 
 

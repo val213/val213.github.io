@@ -174,6 +174,20 @@
   </header>
   
 
+  <style>
+    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
+    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
+    body.code-wrap .highlight pre,
+    body.code-wrap .highlight .code,
+    body.code-wrap .article-entry pre{
+      white-space:pre-wrap !important;
+      word-break:break-word !important;
+      overflow-wrap:break-word !important;
+    }
+  </style>
+  <div class="code-wrap-toggle">
+    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
+  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>这节课是数据专题的第二讲，很有老派大数据味道的一节课。</p>
 <p>上节课讲了&quot;有什么数据集&quot;，这节课则关注这些处理步骤的细节，会讲很多经典的大数据处理算法，还有一些挺有意思的数学，看看质量过滤和去重到底是怎么工作的。</p>
@@ -346,6 +360,18 @@
 <p>但<strong>这些都只是工具而已</strong>。知道这些算法怎么工作只是第一步，真正重要的是花时间和数据打交道。要去看你过滤掉了什么，留下了什么，然后训练一个小模型看看效果，再回来调整你的阈值和参数。这个过程没有捷径，只能靠经验。</p>
 
   </div>
+  <script>
+    (function(){
+      var t=document.getElementById('codeWrapToggle');
+      if(!t)return;
+      var k='code-wrap';
+      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
+      t.addEventListener('change',function(){
+        document.body.classList.toggle('code-wrap',t.checked);
+        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
+      });
+    })();
+  </script>
 </article>
 
 

@@ -174,6 +174,20 @@
   </header>
   
 
+  <style>
+    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
+    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
+    body.code-wrap .highlight pre,
+    body.code-wrap .highlight .code,
+    body.code-wrap .article-entry pre{
+      white-space:pre-wrap !important;
+      word-break:break-word !important;
+      overflow-wrap:break-word !important;
+    }
+  </style>
+  <div class="code-wrap-toggle">
+    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
+  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>这是「CS336 之后」系列的第一篇。</p>
 <p>起因是我把 CS336 Spring 2026 跟完之后（<a href="/2026/08/29/cs336-spring-2026-whats-new/">逐讲增量盘点</a>），发现一个尴尬的事实：课程在 6 月 3 日结束，而 Kimi K3（7/16）、GLM-5.3（8/14）全都是这之后发布的。课堂上的例子永远比时代晚一个身位。</p>
@@ -465,6 +479,18 @@
 <p>课程材料见 <a href="/2026/08/29/cs336-spring-2026-whats-new/">《CS336 Spring 2026 有什么新东西》</a>。</p>
 
   </div>
+  <script>
+    (function(){
+      var t=document.getElementById('codeWrapToggle');
+      if(!t)return;
+      var k='code-wrap';
+      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
+      t.addEventListener('change',function(){
+        document.body.classList.toggle('code-wrap',t.checked);
+        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
+      });
+    })();
+  </script>
 </article>
 
 

@@ -175,6 +175,20 @@
   </header>
   
 
+  <style>
+    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
+    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
+    body.code-wrap .highlight pre,
+    body.code-wrap .highlight .code,
+    body.code-wrap .article-entry pre{
+      white-space:pre-wrap !important;
+      word-break:break-word !important;
+      overflow-wrap:break-word !important;
+    }
+  </style>
+  <div class="code-wrap-toggle">
+    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
+  </div>
   <div class="content e-content" itemprop="articleBody">
     <h2 id="当理论照进现实：DeepSeek-Harness-与一场关于“底盘”的争论">当理论照进现实：DeepSeek Harness 与一场关于“底盘”的争论</h2>
 <p>2026年8月13日，DeepSeek 以 MIT 协议开源了 DeepSeek Harness（DSH）开发者预览版。一夜之间，GitHub 仓库突破 5 万星。与此同时，社交媒体上出现了两种截然不同的声音：一方欢呼“Agent 界的 Android 来了”，另一方则抱怨“半成品、Bug 多、Token 消耗高”。</p>
@@ -213,6 +227,18 @@
 <p>毕竟，罗马不是一天建成的，但乐高底板可以。</p>
 
   </div>
+  <script>
+    (function(){
+      var t=document.getElementById('codeWrapToggle');
+      if(!t)return;
+      var k='code-wrap';
+      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
+      t.addEventListener('change',function(){
+        document.body.classList.toggle('code-wrap',t.checked);
+        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
+      });
+    })();
+  </script>
 </article>
 
 
