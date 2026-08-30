@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="CS336 L4 讲了两条竞争路线：线性注意力与稀疏注意力，并断言&quot;纯线性在大规模未被验证&quot;。三个月后，Kimi K3 给线性路线投了 2.8T 参数的信任票，GLM-5.3-Flash 则把两条路线直接缝在了一起。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了">
+<meta property="og:url" content="https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="CS336 L4 讲了两条竞争路线：线性注意力与稀疏注意力，并断言&quot;纯线性在大规模未被验证&quot;。三个月后，Kimi K3 给线性路线投了 2.8T 参数的信任票，GLM-5.3-Flash 则把两条路线直接缝在了一起。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-29T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T13:07:07.829Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="CS336">
+<meta property="article:tag" content="长上下文">
+<meta property="article:tag" content="线性注意力">
+<meta property="article:tag" content="稀疏注意力">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/08/29/cs336-spring-2026-whats-new/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&text=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&is_video=false&description=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了&body=Check out this article: https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&name=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了&description=CS336 L4 讲了两条竞争路线：线性注意力与稀疏注意力，并断言&#34;纯线性在大规模未被验证&#34;。三个月后，Kimi K3 给线性路线投了 2.8T 参数的信任票，GLM-5.3-Flash 则把两条路线直接缝在了一起。"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&t=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AF%BE%E7%A8%8B%E7%BB%99%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9AL4-%E7%9A%84%E4%B8%A4%E6%9D%A1%E8%B7%AF%E7%BA%BF"><span class="toc-number">1.</span> <span class="toc-text">一、课程给的问题：L4 的两条路线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%B8%89%E4%BB%BD%E7%AD%94%E5%8D%B7"><span class="toc-number">2.</span> <span class="toc-text">二、三份答卷</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E5%8D%B7%E4%B8%80%EF%BC%9ADeepSeek-V4-%E2%80%94%E2%80%94-%E8%B5%B0%E5%8E%8B%E7%BC%A9%EF%BC%8C%E5%A4%8D%E7%94%A8-DSA"><span class="toc-number">2.1.</span> <span class="toc-text">答卷一：DeepSeek V4 —— 走压缩，复用 DSA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E5%8D%B7%E4%BA%8C%EF%BC%9AKimi-K3-%E2%80%94%E2%80%94-%E7%BB%99%E7%BA%BF%E6%80%A7%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%8A%95%E4%BA%86-2-8T-%E5%8F%82%E6%95%B0%E7%9A%84%E4%BF%A1%E4%BB%BB%E7%A5%A8"><span class="toc-number">2.2.</span> <span class="toc-text">答卷二：Kimi K3 —— 给线性注意力投了 2.8T 参数的信任票</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E5%8D%B7%E4%B8%89%EF%BC%9AGLM-5-3-Flash-%E2%80%94%E2%80%94-%E4%B8%A4%E6%9D%A1%E8%B7%AF%E7%BA%BF%E7%9B%B4%E6%8E%A5%E7%BC%9D%E5%90%88"><span class="toc-number">2.3.</span> <span class="toc-text">答卷三：GLM-5.3-Flash —— 两条路线直接缝合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%80%90%E6%9D%A1%E5%AF%B9%E7%85%A7%EF%BC%9A%E8%AF%BE%E7%A8%8B%E7%9A%84%E5%9B%9B%E6%9D%A1%E5%88%A4%E6%96%AD"><span class="toc-number">3.</span> <span class="toc-text">三、逐条对照：课程的四条判断</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E4%B8%A4%E4%B8%AA%E4%BB%8D%E7%84%B6%E6%82%AC%E8%80%8C%E6%9C%AA%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">四、两个仍然悬而未决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%B8%80%E4%BB%BD%E5%8F%AF%E4%BB%A5%E5%A4%8D%E7%94%A8%E7%9A%84%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="toc-number">5.</span> <span class="toc-text">五、一份可以复用的检查清单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%B3%BB%E5%88%97%E9%A2%84%E5%91%8A"><span class="toc-number">6.</span> <span class="toc-text">六、系列预告</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%EF%BC%9A%E6%9C%AC%E7%AF%87%E7%9A%84%E4%B8%80%E6%89%8B%E6%9D%90%E6%96%99"><span class="toc-number">7.</span> <span class="toc-text">附：本篇的一手材料</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-08-29T08:00:00.000Z" class="dt-published" itemprop="datePublished">2026-08-29</time>
+        
+        (Updated: <time datetime="2026-08-29T13:07:07.829Z" class="dt-updated" itemprop="dateModified">2026-08-29</time>)
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/CS336/" rel="tag">CS336</a>, <a class="p-category" href="/tags/LLM/" rel="tag">LLM</a>, <a class="p-category" href="/tags/%E7%A8%80%E7%96%8F%E6%B3%A8%E6%84%8F%E5%8A%9B/" rel="tag">稀疏注意力</a>, <a class="p-category" href="/tags/%E7%BA%BF%E6%80%A7%E6%B3%A8%E6%84%8F%E5%8A%9B/" rel="tag">线性注意力</a>, <a class="p-category" href="/tags/%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87/" rel="tag">长上下文</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>这是「CS336 之后」系列的第一篇。</p>
+<p>起因是我把 CS336 Spring 2026 跟完之后（<a href="/2026/08/29/cs336-spring-2026-whats-new/">逐讲增量盘点</a>），发现一个尴尬的事实：课程在 6 月 3 日结束，而 Kimi K3（7/16）、GLM-5.3（8/14）全都是这之后发布的。课堂上的例子永远比时代晚一个身位。</p>
+<p>但换个角度想，这恰恰是课程最有价值的地方：它给的<strong>不是结论，是提问的能力</strong>。技术报告是答案，但没有框架你连问题都提不出来。</p>
+<p>这一篇就拿<strong>长上下文</strong>这个主题做示范。我会先复述课程给的判断框架，再看三个最新模型各自交了什么答卷，最后指出——<strong>其中一个结果，课程没预料到</strong>。</p>
+<hr>
+<h2 id="一、课程给的问题：L4-的两条路线">一、课程给的问题：L4 的两条路线</h2>
+<p>CS336 2026 的 L4（4 月 8 日）是今年全新的一讲。2025 年这一讲叫 &quot;Mixture of experts&quot;，2026 年改成了 &quot;<strong>Attention alternatives</strong> and mixture of experts&quot;——60 页里<strong>前 13 页是全新的</strong>。</p>
+<p>动机很直白：FFN 的开销随序列长度<strong>线性</strong>增长，attention 是<strong>二次</strong>增长。序列一长，attention 就是瓶颈。</p>
+<p>课程把解法归成两类，然后用<strong>一个统一的公式骨架</strong>串起了四代模型：</p>
+<ol>
+<li><strong>线性注意力</strong>：<code>QKᵀV = Q(KᵀV)</code>，复杂度从 <code>n²dk + n²dv</code> 降到 <code>2·n·dv·dk</code>。循环形式 <code>S_t = S_&#123;t-1&#125; + k_t v_tᵀ</code> 与 LSTM 同构，形成&quot;训练用并行二次形式、推理用串行线性形式&quot;的对偶。</li>
+<li><strong>Mamba-2</strong>：加输入相关的 γ_t 门控 + <code>v_tᵀD</code> 直通项，动机是&quot;何时遗忘&quot;。</li>
+<li><strong>Gated DeltaNet</strong>：再加 β_t &quot;no-input&quot; 门与 <code>(I − β_t k_t k_tᵀ)</code> 沿当前 key 方向的擦除。讲义指出这与 fast weight programming / test-time training 的元学习最小二乘<strong>殊途同归</strong>。</li>
+</ol>
+<p>然后是三个落地模型及混合比例：<strong>MiniMax M1（7:1 线性:full）</strong>、<strong>Nemotron 3（Mamba-2 约 3:1）</strong>、<strong>Qwen 3.5 / Next（GDN 3:1）</strong>。</p>
+<p>另一个完全不同的路线是 <strong>DSA（DeepSeek Sparse Attention）</strong>：稀疏而非线性。先用一个轻量 indexer（QK 内积 + ReLU + top-K）筛出子集，再对子集做 full attention。要点是 indexer 本身仍是二次的但常数极小（可低精度/低维），K 有上界所以第二阶段&quot;贵但短&quot;，而且<strong>可以 post-hoc 在长上下文扩展阶段才插入</strong>，成本极低。</p>
+<p>课程给了四条明确的判断：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>至今没有人证明纯线性注意力在大规模可行</strong>，下面讲的全是 hybrid</td>
+</tr>
+<tr>
+<td>2</td>
+<td>混合比存在<strong>性能悬崖</strong>：低比例几乎无损，比例一高长上下文检索与 QA 单调劣化，全 RNN 明显掉点</td>
+</tr>
+<tr>
+<td>3</td>
+<td>DSA 是<strong>完全不同的第二条路线</strong>（稀疏 vs 线性），且可 post-hoc 插入</td>
+</tr>
+<tr>
+<td>4</td>
+<td>线性注意力与 SSM 是 KV cache 之外的方向，当前架构&quot;<strong>fundamentally inference-unfriendly</strong>&quot;</td>
+</tr>
+</tbody>
+</table>
+<p>这四条就是我们拿来读报告的尺子。</p>
+<hr>
+<h2 id="二、三份答卷">二、三份答卷</h2>
+<p>先把时间线摆清楚，因为有个容易搞错的地方：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>发布</th>
+<th>相对课程（3/30–6/3）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DeepSeek V4</strong></td>
+<td><strong>4/24</strong>（技术报告+开源权重）</td>
+<td><strong>课程期间</strong></td>
+</tr>
+<tr>
+<td>Kimi K3</td>
+<td>7/16</td>
+<td>结课后 6 周</td>
+</tr>
+<tr>
+<td>GLM-5.3</td>
+<td>8/14</td>
+<td>结课后 10 周</td>
+</tr>
+<tr>
+<td>GLM-5.3-Flash</td>
+<td>8/26</td>
+<td>结课后 12 周</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DeepSeek V4 是在课程期间发布的</strong>（4/24，58 页技术报告，同步开源权重）。L10 在 4/29 上课，Percy 讲的是 5 天前刚出的东西。所以 V4 不算&quot;课程没讲到&quot;——恰恰相反，它是课程实时性的证明。真正没讲到的是 K3 和 GLM-5.3。</p>
+<h3 id="答卷一：DeepSeek-V4-——-走压缩，复用-DSA">答卷一：DeepSeek V4 —— 走压缩，复用 DSA</h3>
+<p>规格：V4-Pro <strong>1.6T 总参 / 49B 激活</strong>，V4-Flash <strong>284B / 13B 激活</strong>，双双支持 <strong>1M 上下文</strong>。</p>
+<p>架构创新三条：</p>
+<ol>
+<li>
+<p><strong>混合注意力 CSA + HCA</strong></p>
+<ul>
+<li><strong>CSA（Compressed Sparse Attention）</strong>：沿序列维度压缩 KV cache，然后执行 <strong>DSA</strong></li>
+<li><strong>HCA（Heavily Compressed Attention）</strong>：更激进地压缩 KV cache，但<strong>保持 dense attention</strong></li>
+</ul>
+<p>注意这两者的分工很讲究：CSA 压缩后走稀疏（保证长程召回），HCA 压缩更狠但保持稠密（保证局部精度）。<strong>DSA 是从 V3.2 直接复用的</strong>——这正好印证了课程说的&quot;DSA 可以 post-hoc 插入&quot;。</p>
+</li>
+<li>
+<p><strong>mHC（Manifold-Constrained Hyper-Connections）</strong>：升级传统残差连接。这个后面还会出现，记住它。</p>
+</li>
+<li>
+<p><strong>Muon 优化器</strong>：用于 V4 系列训练，&quot;faster convergence and improved training stability&quot;。</p>
+</li>
+</ol>
+<p>基础设施上有两个细节值得注意：用 <strong>TileLang</strong>（一种 DSL）平衡 kernel 开发效率与运行效率；<strong>KV cache 落盘（On-Disk KV Cache Storage）</strong>——这正是 L18 客座讲座里 Dan Fu 讲的&quot;现代版操作系统换页&quot;（HBM → DRAM → SSD）。</p>
+<h3 id="答卷二：Kimi-K3-——-给线性注意力投了-2-8T-参数的信任票">答卷二：Kimi K3 —— 给线性注意力投了 2.8T 参数的信任票</h3>
+<p>规格：<strong>2.8T 总参 / 104B 激活 / 1M 上下文 / 原生多模态</strong>。</p>
+<p>架构三条：</p>
+<ol>
+<li>
+<p><strong>混合注意力 KDA + Gated MLA，3:1</strong></p>
+<blockquote>
+<p>&quot;Each block contains 3 KDA layers followed by 1 Gated MLA layer, giving a <strong>3:1</strong> mixing ratio.&quot;</p>
+</blockquote>
+<p><strong>3:1。</strong> 和课程里 Qwen 3.5 的 GDN 比例<strong>一模一样</strong>。这不是巧合，后面会讲。</p>
+</li>
+<li>
+<p><strong>KDA（Kimi Delta Attention）的公式</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S_t = (I − β_t k_t k_tᵀ) · Diag(α_t) · S_&#123;t−1&#125; + β_t k_t v_tᵀ</span><br></pre></td></tr></table></figure>
+<p><strong>这就是课程 L4 讲的 Gated DeltaNet 公式</strong>，一字不差：<code>(I − β_t k_t k_tᵀ)</code> 沿当前 key 方向的擦除，外加一个 channel-wise 的衰减 <code>Diag(α_t)</code>。</p>
+<p>课程 4/8 讲，K3 在 7/16 用它跑了 2.8T 参数。这说明课程讲的不是象牙塔里的东西，就是当时业界正在用的东西。</p>
+<p>工程上 K3 还解决了一个具体的数值问题：chunkwise 形式需要用 <code>1/Γ</code> 重缩放 key，而 Γ 是 (0,1) 区间的衰减因子连乘，倒数会无界增长导致溢出。Kimi Linear 的解法是在 log 空间算相对衰减并把 chunk 切成 16-token 的二级 tile；<strong>K3 改用 scaled sigmoid 从下界约束 log-decay</strong>。这是典型的&quot;算法—系统协同设计&quot;。</p>
+</li>
+<li>
+<p><strong>Stable LatentMoE</strong>：专家空间扩到 <strong>896 个，每 token 激活 16 个</strong>。配套 Normalized LatentMoE、SiTU-GLU、Quantile Balancing 来稳定极端稀疏下的优化。</p>
+<p>对比一下：课程 L11 讲 Kimi <strong>K2</strong> 选 sparsity = <strong>48</strong>，理由是&quot;那之后边际递减&quot;。K3 的 896/16 = <strong>56</strong>。稀疏度还在往上推。</p>
+</li>
+</ol>
+<p>另外两个点：K3 用的是 <strong>Per-Head Muon</strong>（不只是 Muon，是 per-head 变体）；官方称相比 K2，<strong>overall scaling efficiency 提升约 2.5 倍</strong>。</p>
+<h3 id="答卷三：GLM-5-3-Flash-——-两条路线直接缝合">答卷三：GLM-5.3-Flash —— 两条路线直接缝合</h3>
+<p>规格：<strong>320B 总参 / 18B 激活 / 1M 上下文</strong>，GLM-5 系列首个原生多模态。</p>
+<p>官方原话：</p>
+<blockquote>
+<p>&quot;是首个采用<strong>稀疏注意力与线性注意力混合架构</strong>的开源前沿模型。&quot;</p>
+</blockquote>
+<p>具体机制：</p>
+<ul>
+<li><strong>线性注意力</strong>通过递归机制捕获<strong>局部</strong>依赖</li>
+<li><strong>稀疏注意力</strong>借助轻量级索引器召回<strong>全局</strong>上下文</li>
+<li>为降低 1M 上下文下索引器的时延与内存开销，引入 <strong>IndexPool</strong>，通过加权池化把索引器的 <strong>4 个缓存向量压缩为 1 个</strong></li>
+</ul>
+<p>效果（官方数据，对比 GLM-5.3）：<strong>注意力计算量降低 3.01 倍，KV 缓存降低 4.44 倍</strong>。</p>
+<p>而且官方直接给出了与 DeepSeek-V4-Flash、Kimi-K3 的横向对比（每 Head 每层注意力计算量、每层平均 KV 缓存大小 BF16）：</p>
+<blockquote>
+<p>&quot;在所有基线模型中，GLM-5.3-Flash 的注意力计算量最低。不过，GLM-5.3-Flash 的 KV 缓存大小仍<strong>略高于</strong> Kimi-K3 和 DeepSeek-V4-Flash。&quot;</p>
+</blockquote>
+<p>这句话很实在——<strong>没有全面最优，只有权衡</strong>。纯线性路线（K3）在 KV cache 上仍然领先，混合路线（GLM）在计算量上领先。</p>
+<p>另外 GLM-5.3-Flash 也用了 <strong>mHC</strong>，和 DeepSeek V4 一样。</p>
+<hr>
+<h2 id="三、逐条对照：课程的四条判断">三、逐条对照：课程的四条判断</h2>
+<p>现在拿尺子量。</p>
+<p><strong>判断 1：&quot;纯线性注意力在大规模未被验证，全是 hybrid&quot; —— ✅ 完全应验</strong></p>
+<p>K3 是 3:1 hybrid，不是纯线性。GLM-5.3-Flash 也是混合。没有任何一个模型赌纯线性。</p>
+<p>值得注意的<strong>规模</strong>：K3 用 2.8T 参数验证了 3:1 的线性混合。这比课程里讲的 Qwen 3.5、Nemotron 3 大了一个数量级。所以&quot;未验证&quot;这个说法现在要改口——<strong>在 2.8T 规模上，3:1 的线性混合是被验证可行的</strong>。但纯线性仍然无人尝试。</p>
+<p><strong>判断 2：&quot;混合比存在性能悬崖&quot; —— ✅ 应验，而且收敛到了同一个点</strong></p>
+<p>课程给了三个比例：MiniMax M1 的 7:1、Nemotron 3 的 3:1、Qwen 3.5 的 3:1。</p>
+<p>半年后 K3 选了 <strong>3:1</strong>。</p>
+<p>不同团队、不同架构、不同规模，都停在 3:1 附近——这强烈暗示存在一个<strong>经验最优区间</strong>。课程的&quot;性能悬崖&quot;判断是对的：7:1 是激进的一端（只有 MiniMax 敢试），3:1 是共识。</p>
+<p><strong>判断 3：&quot;DSA 是完全不同的第二条路线，可 post-hoc 插入&quot; —— ✅ 应验</strong></p>
+<p>DeepSeek V4 直接复用 V3.2 的 DSA。GLM 用的也是稀疏索引器路线（GLM-DSA）。这条路线的可复用性被证明得非常彻底。</p>
+<p><strong>判断 4：两条路线是&quot;二选一&quot; —— ❌ 被推翻了</strong></p>
+<p>这是课程<strong>没预料到</strong>的部分。</p>
+<p>课程把线性注意力和稀疏注意力讲成两条<strong>竞争</strong>路线。讲义里甚至有一页专门讲 ByteDance Seed 与 UC Santa Cruz 的混合比实验，暗示你要在&quot;线性占比&quot;这个一维坐标上选一个点。</p>
+<p>但 GLM-5.3-Flash 给出的答案是：<strong>两个都要，但分工不同</strong>——</p>
+<ul>
+<li>线性注意力负责<strong>局部</strong>（递归机制天然擅长邻近依赖，且 KV cache 固定大小）</li>
+<li>稀疏注意力负责<strong>全局</strong>（轻量索引器召回远处的关键信息）</li>
+</ul>
+<p>这是一个二维的选择，不是一维的。课程的框架仍然有效，但它描述的是 2026 年 4 月的认知状态。</p>
+<p><strong>还有一个课程没讲但已经成了共识的东西：mHC。</strong></p>
+<p>DeepSeek V4 和 GLM-5.3-Flash <strong>都用了</strong> Manifold-Constrained Hyper-Connections。这是 Xie et al. 2026 的工作，升级传统残差连接。两个独立团队同时采用，说明残差拓扑是当前架构创新的一个活跃方向——而课程 L3 讲残差时（pre-norm vs post-norm、QK-norm、z-loss）完全没有覆盖到这一层。</p>
+<hr>
+<h2 id="四、两个仍然悬而未决的问题">四、两个仍然悬而未决的问题</h2>
+<p>技术报告回答了一些问题，也暴露了新问题。</p>
+<p><strong>1. Muon 到底好不好？仍然没有答案。</strong></p>
+<p>课程 L11 的完整叙事是：nanoGPT speedrun 上 Muon 大幅超 Adam → 大规模研究显示收益随 scale 递减 → <strong>Kimi K2 全量用 Muon，但没有 ablation，&quot;是否真比 AdamW 好&quot;仍是未解问题</strong>。</p>
+<p>现在 K3 用 Per-Head Muon，DeepSeek V4 也用 Muon。两个前沿模型都上车了。</p>
+<p><strong>但依然没有 ablation。</strong> 报告里只说&quot;faster convergence and improved training stability&quot;，没有和 AdamW 的同规模对照。课程里 Tatsu 那句&quot;一半是科学，一半是 vibes&quot;，到今天仍然成立。</p>
+<p>顺带说个方法论问题：L11 讲过，<strong>做 optimizer 对比至少要同时盯住两个轴——compute 与 Chinchilla ratio（token:param）</strong>。只扫模型尺寸轴的对比论文基本不可信。以后看到任何&quot;XX 优化器吊打 AdamW&quot;的说法，先问它扫了 ratio 没有。</p>
+<p><strong>2. 稀疏度应该多大？没有理论，只有实践。</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>总参</th>
+<th>激活</th>
+<th>专家数</th>
+<th>激活专家</th>
+<th>稀疏度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kimi K2</td>
+<td>1T</td>
+<td>32B</td>
+<td>—</td>
+<td>—</td>
+<td><strong>48</strong></td>
+</tr>
+<tr>
+<td>Kimi K3</td>
+<td>2.8T</td>
+<td>104B</td>
+<td>896</td>
+<td>16</td>
+<td><strong>56</strong></td>
+</tr>
+<tr>
+<td>DeepSeek V4-Pro</td>
+<td>1.6T</td>
+<td>49B</td>
+<td>—</td>
+<td>—</td>
+<td>~33</td>
+</tr>
+<tr>
+<td>GLM-5.3-Flash</td>
+<td>320B</td>
+<td>18B</td>
+<td>—</td>
+<td>—</td>
+<td>~18</td>
+</tr>
+</tbody>
+</table>
+<p>从 18 到 56，差 3 倍。<strong>没有收敛，也没有公开的选择依据</strong>。课程 L11 讲 Kimi K2 选 48 是&quot;因为那之后边际递减&quot;——这是唯一的公开推理，而且是单点的。</p>
+<p>顺带一提，GLM-5.3-Flash 只有 320B 却拿到 AA 智能指数 57 分（与 Claude Opus 4.8 持平），<strong>稀疏度只有 18</strong>。这暗示小模型 + 低稀疏度 + 好架构，可能比大模型 + 高稀疏度更划算。当然，官方数字要打折看。</p>
+<hr>
+<h2 id="五、一份可以复用的检查清单">五、一份可以复用的检查清单</h2>
+<p>这一篇的方法论，总结一下就是：<strong>拿课程当解剖刀，而不是当百科全书</strong>。</p>
+<p>具体到长上下文这个主题，读一份技术报告时该问：</p>
+<table>
+<thead>
+<tr>
+<th>该问的问题</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>走的是线性、稀疏，还是混合？</td>
+<td>L4</td>
+</tr>
+<tr>
+<td>如果是混合，比例多少？为什么停在这个点？</td>
+<td>L4（3:1 共识，7:1 是激进端）</td>
+</tr>
+<tr>
+<td>稀疏注意力是 post-hoc 插入还是从零训？</td>
+<td>L4</td>
+</tr>
+<tr>
+<td>KV cache 怎么压？MLA / DSA / 压缩？压了多少倍？</td>
+<td>L10</td>
+</tr>
+<tr>
+<td>1M 上下文时 attention 的算术强度是多少？memory-bound 还是 compute-bound？</td>
+<td>L2</td>
+</tr>
+<tr>
+<td>长上下文阶段的 EP / CP 怎么配？</td>
+<td>L8（TP ≤ 8，CP 可到 64）</td>
+</tr>
+<tr>
+<td>KV cache 有没有分层？落盘了吗？</td>
+<td>L18（HBM→DRAM→SSD 换页）</td>
+</tr>
+</tbody>
+</table>
+<p>这套问题可以套到任何一份技术报告上——包括半年前发布的旧报告，以及将来才会出现的新报告。</p>
+<hr>
+<h2 id="六、系列预告">六、系列预告</h2>
+<p>这个系列会按<strong>技术主题</strong>切，不按模型切——避免退化成模型发布简讯。计划中的几篇：</p>
+<ol>
+<li><strong>长上下文：路线之争与合流</strong>（本文）</li>
+<li><strong>MoE 稀疏度</strong>：从 K2 的 48 到 K3 的 56，稀疏度这个维度到底怎么选</li>
+<li><strong>Muon 与优化器</strong>：一个课程明确说&quot;仍是未解问题&quot;的话题，半年后进展如何</li>
+<li><strong>Agent 能力从哪来</strong>：mid-training 注入 vs 末段注入（L15/L16 的核心争议）</li>
+<li><strong>国产芯片上的推理</strong>：GLM-5.3-Flash 跑在国产芯片集群上，这件事的系统含义</li>
+</ol>
+<p>每篇都会有一个明确的结构：<strong>课程给了什么判断 → 报告给了什么答案 → 哪些应验、哪些失效</strong>。</p>
+<p>最后说一句本系列的立场。技术报告是 PR 文档，不是论文——它只写成功的不写失败的。而课程里最有价值的判断恰恰是负面的：&quot;至今没有人证明纯线性注意力在大规模可行&quot;、&quot;混合比存在性能悬崖&quot;。这类信息你不会在任何一份技术报告里看到。</p>
+<p><strong>所以这两样东西是互补的，不是替代关系。</strong> 课程给尺子，报告给读数。</p>
+<hr>
+<h2 id="附：本篇的一手材料">附：本篇的一手材料</h2>
+<p>全部落盘在 <code>~/valyang-daily/cs336/techreports/</code>，可复现：</p>
+<ul>
+<li><strong>DeepSeek V4</strong>：arXiv 2606.19348，《DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence》</li>
+<li><strong>Kimi K3</strong>：arXiv 2607.24653，《Kimi K3: Open Frontier Intelligence》</li>
+<li><strong>GLM-5.3-Flash</strong>：智谱官方文档 <a target="_blank" rel="noopener" href="http://docs.bigmodel.cn">docs.bigmodel.cn</a>（含架构说明与横向对比数据）</li>
+</ul>
+<p>说明：本篇只纳入<strong>有技术报告或官方技术文档</strong>的模型。混元 Hy4 preview（8/28 发布）截至本文写作时仅有新闻稿、无技术报告，无法验证其架构细节，故未纳入分析范围；待其技术报告发布后再单独补篇。</p>
+<p>课程材料见 <a href="/2026/08/29/cs336-spring-2026-whats-new/">《CS336 Spring 2026 有什么新东西》</a>。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AF%BE%E7%A8%8B%E7%BB%99%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9AL4-%E7%9A%84%E4%B8%A4%E6%9D%A1%E8%B7%AF%E7%BA%BF"><span class="toc-number">1.</span> <span class="toc-text">一、课程给的问题：L4 的两条路线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%B8%89%E4%BB%BD%E7%AD%94%E5%8D%B7"><span class="toc-number">2.</span> <span class="toc-text">二、三份答卷</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E5%8D%B7%E4%B8%80%EF%BC%9ADeepSeek-V4-%E2%80%94%E2%80%94-%E8%B5%B0%E5%8E%8B%E7%BC%A9%EF%BC%8C%E5%A4%8D%E7%94%A8-DSA"><span class="toc-number">2.1.</span> <span class="toc-text">答卷一：DeepSeek V4 —— 走压缩，复用 DSA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E5%8D%B7%E4%BA%8C%EF%BC%9AKimi-K3-%E2%80%94%E2%80%94-%E7%BB%99%E7%BA%BF%E6%80%A7%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%8A%95%E4%BA%86-2-8T-%E5%8F%82%E6%95%B0%E7%9A%84%E4%BF%A1%E4%BB%BB%E7%A5%A8"><span class="toc-number">2.2.</span> <span class="toc-text">答卷二：Kimi K3 —— 给线性注意力投了 2.8T 参数的信任票</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E5%8D%B7%E4%B8%89%EF%BC%9AGLM-5-3-Flash-%E2%80%94%E2%80%94-%E4%B8%A4%E6%9D%A1%E8%B7%AF%E7%BA%BF%E7%9B%B4%E6%8E%A5%E7%BC%9D%E5%90%88"><span class="toc-number">2.3.</span> <span class="toc-text">答卷三：GLM-5.3-Flash —— 两条路线直接缝合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%80%90%E6%9D%A1%E5%AF%B9%E7%85%A7%EF%BC%9A%E8%AF%BE%E7%A8%8B%E7%9A%84%E5%9B%9B%E6%9D%A1%E5%88%A4%E6%96%AD"><span class="toc-number">3.</span> <span class="toc-text">三、逐条对照：课程的四条判断</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E4%B8%A4%E4%B8%AA%E4%BB%8D%E7%84%B6%E6%82%AC%E8%80%8C%E6%9C%AA%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">四、两个仍然悬而未决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%B8%80%E4%BB%BD%E5%8F%AF%E4%BB%A5%E5%A4%8D%E7%94%A8%E7%9A%84%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="toc-number">5.</span> <span class="toc-text">五、一份可以复用的检查清单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%B3%BB%E5%88%97%E9%A2%84%E5%91%8A"><span class="toc-number">6.</span> <span class="toc-text">六、系列预告</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%EF%BC%9A%E6%9C%AC%E7%AF%87%E7%9A%84%E4%B8%80%E6%89%8B%E6%9D%90%E6%96%99"><span class="toc-number">7.</span> <span class="toc-text">附：本篇的一手材料</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&text=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&is_video=false&description=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了&body=Check out this article: https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&title=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&name=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了&description=CS336 L4 讲了两条竞争路线：线性注意力与稀疏注意力，并断言&#34;纯线性在大规模未被验证&#34;。三个月后，Kimi K3 给线性路线投了 2.8T 参数的信任票，GLM-5.3-Flash 则把两条路线直接缝在了一起。"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/08/29/cs336-after-01-long-context-convergence/&t=「CS336 之后」01：长上下文的路线之争，在课程结束后三个月合流了"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

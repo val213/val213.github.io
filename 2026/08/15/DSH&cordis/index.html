@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="当理论照进现实：DeepSeek Harness 与一场关于“底盘”的争论 2026年8月13日，DeepSeek 以 MIT 协议开源了 DeepSeek Harness（DSH）开发者预览版。一夜之间，GitHub 仓库突破 5 万星。与此同时，社交媒体上出现了两种截然不同的声音：一方欢呼“Agent 界的 Android 来了”，另一方则抱怨“半成品、Bug 多、Token 消耗高”。 同一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Val&#39;s Blog">
+<meta property="og:url" content="https://val213.github.io/2026/08/15/DSH&cordis/index.html">
+<meta property="og:site_name" content="Val&#39;s Blog">
+<meta property="og:description" content="当理论照进现实：DeepSeek Harness 与一场关于“底盘”的争论 2026年8月13日，DeepSeek 以 MIT 协议开源了 DeepSeek Harness（DSH）开发者预览版。一夜之间，GitHub 仓库突破 5 万星。与此同时，社交媒体上出现了两种截然不同的声音：一方欢呼“Agent 界的 Android 来了”，另一方则抱怨“半成品、Bug 多、Token 消耗高”。 同一">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-15T13:33:29.905Z">
+<meta property="article:modified_time" content="2026-08-16T04:15:48.614Z">
+<meta property="article:author" content="Val">
+<meta property="article:tag" content="LLM, AI, 源码解析, 深度学习">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Val&#39;s Blog</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    <!-- Web fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&family=Fira+Code:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/08/29/cs336-spring-2026-whats-new/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/07/04/%E5%A6%82%E6%9E%9C%E5%BD%BC%E5%BE%97%E6%9E%97%E5%A5%87%E6%87%82AI/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/08/15/DSH&amp;cordis/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&text="><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&is_video=false&description="><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=&body=Check out this article: https://val213.github.io/2026/08/15/DSH&amp;cordis/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&name=&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/08/15/DSH&amp;cordis/&t="><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E7%90%86%E8%AE%BA%E7%85%A7%E8%BF%9B%E7%8E%B0%E5%AE%9E%EF%BC%9ADeepSeek-Harness-%E4%B8%8E%E4%B8%80%E5%9C%BA%E5%85%B3%E4%BA%8E%E2%80%9C%E5%BA%95%E7%9B%98%E2%80%9D%E7%9A%84%E4%BA%89%E8%AE%BA"><span class="toc-number">1.</span> <span class="toc-text">当理论照进现实：DeepSeek Harness 与一场关于“底盘”的争论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81Cordis%EF%BC%9A%E4%B9%90%E9%AB%98%E5%BA%95%E6%9D%BF%E4%B8%8A%E7%9A%84%E6%95%B0%E5%AD%A6"><span class="toc-number">1.1.</span> <span class="toc-text">一、Cordis：乐高底板上的数学</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%BA%95%E7%9B%98%E6%80%9D%E7%BB%B4%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%B4%E5%AE%83%E2%80%9C%E8%B6%85%E5%89%8D%E2%80%9D"><span class="toc-number">1.2.</span> <span class="toc-text">二、底盘思维：为什么说它“超前”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%A4%BE%E5%8C%BA%E7%9A%84%E4%B8%A4%E6%9E%81%EF%BC%9A%E6%96%B9%E5%90%91%E4%B8%8E%E5%AE%8C%E6%88%90%E5%BA%A6"><span class="toc-number">1.3.</span> <span class="toc-text">三、社区的两极：方向与完成度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%9C%AA%E6%9D%A5%EF%BC%9A%E5%BD%93-Harness-%E5%AD%A6%E4%BC%9A%E8%87%AA%E6%88%91%E4%BF%AE%E6%94%B9"><span class="toc-number">1.4.</span> <span class="toc-text">四、未来：当 Harness 学会自我修改</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Val</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-08-15T13:33:29.905Z" class="dt-published" itemprop="datePublished">2026-08-15</time>
+        
+        (Updated: <time datetime="2026-08-16T04:15:48.614Z" class="dt-updated" itemprop="dateModified">2026-08-16</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="当理论照进现实：DeepSeek-Harness-与一场关于“底盘”的争论">当理论照进现实：DeepSeek Harness 与一场关于“底盘”的争论</h2>
+<p>2026年8月13日，DeepSeek 以 MIT 协议开源了 DeepSeek Harness（DSH）开发者预览版。一夜之间，GitHub 仓库突破 5 万星。与此同时，社交媒体上出现了两种截然不同的声音：一方欢呼“Agent 界的 Android 来了”，另一方则抱怨“半成品、Bug 多、Token 消耗高”。</p>
+<p>同一件事，为何评价如此撕裂？</p>
+<p>答案藏在 DSH 的定位里——它不是一个面向终端用户的“产品”，而是一个面向开发者的“底盘”。理解了这个底盘的设计思想，就读懂了这场争论的本质。</p>
+<h3 id="一、Cordis：乐高底板上的数学">一、Cordis：乐高底板上的数学</h3>
+<p>DSH 的底层是 Cordis——一个由北大与 DeepSeek 联合设计的“元框架”。Cordis 不提供任何具体的 Agent 能力，它只做一件事：管理插件的加载、卸载和依赖关系。</p>
+<p>在 Cordis 的世界里，“一切皆插件”不是口号，而是字面意思：模型适配器、工具注册表、会话日志、Agent Loop、文件系统、沙箱、甚至 UI 都是插件。<strong>没有特权核心</strong>——想换模型就换模型插件，想换沙箱就换沙箱插件，想重写 Agent Loop 就重写 Agent Loop 插件。</p>
+<p>这套架构背后有一套完整的数学理论——发表于同日的论文《A Programming Paradigm for Spatiotemporal Composability》。论文将动态组合拆解为两个正交维度：</p>
+<p><strong>时间可组合性</strong>：组件卸载后，它做过的所有事情能否被完全撤销？</p>
+<p>传统的插件系统，卸载一个插件往往需要重启整个宿主进程。VSCode 的扩展宿主便是典型案例：排名前 100 的扩展中，87 个包含可执行代码，一旦激活就无法在运行时单独卸载。Cordis 的解法是“可逆效应”（revertible effects）——每个对上下文的修改都必须配一个显式的逆函数，运行时将这些逆函数按顺序叠加成一条“撤销链”，卸载时反向执行。开发者只需为每个原子操作提供逆函数，复合操作的逆函数由系统自动推导。</p>
+<p><strong>空间可组合性</strong>：组件依赖谁？依赖变化后，谁先启动、谁先退出？</p>
+<p>传统插件系统中，组件之间的依赖关系大多是静态的，在编译或初始化阶段就已固定。而 Agent 运行时，组件可能随时出现、消失或更换身份。Cordis 通过“反应式余效应”（reactive coeffects）解决：组件声明自己需要哪些依赖，系统在依赖满足时自动激活，依赖缺失时自动停用。</p>
+<p>论文还证明了四个关键性质：<strong>保持性</strong>（系统状态始终合法）、<strong>全局时空可组合性</strong>（单个组件的可组合性可推广到整个系统）、<strong>进展性</strong>（系统不会死锁）、<strong>合流性</strong>（无论调度顺序如何，系统最终收敛到同一个状态——等同于从零开始按依赖顺序一次性加载所有组件所达到的状态）。</p>
+<p>这不是实验室里的玩具。Cordis 已经在 Koishi 聊天机器人框架上跑了四年，支撑了超过 4000 个社区插件。</p>
+<h3 id="二、底盘思维：为什么说它“超前”">二、底盘思维：为什么说它“超前”</h3>
+<p>理解了 Cordis 的设计哲学，就能理解 DSH 真正的价值所在。</p>
+<p>多数人把 DSH 当作“DeepSeek 版 Claude Code”来比较——比界面、比响应速度、比 Token 消耗。但如果用产品的标准去衡量一个开发者预览版的“底盘”，自然会得出“半成品”的结论。</p>
+<p>DSH 的定位是 <strong>Agent Runtime 的基础设施</strong>——它不是要取代 Claude Code，而是要为下一代 Agent 提供可编程、可观测、可自进化的运行时。</p>
+<p>有几个设计细节值得关注：</p>
+<p><strong>159 个插件</strong>：一个默认部署的 DSH 包含 159 个插件，LLM、Session、热模块重载全部以插件形式存在，均可独立开关。这意味着你可以像搭乐高一样组合 Agent——不需要改一行源码。</p>
+<p><strong>仅追加事件日志</strong>：模型看到的一切都写入仅追加的会话日志，历史消息是从日志中“投影”出来的。这意味着你可以回溯、分叉、重放任意一次运行——这是调试和自进化的基础。</p>
+<p><strong>能力 Seam</strong>：每个可替换能力 = 接口 + 实现 + 消费者。换一个 Provider 就能整体换掉产品的一块能力——例如把文件系统从本地换成远程沙箱，Bash、PTY、LSP 全部跟着迁移，无需逐个修改。</p>
+<p>这些设计的共同指向是：<strong>让 Agent 运行时本身可以被程序化地修改和优化</strong>。这正是“自进化 Agent”的前提——如果连 Harness 本身都是不可拆卸的黑盒，Agent 又如何能自我改进？</p>
+<h3 id="三、社区的两极：方向与完成度">三、社区的两极：方向与完成度</h3>
+<p>DSH 发布后的社区反应，恰好印证了“底盘”与“产品”的错位。</p>
+<p><strong>正面评价集中在架构层面</strong>。开发者普遍认可“一切皆插件”的理念，认为它提供了极高的扩展性和可组合性。社区在发布后迅速涌现出插件集合、桌面封装和学习教程。有人从 RSI（Recursive Self-Improvement）角度评价：Cordis 让组件热插拔与状态无伤撤销成为可能，这为大规模结构实验打开了空间。</p>
+<p><strong>负面评价集中在体验层面</strong>。门槛高（需要 Node.js/npx 环境）、Bug 多、UI 粗糙、Token 消耗偏高。有用户反映“改配置多次崩溃”“工具调用参数传错”。官方也明确声明这是开发者预览版，会有破坏性变更。</p>
+<p>最中肯的概括来自社区的一条评论：“普遍认可它的方向，但远没有认可它现在的完成度”。</p>
+<p>这场争论的本质是：<strong>用产品的预期去衡量一个尚在早期的底层架构，必然产生落差</strong>。DSH 在发布时的定位就是“底盘”，而非“整车”。</p>
+<h3 id="四、未来：当-Harness-学会自我修改">四、未来：当 Harness 学会自我修改</h3>
+<p>DSH 的真正想象力不在于今天它能做什么，而在于它为明天准备了什么。</p>
+<p>当 Agent 能够自己生成工具、自己装进运行时、发现问题后自己替换掉自己——每一次这样的自我修改都是一次动态组合。如果没有时间可组合性，每次修改都要重启整个进程，积累的上下文和缓存全部丢失；如果没有空间可组合性，每个模块都要自己检测和适应依赖的变化，稍有不慎就会引入循环依赖。</p>
+<p>Cordis 提供的正是这样一种能力：让 Harness 的每一层都可以被程序化地拆卸和重组，让 Agent 的自我改进成为可能。</p>
+<p>从这个角度看，DSH 的“不完美”恰恰是其设计哲学的必然结果——一个真正开放的底盘，注定比一个锁死的产品需要更多时间打磨。给它一些时间。</p>
+<p>毕竟，罗马不是一天建成的，但乐高底板可以。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/tags/">标签</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E7%90%86%E8%AE%BA%E7%85%A7%E8%BF%9B%E7%8E%B0%E5%AE%9E%EF%BC%9ADeepSeek-Harness-%E4%B8%8E%E4%B8%80%E5%9C%BA%E5%85%B3%E4%BA%8E%E2%80%9C%E5%BA%95%E7%9B%98%E2%80%9D%E7%9A%84%E4%BA%89%E8%AE%BA"><span class="toc-number">1.</span> <span class="toc-text">当理论照进现实：DeepSeek Harness 与一场关于“底盘”的争论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81Cordis%EF%BC%9A%E4%B9%90%E9%AB%98%E5%BA%95%E6%9D%BF%E4%B8%8A%E7%9A%84%E6%95%B0%E5%AD%A6"><span class="toc-number">1.1.</span> <span class="toc-text">一、Cordis：乐高底板上的数学</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%BA%95%E7%9B%98%E6%80%9D%E7%BB%B4%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%B4%E5%AE%83%E2%80%9C%E8%B6%85%E5%89%8D%E2%80%9D"><span class="toc-number">1.2.</span> <span class="toc-text">二、底盘思维：为什么说它“超前”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%A4%BE%E5%8C%BA%E7%9A%84%E4%B8%A4%E6%9E%81%EF%BC%9A%E6%96%B9%E5%90%91%E4%B8%8E%E5%AE%8C%E6%88%90%E5%BA%A6"><span class="toc-number">1.3.</span> <span class="toc-text">三、社区的两极：方向与完成度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%9C%AA%E6%9D%A5%EF%BC%9A%E5%BD%93-Harness-%E5%AD%A6%E4%BC%9A%E8%87%AA%E6%88%91%E4%BF%AE%E6%94%B9"><span class="toc-number">1.4.</span> <span class="toc-text">四、未来：当 Harness 学会自我修改</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://val213.github.io/2026/08/15/DSH&amp;cordis/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&text="><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&is_video=false&description="><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=&body=Check out this article: https://val213.github.io/2026/08/15/DSH&amp;cordis/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&title="><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://val213.github.io/2026/08/15/DSH&amp;cordis/&name=&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://val213.github.io/2026/08/15/DSH&amp;cordis/&t="><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2026
+    Val
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/tags/">标签</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
