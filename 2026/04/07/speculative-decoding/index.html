@@ -174,20 +174,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <h2 id="概述">概述</h2>
 <p>Speculative Decoding 是解决自回归解码串行瓶颈的核心技术。自回归解码每次只生成一个 token，大模型的每步推理都需要完整的前向传播，导致推理速度慢、延迟高。</p>
@@ -238,18 +224,6 @@
 <p><em>本文是 <a target="_blank" rel="noopener" href="https://github.com/GeeeekExplorer/nano-vllm">nano-vllm</a> 源码学习的延伸思考。</em></p>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 

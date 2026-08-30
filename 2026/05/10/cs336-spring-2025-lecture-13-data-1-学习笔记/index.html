@@ -174,20 +174,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>今天这节课要讲的是数据。在之前的所有课程中，我们讨论的都是在给定数据的情况下如何训练模型，讲了优化器、分词、缩放定律、并行计算等等。但是这些全都是基于一个固定的数据集展开的。那现在我们要讨论的是，我们到底应该用什么样的数据来训练模型。<strong>Percy 认为数据是做好语言模型最重要的因素。</strong></p>
 <p>首先是看一下各大公司在他们的论文里实际披露了什么信息。像Llama3甚至DeepSeek，他们都完整公开了自己的架构，论文里也花了大篇幅讲训练的过程跟原理，但基本上他们都从来不谈论数据。即便是以详尽著称的 Llama 3 论文，关于数据集也只有一句轻描淡写的描述：&quot;我们从多种数据源构建了数据集，包含截至 2023 年底的知识。&quot;这种保密背后大抵有两个考量：一是激烈的商业竞争，二是日益严峻的版权诉讼风险。</p>
@@ -282,18 +268,6 @@
 <p>最后，如果你觉得整个领域一团糟，你是对的。整个数据处理领域目前还非常依赖启发式方法，缺乏坚实的理论基础。这既是挑战，也是机遇。</p>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 

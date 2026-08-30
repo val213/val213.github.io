@@ -187,20 +187,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <blockquote>
 <p>本文首发于<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/2020160372183709608">知乎</a>，现迁移至个人博客。</p>
@@ -404,18 +390,6 @@ QK norm 最初是视觉和多模态模型领域的创新，在Q/K计算内积前
 ![](/images/cs336-spring-2025-lecture-3-你不想了解的架构和训练细节-学习笔记/fig22.jpg)</p>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 

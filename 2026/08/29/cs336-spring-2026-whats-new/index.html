@@ -175,20 +175,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>去年我们把 CS336 Spring 2025 从头跟了一遍，写了十几篇笔记。今年 Spring 2026 的课也更新完了，<strong>相比于 2025，今年的 CS336 有什么新东西？</strong></p>
 <hr>
@@ -362,18 +348,6 @@
 <p>把 L5-L8 那些散的硬件/系统知识收拢成一个统一视角：推理时代的瓶颈不在模型而在系统，于是网络拓扑、量化格式、甚至芯片收购都开始反过来决定模型设计。这个谱半径视角——把&quot;循环 transformer 训练十次九爆&quot;这个经验现象，归约成&quot;A 矩阵谱半径 &gt; 1&quot;一句数学判断，再给出负对角矩阵的解法。是&quot;系统—算法协同设计&quot;在课程里一个很漂亮的落地。</p>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 

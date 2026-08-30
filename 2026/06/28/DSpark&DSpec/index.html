@@ -183,20 +183,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>如果你关注大模型系统工程（LLM Sys），你一定知道<strong>投机解码（Speculative Decoding）</strong>。为了打破大模型自回归（Decode）阶段受限于显存带宽（Memory-Bound）的物理枷锁，让轻量的小模型（Draft）先“猜”、大模型（Target）再并行“验”，已经成了行业共识。</p>
 <p>但在实际落地的万卡生产环境里，投机解码长期面临着两个尴尬的硬伤：</p>
@@ -256,18 +242,6 @@ DFlash 一口气同时预测未来多个位置。因为第 2 个位置在预测�
 <p>这正是当前大模型推理系统（LLM Inference Optimization）最前沿、最硬核的演进方向。有了这套开源全栈方案，整个开源社区距离“天下武功，唯快不破”的终极推理体验，又向前跨出了一大步。</p>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 

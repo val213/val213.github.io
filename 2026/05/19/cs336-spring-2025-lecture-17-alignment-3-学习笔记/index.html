@@ -173,20 +173,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>这节课是上一节基于可验证奖励的强化学习的延续，没有引入太多全新的概念，而是沉下心来把策略梯度的底层机制讲透，结合完整的可运行代码和数学推导，拆解GRPO这个现在工业界广泛使用的算法到底是怎么工作的。这也是最后一节正课，后面两节课邀请了当时还在阿里通义千问的Junyang Lin（林俊旸）和Llama团队的Mike Lewis，来分享他们在工业界做大模型对齐的一手经验。</p>
 <p>强化学习之所以让人兴奋，核心在于它是让模型真正超越人类能力的关键。监督学习的天花板永远是标注数据的质量，你最多只能让模型模仿人类的行为；但只要你能定义一个可测量、可验证的奖励函数，模型就可以通过不断的试错和优化，在这个任务上迭代到远超人类的水平。当然这也带来了两个巨大的挑战：一个是强化学习本身的优化过程非常不稳定，另一个是如何设计出不会被模型钻空子、又能泛化到通用场景的奖励函数，这两个问题至今都是领域内的研究热点。</p>
@@ -286,18 +272,6 @@
 <p>当然，强化学习还有很多未解的问题，从优化的稳定性到奖励函数的设计，再到大规模系统的构建，都还有大量的工作要做。但它的潜力是巨大的，只要我们能解决这些问题，就能让模型在越来越多的任务上超越人类的水平。</p>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 

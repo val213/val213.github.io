@@ -175,20 +175,6 @@
   </header>
   
 
-  <style>
-    .code-wrap-toggle{margin:.4rem 0 1.2rem;font-size:.85rem;color:#9a9a9a;}
-    .code-wrap-toggle label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:.35rem;}
-    body.code-wrap .highlight pre,
-    body.code-wrap .highlight .code,
-    body.code-wrap .article-entry pre{
-      white-space:pre-wrap !important;
-      word-break:break-word !important;
-      overflow-wrap:break-word !important;
-    }
-  </style>
-  <div class="code-wrap-toggle">
-    <label><input type="checkbox" id="codeWrapToggle"> 代码块自动换行（长行折行，便于手机阅读）</label>
-  </div>
   <div class="content e-content" itemprop="articleBody">
     <p>上节课讲到 RLHF 的两大致命问题——<strong>过度优化</strong>和<strong>校准性丧失</strong>——这些问题让人类反馈的路越走越窄。人类偏好太嘈杂、太容易被 hack，很难支撑真正的规模化强化学习。</p>
 <p>于是自然的思路是：既然 RL 在奖励明确、可自动验证的领域（如 AlphaGo、AlphaFold）已经大获成功，那能不能把同样的思想用到语言模型后训练上？把&quot;人类喜不喜欢&quot;换成&quot;答案对不对&quot;？这就是本节课的主题——<strong>基于可验证奖励的强化学习（RLVR, Reinforcement Learning from Verifiable Rewards）</strong>，也就是驱动 o1、DeepSeek R1 这些推理模型爆发的核心技术。</p>
@@ -265,18 +251,6 @@
 </ol>
 
   </div>
-  <script>
-    (function(){
-      var t=document.getElementById('codeWrapToggle');
-      if(!t)return;
-      var k='code-wrap';
-      try{ if(localStorage.getItem(k)==='1'){document.body.classList.add('code-wrap');t.checked=true;} }catch(e){}
-      t.addEventListener('change',function(){
-        document.body.classList.toggle('code-wrap',t.checked);
-        try{ localStorage.setItem(k,t.checked?'1':'0'); }catch(e){}
-      });
-    })();
-  </script>
 </article>
 
 
